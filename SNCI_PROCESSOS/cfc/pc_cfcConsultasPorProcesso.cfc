@@ -241,7 +241,7 @@
 																				<i id="btFinalizaBloqueado" onclick="javascript:finalizaBloqueado(<cfoutput>'#rsProcCard.pc_processo_id#'</cfoutput>)" class="fas fa-shield-alt grow-icon" style="color: #fff; cursor:pointer;" title="Finalizar Processo mantendo o Bloqueio" data-toggle="popover" data-trigger="hover" data-placement="bottom" data-content="Finalizar c/ Bloqueio o Processo Nº <cfoutput>#pc_processo_id#</cfoutput>."></i>
 																			</div>
 																		<cfelse>
-																			<cfif pc_num_status eq 4 AND pc_modalidade eq "E" AND rsProcComOrientações.recordcount neq 0 AND rsProcComPosicOrgAvaliado.recordcount eq 0 AND rsProcComPropMelhoriaAvaliada.recordcount eq 0 and #application.rsUsuarioParametros.pc_org_controle_interno# eq 'S' and #application.rsUsuarioParametros.pc_usu_perfil# neq 13>
+																			<cfif pc_num_status eq 4 AND pc_modalidade eq "E" AND rsProcComPosicOrgAvaliado.recordcount eq 0 AND rsProcComPropMelhoriaAvaliada.recordcount eq 0 and #application.rsUsuarioParametros.pc_org_controle_interno# eq 'S' and #application.rsUsuarioParametros.pc_usu_perfil# neq 13>
 																				<div style="display: flex; justify-content: space-between; align-items: center; width: 100%;padding-left:5px;padding-right:5px;">
 																					<i id="btBloquear" onclick="<cfoutput>javascript:bloquearProcesso('#pc_processo_id#','#siglaOrgAvaliado#');</cfoutput>" class="fas fa-lock grow-icon" style="color: #cd0316; cursor:pointer;" title="Bloquear Processo" data-toggle="popover" data-trigger="hover" data-placement="bottom" data-content="Bloquear o Processo Nº <cfoutput>#pc_processo_id#</cfoutput>."></i>
 																				</div>
@@ -556,9 +556,8 @@
 
 										if(valor == 'true'){
 											Swal.fire({
-												html: logoSNCIsweetalert2('<strong>Operação não permitida!</strong><br><div style="background-color:#dc3545;color:#fff;text-align:justify;border-radius:0.8rem;padding:15px;">Este processo possue Orientações bloqueadas. Para finalizar este  Processo, todas as Orientações bloqueadas devem ser analisadas e baixadas na tela de "Acompanhamento" pelo Órgão de Origem. Após a última Orientação ser baixada, este processo receberá, automaticamente, o status "Finalizado c/ Bloqueio" e as suas Propostas de Melhoria, caso existam, receberão o status "NÃO INFORMADO".</div>'),
-												});
-											$('#modalOverlay').delay(1000).hide(0, function() {
+												html: logoSNCIsweetalert2('<strong>Operação não permitida!</strong><br><div style="background-color:#dc3545;color:#fff;text-align:justify;border-radius:0.8rem;padding:15px;">Este processo possui orientações bloqueadas. Para finalizá-lo, todas as orientações bloqueadas devem ser analisadas e baixadas na tela de "Acompanhamento" pelo Órgão de Origem. Após a última orientação ser baixada, este processo receberá automaticamente o status "Finalizado c/ Bloqueio" e suas Propostas de Melhoria, caso existam, receberão o status "NÃO INFORMADO".</div>'),});
+												$('#modalOverlay').delay(1000).hide(0, function() {
 												$('#modalOverlay').modal('hide');
 											});
 										} else {
@@ -2564,25 +2563,27 @@
 
 			<!--COLOCA AS ORIENTAÇÕES COM STATUS 14 - BLOQUEADA-->
 			<!-- LOOP EM CADA ORIENTAÇÃO DO PROCESSO-->
-			<cfloop query="rsOrientacoes">
-				<cfquery datasource="#application.dsn_processos#" >
-					UPDATE	pc_avaliacao_orientacoes 
-					SET 	pc_aval_orientacao_status = 14,
-							pc_aval_orientacao_dataPrevistaResp = '',
-							pc_aval_orientacao_status_datahora =  <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
-							pc_aval_orientacao_atualiz_login = '#application.rsUsuarioParametros.pc_usu_login#'
-					WHERE 	pc_aval_orientacao_id = #pc_aval_orientacao_id#
-				</cfquery>
-				<!--fim COLOCA AS ORIENTAÇÕES COM STATUS 14 - BLOQUEADA-->
+			<cfif rsOrientacoes.recordcount neq 0>
+				<cfloop query="rsOrientacoes">
+					<cfquery datasource="#application.dsn_processos#" >
+						UPDATE	pc_avaliacao_orientacoes 
+						SET 	pc_aval_orientacao_status = 14,
+								pc_aval_orientacao_dataPrevistaResp = '',
+								pc_aval_orientacao_status_datahora =  <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
+								pc_aval_orientacao_atualiz_login = '#application.rsUsuarioParametros.pc_usu_login#'
+						WHERE 	pc_aval_orientacao_id = #pc_aval_orientacao_id#
+					</cfquery>
+					<!--fim COLOCA AS ORIENTAÇÕES COM STATUS 14 - BLOQUEADA-->
 
-				<!--Texto padrão manifestação-->
-				<cfset posicaoInicial = "Processo BLOQUEADO.<br>Este relatório aguarda a finalização de análises complementares do controle interno e/ou outros órgãos da empresa para liberação ao ÓRGÃO AVALIADO. Favor aguardar.">
-				<!--Insere a manifestação inicial do controle interno para a orientação bloqueada-->
-				<cfquery datasource="#application.dsn_processos#">
-					INSERT pc_avaliacao_posicionamentos(pc_aval_posic_num_orientacao, pc_aval_posic_texto, pc_aval_posic_datahora, pc_aval_posic_matricula, pc_aval_posic_num_orgao, pc_aval_posic_num_orgaoResp, pc_aval_posic_dataPrevistaResp, pc_aval_posic_status,  pc_aval_posic_enviado)
-					VALUES ('#pc_aval_orientacao_id#', '#posicaoInicial#',<cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,'#application.rsUsuarioParametros.pc_usu_matricula#','#application.rsUsuarioParametros.pc_usu_lotacao#', null,'',14, 1)
-				</cfquery>
-			</cfloop>
+					<!--Texto padrão manifestação-->
+					<cfset posicaoInicial = "Processo BLOQUEADO.<br>Este relatório aguarda a finalização de análises complementares do controle interno e/ou outros órgãos da empresa para liberação ao ÓRGÃO AVALIADO. Favor aguardar.">
+					<!--Insere a manifestação inicial do controle interno para a orientação bloqueada-->
+					<cfquery datasource="#application.dsn_processos#">
+						INSERT pc_avaliacao_posicionamentos(pc_aval_posic_num_orientacao, pc_aval_posic_texto, pc_aval_posic_datahora, pc_aval_posic_matricula, pc_aval_posic_num_orgao, pc_aval_posic_num_orgaoResp, pc_aval_posic_dataPrevistaResp, pc_aval_posic_status,  pc_aval_posic_enviado)
+						VALUES ('#pc_aval_orientacao_id#', '#posicaoInicial#',<cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,'#application.rsUsuarioParametros.pc_usu_matricula#','#application.rsUsuarioParametros.pc_usu_lotacao#', null,'',14, 1)
+					</cfquery>
+				</cfloop>
+			</cfif>
 			<!--fim LOOP EM CADA ORIENTAÇÃO DO PROCESSO-->
 
 

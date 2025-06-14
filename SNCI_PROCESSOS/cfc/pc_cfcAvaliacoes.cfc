@@ -5144,6 +5144,12 @@
 												<cfelse>
 													<button id="btEnviarParaAcompanhamento"  class="btn btn-block statusOrientacoes efeito-grow" style="background-color:green;color:#fff;"  >Este é o último item para validação e não existem medidas/orientações para regularização para acompanhamento em nenhum item deste processo.<br> Clique aqui para Finalizar Processo.</button>
 												</cfif>
+											<cfelse>
+												<cfif rsModalidadeProcesso.pc_iniciarBloqueado eq 'S'><!--Se o processo estiver bloqueado-->
+													<button id="btEnviarParaAcompanhamento"  class="btn btn-block statusOrientacoes efeito-grow" style="background-color:green;color:#fff;"  >Este é o último item para validação, porém, o processo foi <span style="color: #fff;background-color: red; padding: 2px;">BLOQUEADO</span>.<br>Clique aqui para manter o bloqueio e concluir o cadastro dos itens.</button>
+												<cfelse>
+													<button id="btEnviarParaAcompanhamento"  class="btn btn-block statusOrientacoes efeito-grow" style="background-color:green;color:#fff;"  >Este é o último item para validação e não existem medidas/orientações para regularização ou Propostas de Melhoria para acompanhamento neste processo.<br>Clique aqui para Finalizar Processo.</button>
+												</cfif>
 											</cfif>
 										</cfif>
 									<cfelse>
@@ -5295,7 +5301,7 @@
 				</cfoutput>
 
 				var mensagemConfirmacao = "Deseja validar e finalizar o cadastro deste item?"
-				if(ultimoItemValidado==1){
+				if(ultimoItemValidado==1  && quantOrientacoes>0){
 					if(processoBloqueado=='S'){
 						mensagemConfirmacao = '<p>Deseja validar e finalizar o cadastro deste item?</p><p>Este é o último item a ser validado, porém, o processo foi <span style="color: #fff;background-color: red; padding: 2px;">BLOQUEADO</span>.\nAs medidas/orientações para regularização e/ou Propostas de Melhoria não serão encaminhadas para os órgãos reponsáveis e só serão visíveis pelos órgãos do controle interno em Consultas.</p><p>Só clique em "Sim!" se todos os itens deste processo estiverem cadastrados.</p>'
 					}else{
@@ -5304,9 +5310,23 @@
 				}
 				if(ultimoItemValidado==1 && quantOrientacoes==0){
 					if(quantMelhorias==0){
-						mensagemConfirmacao = '<p>Deseja validar e finalizar o cadastro deste item?</p><p>Este é o último item a ser validado e seu processo não possue medidas/orientações para regularização ou Propostas de Melhoria.\nEste processo será FINALIZADO.</p><p>Só clique em "Sim!" se todos os itens deste processo estiverem cadastrados.<p>'
+						if(processoBloqueado=='S'){
+							mensagemConfirmacao = '<p>Deseja validar e finalizar o cadastro deste item?</p><p>Este é o último item a ser validado, porém, o processo foi <span style="color: #fff;background-color: red; padding: 2px;">BLOQUEADO</span>.\nAs Propostas de Melhoria não serão encaminhadas para os órgãos reponsáveis e só serão visíveis pelos órgãos do controle interno em Consultas.</p><p>Só clique em "Sim!" se todos os itens deste processo estiverem cadastrados.</p>'
+						}else{
+							//se o processo não tiver orientações e nem melhorias
+							//e for o último item a ser validado
+							//e o processo não estiver bloqueado
+							mensagemConfirmacao = '<p>Deseja validar e finalizar o cadastro deste item?</p><p>Este é o último item a ser validado e seu processo não possue medidas/orientações para regularização ou Propostas de Melhoria.\nEste processo será FINALIZADO.</p><p>Só clique em "Sim!" se todos os itens deste processo estiverem cadastrados.<p>'
+						}
 					}else{
-                        mensagemConfirmacao = '<p>Deseja validar e finalizar o cadastro deste item?</p><p>Este é o último item a ser validado e seu processo não possue medidas/orientações para regularização.\nEste processo será FINALIZADO.</p><p>Só clique em "Sim!" se todos os itens deste processo estiverem cadastrados e todas as propostas de melhoria tiverem sido cadastradas.<p>'
+							//se o processo não tiver orientações
+							//e tiver melhorias
+							//e for o último item a ser validado
+						if(processoBloqueado=='S'){	
+							mensagemConfirmacao = '<p>Deseja validar e finalizar o cadastro deste item?</p><p>Este é o último item a ser validado, porém, o processo foi <span style="color: #fff;background-color: red; padding: 2px;">BLOQUEADO</span>.\nAs Propostas de Melhoria não serão encaminhadas para os órgãos reponsáveis e só serão visíveis pelos órgãos do controle interno em Consultas.</p><p>Só clique em "Sim!" se todos os itens deste processo estiverem cadastrados.</p>'
+						}else{
+                        	mensagemConfirmacao = '<p>Deseja validar e finalizar o cadastro deste item?</p><p>Este é o último item a ser validado e seu processo não possue medidas/orientações para regularização.\nEste processo será FINALIZADO.</p><p>Só clique em "Sim!" se todos os itens deste processo estiverem cadastrados e todas as propostas de melhoria tiverem sido cadastradas.<p>'
+						}
 					}
 				}
 				
