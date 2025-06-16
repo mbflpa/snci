@@ -58,7 +58,7 @@
 
 <!--- <cfinclude template="cabecalho.cfm"> --->
 
-
+<cfset dtpart = year(now()) & '-01-01'>
 <!--- area de conteudo   --->
 <table width="50%" align="left">
   <tr>
@@ -87,12 +87,12 @@
           <tr>
             <th scope="row">Início</th>
             <td  colspan="1">
-              <input class="form-control" id="dtinic" name="dtinic" type="date" placeholder="DD/MM/AAAA">
+              <input class="form-control" id="dtinic" name="dtinic" type="date" placeholder="DD/MM/AAAA" value="<cfoutput>#dtpart#</cfoutput>">
             </td>
           </tr>
           <tr>
             <th scope="row">Final</th>
-            <td colspan="1"><input class="form-control" id="dtfinal" name="dtfinal" type="date" placeholder="DD/MM/AAAA"></td>
+            <td colspan="1"><input class="form-control" id="dtfinal" name="dtfinal" type="date" placeholder="DD/MM/AAAA" value="<cfoutput>#dateformat(now(),"yyyy-mm-dd")#</cfoutput>"></td>
 
           </tr>
           <tr>

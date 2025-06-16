@@ -49,6 +49,21 @@
   th {
     font-size: 12px;
   }
+h5 {
+	font-weight: bold;
+	font-size: 90%;
+  }
+.btnimprimir{
+	margin-top: 0.3em;
+	padding: 0.2em;
+	color: #180606;
+	display: inline-block;
+	width:85px;
+	height:15px;
+	background-color:#10df0cf0;
+	border-radius: 10px 20px;
+	cursor: pointer;
+	}	
 </style>
 </head>
 <br>
@@ -56,7 +71,7 @@
 
 <!--- <cfinclude template="cabecalho.cfm"> --->
 
-
+<cfset dtpart = year(now()) & '-01-01'>
 <!--- area de conteudo   --->
 <table width="50%" align="left">
   <tr>
@@ -85,12 +100,12 @@
           <tr>
             <th scope="row">Início</th>
             <td  colspan="1">
-              <input class="form-control" id="dtinic" name="dtinic" type="date" placeholder="DD/MM/AAAA">
+              <input class="form-control" id="dtinic" name="dtinic" type="date" placeholder="DD/MM/AAAA" value="<cfoutput>#dtpart#</cfoutput>">
             </td>
           </tr>
           <tr>
             <th scope="row">Final</th>
-            <td colspan="1"><input class="form-control" id="dtfinal" name="dtfinal" type="date" placeholder="DD/MM/AAAA"></td>
+            <td colspan="1"><input class="form-control" id="dtfinal" name="dtfinal" type="date" placeholder="DD/MM/AAAA" value="<cfoutput>#dateformat(now(),"yyyy-mm-dd")#</cfoutput>"></td>
           </tr>
           <tr>
             <th scope="row">Superintendência</th>
@@ -277,7 +292,8 @@
                 let url = 'href=Revisor_analise_relat.cfm?ninsp='+ret[0]+'&matrevisor='+matrevisor
                 //alert(url)
                 tab += '<tr>'
-                  tab += '<td class="alert alert-primary"><a class="alert-link" '+url+' target="_blank">'+ret[0]+'</a></td>'
+                 // tab += '<td class="alert alert-primary"><a class="alert-link" '+url+' target="_blank">'+ret[0]+'</a></td>'
+                  tab += '<td class="alert alert-primary"><a class="alert-link" '+url+' target="_blank"><div class="btnimprimir" align="center" title="Imprimir esta"><h5>'+ret[0]+'</h5></div></a></td>'
                   tab += '<td>'+ret[1]+'</td>'
                   tab += '<td>'+ret[2]+'</td>'
                   tab += '<td>'+ret[3]+'</td>'
