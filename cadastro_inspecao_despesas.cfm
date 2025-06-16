@@ -41,8 +41,7 @@
 			<cfquery datasource="#dsn_inspecao#">
 				UPDATE Inspecao 
 					SET 
-					INP_ValorPrevisto          = #inpvalorprevisto#
-					, INP_AdiNoturno           = #inpadinoturno#
+					  INP_AdiNoturno           = #inpadinoturno#
 					, INP_Deslocamento         = #inpdeslocamento#
 					, INP_Diarias              = #inpdiarias#
 					, INP_PassagemArea         = #inppassagemarea#
@@ -74,6 +73,7 @@
 	, INP_DtEncerramento
 	, INP_Coordenador
 	, INP_ValorPrevisto
+	, INP_NaoAplicarValorPrevisto
 	, INP_AdiNoturno
 	, INP_Deslocamento
 	, INP_Diarias
@@ -533,6 +533,8 @@ label {
 					<form id="form1" action="cadastro_inspecao_despesas.cfm" method="post" name="form1">
 						<input type="hidden" id="acao" name="acao" value="">
 						<input type="hidden" id="inspecao" name="inspecao" value="#url.numInspecao#">
+						<input type="hidden" id="naoaplvlrprev" name="naoaplvlrprev" value="#rsResult.INP_NaoAplicarValorPrevisto#">
+						
 						
 						<table width="40%" align="left" class="table table-bordered table-hover">
 							<tr>
@@ -655,6 +657,15 @@ label {
 <script>
 	$(function(e){
 		fazersoma()
+		let naoaplvlrprev = $('#naoaplvlrprev').val()
+		if(naoaplvlrprev == 1) 
+		{
+			$("#cbvlrprev").prop("checked", true)
+		//	$('#cbvlrprev').attr('title','ativo')
+			$("#inpvalorprevisto").val('0,00')
+			$("#cbvlrprev").attr('disabled', true);
+			$("#inpvalorprevisto").prop('readonly', true)
+		}
 	})
 
 	function numericos() {
@@ -775,22 +786,24 @@ label {
 	// Inicial   Salvar 
 	//***************************************************
 	$('.btnsalvar').click(function(){
+		/*
 		if (($('#inpvalorprevisto').val() =='' || $('#inpvalorprevisto').val() == '0,00') && $("#cbvlrprev").prop("checked") == false)
 			{
 				alert('Gestor(a), informar o valor previsto')
 				$('#inpvalorprevisto').focus()
 				return false
 		}	
+		*/
 		if (($('#totrealizado').val() =='' || $('#totrealizado').val() == '0,00') && $("#cbrecursos").prop("checked") == false)
 			{
-				alert('Gestor(a), informar os recursos alocados')
+				alert('Gestor(a), informar os recursos alocados ou \n\nselecione Não se Aplica (Recursos alocados)')
 				$('#inpadinoturno').focus()
 				return false
 		}
 		
 		if($('#inpadinoturno').val() == '0,00' || $('#inpdeslocamento').val() == '0,00' || $('#inpdiarias').val() == '0,00' || $('#inppassagemarea').val() == '0,00' || $('#inpreembveicproprio').val() == '0,00' || $('#inprepousoremunerado').val() == '0,00' || $('#inpressarcirempregado').val() == '0,00' || $('#inpoutros').val() == '0,00')
 		{
-			if(confirm("Gestor(a), há recurso(s) alocado(s) com valore(s) igual '0,00'. \n\nConfirma continuar?")){		
+			if(confirm("Gestor(a), há recurso(s) alocado(s) com valore(s) igual '0,00'. \n\nConfirma continuar assim?")){		
 				//return true
 			}
 			else{
@@ -806,9 +819,8 @@ label {
 			$('#acao').val('')
 			return false
 		}			
-		
 	})
-
+/*
 	$('#cbvlrprev').click(function(){  
 		let title = $(this).attr('title')
 		$('#inpvalorprevisto').val('0,00')
@@ -820,7 +832,7 @@ label {
 			$("#inpvalorprevisto").prop('readonly', false)
 		}
 	})	
-
+*/
 	$('#cbrecursos').click(function(){  
 		let title = $(this).attr('title')
 		$('#inpadinoturno').val('0,00')

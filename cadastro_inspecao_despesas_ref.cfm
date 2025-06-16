@@ -168,7 +168,7 @@
         if($(this).val() != ''){   
             let ano = $('#frmano').val() 
             let dtinic = $('#dtinic').val() 
-            dtinic += ' 23:59:59.000'
+            dtinic += ' 00:00:00.000'
             let dtfinal = $('#dtfinal').val()
             dtfinal += ' 23:59:59.999'
             let frmse = $(this).val()
@@ -203,7 +203,7 @@
         if($(this).val() != ''){   
             let ano = $('#frmano').val(); 
             let dtinic = $('#dtinic').val() 
-            dtinic += ' 23:59:59.000'
+            dtinic += ' 00:00:00.000'
             let dtfinal = $('#dtfinal').val()
             dtfinal += ' 23:59:59.999'
             let frmse = $('#frmse').val(); 

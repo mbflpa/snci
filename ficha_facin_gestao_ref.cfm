@@ -161,7 +161,7 @@
       $('#frmse').change(function(e){ 
         let prots = '<option value="" selected>---</option>';
         let dtinic = $('#dtinic').val() 
-        dtinic += ' 23:59:59.000'
+        dtinic += ' 00:00:00.000'
         let dtfinal = $('#dtfinal').val()
         dtfinal += ' 23:59:59.000'
         if(dtinic == '' || dtfinal == ''){
@@ -200,7 +200,7 @@
         prots += '<option value="t">Todas</option>'
         if($(this).val() != ''){    
             let dtinic = $('#dtinic').val() 
-            dtinic += ' 23:59:59.000'
+            dtinic += ' 00:00:00.000'
             let dtfinal = $('#dtfinal').val()
             dtfinal += ' 23:59:59.999'
             let ano = $('#frmano').val(); 
@@ -236,7 +236,7 @@
         if($(this).val() != ''){   
             let ano = $('#frmano').val(); 
             let dtinic = $('#dtinic').val() 
-            dtinic += ' 23:59:59.000'
+            dtinic += ' 00:00:00.000'
             let dtfinal = $('#dtfinal').val()
             dtfinal += ' 23:59:59.999'
             let frmse = $('#frmse').val(); 

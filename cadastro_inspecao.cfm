@@ -126,9 +126,9 @@
 	<cfparam name="URL.dataPrevista" default="#form.dataPrevista#">
 	<cfparam name="URL.resp" default="#form.responsavel#">
 	<cfparam name="URL.inpvalorprevisto" default="#form.inpvalorprevisto#">
+	<cfparam name="URL.inpnaoaplicarvalorprevisto" default="#form.cbvlrprev#">
 	
     <cfset nInsp ='#left(trim("#form.selUnidades#"),2)#0001' & Year(Now())>
-	
 
 	<cfquery datasource="#dsn_inspecao#" name="rsNumProximaInspecao">
 		SELECT MAX(cast(RIGHT(LEFT(ltrim(rtrim(NIP_NumInspecao)),6),4) as integer)) +1 as numInspecao FROM
@@ -159,7 +159,10 @@
 				WHERE TUI_Modalidade ='#selModalidades#' and TUI_Ano=year(#dataPrevista#) and 
 				TUI_TipoUnid='#rsUnidadeSelecionadaItens.Und_TipoUnidade#' and TUI_Ativo=1
 	        </cfquery>
-
+			<cfset naoaplvlrprev = 'FALSE'>
+			<cfif inpnaoaplicarvalorprevisto eq 'on'>
+				<cfset naoaplvlrprev = 'TRUE'>
+			</cfif>
 			<cfif rsItens.recordcount neq 0> 
 							<cfquery datasource="#dsn_inspecao#">
 								INSERT INTO Numera_Inspecao
@@ -170,9 +173,9 @@
 
 							<cfquery datasource="#dsn_inspecao#">
 								INSERT INTO Inspecao
-								(INP_Unidade,INP_NumInspecao,INP_HrsPreInspecao,INP_DtInicDeslocamento,INP_DtFimDeslocamento,INP_HrsDeslocamento,INP_DtInicInspecao,INP_DtFimInspecao,INP_HrsInspecao,INP_Situacao,INP_DtEncerramento,INP_Coordenador,INP_Responsavel,INP_DtUltAtu,INP_UserName,INP_Motivo,INP_Modalidade,INP_ValorPrevisto)
+								(INP_Unidade,INP_NumInspecao,INP_HrsPreInspecao,INP_DtInicDeslocamento,INP_DtFimDeslocamento,INP_HrsDeslocamento,INP_DtInicInspecao,INP_DtFimInspecao,INP_HrsInspecao,INP_Situacao,INP_DtEncerramento,INP_Coordenador,INP_Responsavel,INP_DtUltAtu,INP_UserName,INP_Motivo,INP_Modalidade,INP_ValorPrevisto,INP_NaoAplicarValorPrevisto)
 								VALUES
-								('#selUnidades#','#nInsp#','0',<cfqueryparam value="#dataPrevista#" cfsqltype="CF_SQL_DATE">,<cfqueryparam value="#dataPrevista#" cfsqltype="CF_SQL_DATE">,'0',<cfqueryparam value="#dataPrevista#" cfsqltype="CF_SQL_DATE">,<cfqueryparam value="#dataPrevista#" cfsqltype="CF_SQL_DATE">,'0','NA',<cfqueryparam value="#dataPrevista#" cfsqltype="CF_SQL_DATE">,'#selCoordenador#','#resp#',convert(char,getdate(), 120),'#qAcesso.Usu_Login#','','#selModalidades#',#inpvalorprevisto#)
+								('#selUnidades#','#nInsp#','0',<cfqueryparam value="#dataPrevista#" cfsqltype="CF_SQL_DATE">,<cfqueryparam value="#dataPrevista#" cfsqltype="CF_SQL_DATE">,'0',<cfqueryparam value="#dataPrevista#" cfsqltype="CF_SQL_DATE">,<cfqueryparam value="#dataPrevista#" cfsqltype="CF_SQL_DATE">,'0','NA',<cfqueryparam value="#dataPrevista#" cfsqltype="CF_SQL_DATE">,'#selCoordenador#','#resp#',convert(char,getdate(), 120),'#qAcesso.Usu_Login#','','#selModalidades#',#inpvalorprevisto#,'#naoaplvlrprev#')
 							</cfquery>
 							<cfquery datasource="#dsn_inspecao#">
 							   	UPDATE Unidades SET Und_NomeGerente = '#resp#' WHERE Und_Codigo ='#selUnidades#'
@@ -814,7 +817,7 @@ z-index:1000;visibility:hidden;position:absolute;" >
 					<td>
 						<label for="inpvalorprevisto" style="color:grey">Valor previsto R$: &nbsp;</label>
 						<input name="inpvalorprevisto" id="inpvalorprevisto" type="text" value="" style="text-align:left" size="18" maxlength="18" onKeyPress="numericos()" onKeyUp="moedadig(this.name)">					
-						<input type="checkbox" id="cbvlrprev" name="cbvlrprev" title="inativo"><label>Não se Aplica</label>
+						<input type="checkbox" id="cbvlrprev" name="cbvlrprev" title="inativo"><label>Não se Aplicar</label>
 					</td>					
 				</tr>
 				<br><br>
