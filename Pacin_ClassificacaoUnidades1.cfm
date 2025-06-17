@@ -18,7 +18,11 @@
 	ORDER BY RIP_NumGrupo, RIP_NumItem
 </cfquery>
 <cfset startTime = CreateTime(0,0,0)> 
-<cfset endTime = CreateTime(0,0,45)> 
+<cfset endTime = CreateTime(0,0,55)> 
+<cfloop from="#startTime#" to="#endTime#" index="i" step="#CreateTimeSpan(0,0,0,1)#"> 
+</cfloop>
+<cfset startTime = CreateTime(0,0,0)> 
+<cfset endTime = CreateTime(0,0,55)> 
 <cfloop from="#startTime#" to="#endTime#" index="i" step="#CreateTimeSpan(0,0,0,1)#"> 
 </cfloop>
 <cfquery name="rsRelev" datasource="#dsn_inspecao#">
@@ -28,12 +32,12 @@
 </cfquery>	
 </cfoutput>
 
-	<html>
-	<head>
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-	<title>Sistema Nacional de Controle Interno</title>
-	<link href="../../estilo.css" rel="stylesheet" type="text/css">
-	<link href="css.css" rel="stylesheet" type="text/css">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>Sistema Nacional de Controle Interno</title>
+<link href="../../estilo.css" rel="stylesheet" type="text/css">
+<link href="css.css" rel="stylesheet" type="text/css">
 
 <script language="JavaScript" type="text/JavaScript">
 <cfinclude template="mm_menu.js">
@@ -70,6 +74,7 @@
 <cfset INPDtFim = dateformat(rsBusca.INP_DtFimInspecao,"dd/mm/yyyy")>
 <cfset INPResp = rsBusca.INP_Responsavel>	
 <cfset HRAval = rsBusca.INP_HrsInspecao>
+
 <form action="Pacin_ClassificacaoUnidades1.cfm" method="post" target="_parent" name="form1">  
 	  <table width="1950" border="0" align="center">
 	       <tr bgcolor="#CCCCCC" class="exibir">
@@ -138,6 +143,7 @@
             (Atual)</div></td>
             <td width="18%">Classif(Atual)</td>
           </tr>
+  
       <cfset somapiini = 0>
 	  <cfset somapmini = 0>		  
       <cfset somapiatu = 0>
@@ -150,10 +156,11 @@
 			<cfset grp = RIP_NumGrupo>	
 			<cfset item = RIP_NumItem>	
 			<cfset resp = RIP_Resposta>	
-			<cfset falta = lscurrencyformat(rsBusca.RIP_Falta)>
-			<cfset sobra = lscurrencyformat(rsBusca.RIP_Sobra)>
-			<cfset emrisco = lscurrencyformat(rsBusca.RIP_EmRisco)>
+			<cfset falta = lscurrencyformat(rsBusca.RIP_Falta,'none')>
+			<cfset sobra = lscurrencyformat(rsBusca.RIP_Sobra,'none')>
+			<cfset emrisco = lscurrencyformat(rsBusca.RIP_EmRisco,'none')>
 			<cfset composic = Itn_PTC_Seq>	
+	
 			<cfset impactosn = 'N'>
 			<cfif left(composic,2) eq '10'>
 			  <cfset impactosn = 'S'>
@@ -305,9 +312,9 @@
 		</cfif>	
 	</cfif>
 <cfoutput>	
-<cfset somafalta = lscurrencyformat(somafalta)>	
-<cfset somasobra = lscurrencyformat(somasobra)>
-<cfset somaemrisco = lscurrencyformat(somaemrisco)>
+<cfset somafalta = lscurrencyformat(somafalta,'none')>	
+<cfset somasobra = lscurrencyformat(somasobra,'none')>
+<cfset somaemrisco = lscurrencyformat(somaemrisco,'none')>
 <cfset totreg = rsBusca.recordcount>	
 <cfset sptmu = somapmini>
 <cfset sptitui = somapiini>
