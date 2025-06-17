@@ -130,7 +130,7 @@
               SELECT COUNT(*)
               FROM pc_avaliacoes a2
               WHERE a2.pc_aval_processo = pc_processos.pc_processo_id
-              AND a2.pc_aval_classificacao = 'L'
+              AND a2.pc_aval_classificacao = 'L' AND pc_processos.pc_num_status in(4,5)
           )
       ) AS unificado
      
