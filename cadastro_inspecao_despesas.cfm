@@ -96,19 +96,9 @@
  	WHERE INP_NumInspecao='#url.numInspecao#' 
 </cfquery>
 
-<!---
-<cfif isDefined("url.numInspecao") And (#url.numInspecao# neq '')>
 
-<cfelse>
-
-</cfif>
---->
 <!--- Área de conteúdo   --->
 
-
-<cfif isDefined("url.numInspecao") And (#url.numInspecao# neq '')>
-
-</cfif>
 
 <!doctype html>
 <html lang="pt-br">
@@ -658,14 +648,13 @@ label {
 	$(function(e){
 		fazersoma()
 		let naoaplvlrprev = $('#naoaplvlrprev').val()
+		
 		if(naoaplvlrprev == 1) 
 		{
 			$("#cbvlrprev").prop("checked", true)
-		//	$('#cbvlrprev').attr('title','ativo')
-			$("#inpvalorprevisto").val('0,00')
-			$("#cbvlrprev").attr('disabled', true);
-			$("#inpvalorprevisto").prop('readonly', true)
 		}
+		$("#inpvalorprevisto").prop('readonly', true)
+		$("#cbvlrprev").attr('disabled', true);
 	})
 
 	function numericos() {

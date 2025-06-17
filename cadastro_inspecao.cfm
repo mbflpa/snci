@@ -126,7 +126,6 @@
 	<cfparam name="URL.dataPrevista" default="#form.dataPrevista#">
 	<cfparam name="URL.resp" default="#form.responsavel#">
 	<cfparam name="URL.inpvalorprevisto" default="#form.inpvalorprevisto#">
-	<cfparam name="URL.inpnaoaplicarvalorprevisto" default="#form.cbvlrprev#">
 	
     <cfset nInsp ='#left(trim("#form.selUnidades#"),2)#0001' & Year(Now())>
 
@@ -159,10 +158,6 @@
 				WHERE TUI_Modalidade ='#selModalidades#' and TUI_Ano=year(#dataPrevista#) and 
 				TUI_TipoUnid='#rsUnidadeSelecionadaItens.Und_TipoUnidade#' and TUI_Ativo=1
 	        </cfquery>
-			<cfset naoaplvlrprev = 'FALSE'>
-			<cfif inpnaoaplicarvalorprevisto eq 'on'>
-				<cfset naoaplvlrprev = 'TRUE'>
-			</cfif>
 			<cfif rsItens.recordcount neq 0> 
 							<cfquery datasource="#dsn_inspecao#">
 								INSERT INTO Numera_Inspecao
@@ -175,7 +170,7 @@
 								INSERT INTO Inspecao
 								(INP_Unidade,INP_NumInspecao,INP_HrsPreInspecao,INP_DtInicDeslocamento,INP_DtFimDeslocamento,INP_HrsDeslocamento,INP_DtInicInspecao,INP_DtFimInspecao,INP_HrsInspecao,INP_Situacao,INP_DtEncerramento,INP_Coordenador,INP_Responsavel,INP_DtUltAtu,INP_UserName,INP_Motivo,INP_Modalidade,INP_ValorPrevisto,INP_NaoAplicarValorPrevisto)
 								VALUES
-								('#selUnidades#','#nInsp#','0',<cfqueryparam value="#dataPrevista#" cfsqltype="CF_SQL_DATE">,<cfqueryparam value="#dataPrevista#" cfsqltype="CF_SQL_DATE">,'0',<cfqueryparam value="#dataPrevista#" cfsqltype="CF_SQL_DATE">,<cfqueryparam value="#dataPrevista#" cfsqltype="CF_SQL_DATE">,'0','NA',<cfqueryparam value="#dataPrevista#" cfsqltype="CF_SQL_DATE">,'#selCoordenador#','#resp#',convert(char,getdate(), 120),'#qAcesso.Usu_Login#','','#selModalidades#',#inpvalorprevisto#,'#naoaplvlrprev#')
+								('#selUnidades#','#nInsp#','0',<cfqueryparam value="#dataPrevista#" cfsqltype="CF_SQL_DATE">,<cfqueryparam value="#dataPrevista#" cfsqltype="CF_SQL_DATE">,'0',<cfqueryparam value="#dataPrevista#" cfsqltype="CF_SQL_DATE">,<cfqueryparam value="#dataPrevista#" cfsqltype="CF_SQL_DATE">,'0','NA',<cfqueryparam value="#dataPrevista#" cfsqltype="CF_SQL_DATE">,'#selCoordenador#','#resp#',convert(char,getdate(), 120),'#qAcesso.Usu_Login#','','#selModalidades#',#inpvalorprevisto#,'#inpnaoaplicarvalorprevisto#')
 							</cfquery>
 							<cfquery datasource="#dsn_inspecao#">
 							   	UPDATE Unidades SET Und_NomeGerente = '#resp#' WHERE Und_Codigo ='#selUnidades#'
@@ -688,6 +683,8 @@ z-index:1000;visibility:hidden;position:absolute;" >
 		<form id="formCadNum" nome="formCadNum" class="appnitro" onSubmit="return valida_formCadNum('')" enctype="multipart/form-data" method="post"  action="cadastro_inspecao.cfm?acao=cadNumInsp">
 		
 		    <input type="hidden" name="NumInspecao" value="<cfoutput>#url.numInspecao#</cfoutput>">
+			<input type="hidden" id="inpnaoaplicarvalorprevisto" name="inpnaoaplicarvalorprevisto" value="0">
+			
 			<input type="hidden" name="sacao" id="sacao" value="">
 			<cfif '#url.acao#' neq 'cadastrado' >
 
@@ -817,7 +814,7 @@ z-index:1000;visibility:hidden;position:absolute;" >
 					<td>
 						<label for="inpvalorprevisto" style="color:grey">Valor previsto R$: &nbsp;</label>
 						<input name="inpvalorprevisto" id="inpvalorprevisto" type="text" value="" style="text-align:left" size="18" maxlength="18" onKeyPress="numericos()" onKeyUp="moedadig(this.name)">					
-						<input type="checkbox" id="cbvlrprev" name="cbvlrprev" title="inativo"><label>Não se Aplicar</label>
+						<input type="checkbox" id="cbvlrprev" name="cbvlrprev" title="inativo"><label>Não se Aplica</label>
 					</td>					
 				</tr>
 				<br><br>
@@ -2262,11 +2259,13 @@ tbody {
 		if(title == 'inativo'){
 			$('#cbvlrprev').attr('title','ativo')
 			$('#inpvalorprevisto').val('0,00')
-			$("#inpvalorprevisto").prop('readonly', true);	
+			$("#inpvalorprevisto").prop('readonly', true)
+			$('#inpnaoaplicarvalorprevisto').val('1')
 		}else{
 			$('#cbvlrprev').attr('title','inativo')
 			$('#inpvalorprevisto').val('0,00')
 			$("#inpvalorprevisto").prop('readonly', false)
+			$('#inpnaoaplicarvalorprevisto').val('0')
 		}
 		//alert($("#cbvlrprev").prop("checked"))
 	})	
