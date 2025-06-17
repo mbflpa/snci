@@ -2853,8 +2853,7 @@
 
 					<cftry>		
 						<!-- Se o processo não estiver bloqueado e a modalidade não for ACOMPANHAMENTO, envia e-mail para o órgão avaliado, com cópia para os órgãos responsáveis pelas orientações do processo-->
-						<cfif rsProcessoComOrientacoes.pc_iniciarBloqueado neq 'S' and rsProcesso.pc_modalidade neq 'A'>
-								
+						<cfif rsProcesso.pc_iniciarBloqueado neq 'S' and rsProcesso.pc_modalidade neq 'A'>
 								<cfset to = "#LTrim(RTrim(rsProcesso.pc_org_email))#">
 								<cfset cc = "#listaEmailsOrgaos#">
 								<cfset siglaOrgaoAvaliado = "#LTrim(RTrim(rsProcesso.pc_org_sigla))#">
