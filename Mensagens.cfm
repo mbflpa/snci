@@ -1,4 +1,3 @@
-
 <cfprocessingdirective pageEncoding ="utf-8">
 <!--- <cfif int(day(now())) is 1>
 <p>=================== Aguarde! =======================</p>
@@ -9,7 +8,6 @@
 <cfset gil = gil> --->
 
 <cfsetting requesttimeout="20000">
-
 <cfset auxdt = dateformat(now(),"YYYYMMDD")>
 <cfquery name="rsDia" datasource="#dsn_inspecao#">
 	SELECT MSG_Realizado, MSG_Status FROM Mensagem WHERE MSG_Codigo = 1
@@ -2419,7 +2417,7 @@
 				<cfquery name="rsGes" datasource="#dsn_inspecao#">
 					SELECT Ars_Sigla, Ars_Email 
 					FROM Areas 
-					WHERE (left(Ars_Codigo,2)= '#scoi_coordena#') AND (Ars_Descricao Like '%SEC AVAL CONT INTERNO/SCOI%' OR Ars_Descricao Like '%SUP CONTR INTERNO/SCOI%')
+					WHERE (left(Ars_Codigo,2)= '#scoi_coordena#') AND (Ars_Descricao Like '%SEC AVAL CONT INTERNO/SGCIN%')
 				</cfquery>
 				<cfset auxnomearea = rsGes.Ars_Sigla>
 				<cfset rot23_sdestina = rsGes.Ars_Email>
@@ -2528,7 +2526,7 @@
 					<cfquery name="rsGes" datasource="#dsn_inspecao#">
 						SELECT Ars_Sigla, Ars_Email 
 						FROM Areas 
-						WHERE AND left(Ars_Codigo,2)= '#scoi_coordena#' and (Ars_Descricao Like '%SEC AVAL CONT INTERNO/SCOI%' OR Ars_Descricao Like '%SUP CONTR INTERNO/SCOI%') 
+						WHERE AND left(Ars_Codigo,2)= '#scoi_coordena#' and (Ars_Descricao Like '%SEC AVAL CONT INTERNO/SGCIN%') 
 					</cfquery>
 		
 					<cfset auxnomearea = rsGes.Ars_Sigla>
@@ -2608,7 +2606,6 @@
 				ORDER BY Dir_Sigla
 			</cfquery>
 			<cfoutput query="rsRotina25">
-				
 				<cfquery name="rs25" datasource="#dsn_inspecao#">
 				SELECT Und_CodDiretoria, Pos_Unidade, Und_Descricao, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem, Pos_DtPosic, Pos_Situacao_Resp, STO_Sigla, STO_Descricao, DATEDIFF(d,Pos_DtPosic, GETDATE()) as diasocorr  
 				FROM Unidades 
@@ -2641,7 +2638,7 @@
 					<cfquery name="rsSCIA" datasource="#dsn_inspecao#">
 					 SELECT DISTINCT Ars_Codigo, Ars_Sigla, Ars_Descricao, Ars_Email, Ars_EmailCoordenador
 					 FROM Areas 
-					 WHERE Left(Ars_Codigo,2) = '#scia_se#' and (Ars_Descricao Like '%SEC ACOMP CONTR INTERNO/SCIA%' OR Ars_Descricao Like '%SEC ACOMP CONTR INTERNO/SCIA%')
+					 WHERE Left(Ars_Codigo,2) = '#scia_se#' and (Ars_Descricao Like '%SEC ACOMP CONTR INTERNO/SGCIN%')
 					 ORDER BY Ars_Sigla
 					</cfquery>					
 					<!---  --->				
@@ -2935,7 +2932,7 @@
 					<cfquery name="rsSCIA" datasource="#dsn_inspecao#">
 					 SELECT DISTINCT Ars_Codigo, Ars_Sigla, Ars_Descricao, Ars_Email, Ars_EmailCoordenador
 					 FROM Areas 
-					 WHERE Left(Ars_Codigo,2) = '#scia_se#' and (Ars_Descricao Like '%SEC ACOMP CONTR INTERNO/SCIA%' OR Ars_Descricao Like '%SEC ACOMP CONTR INTERNO/SCIA%')
+					 WHERE Left(Ars_Codigo,2) = '#scia_se#' and (Ars_Descricao Like '%SEC ACOMP CONTR INTERNO/SGCIN%')
 					 ORDER BY Ars_Sigla
 					</cfquery>					
 					<!---  --->				
@@ -3002,7 +2999,91 @@
  	<!--- ###### FIM Resposta AGF ###### --->
   </cfif> 
   <!---  --->
-  <cfif rotina eq 28>
+  <cfif rotina eq 28 and rotinaSN is 'S'>
+			<cfoutput>Modulo de nº : #rotina# em execucao</cfoutput><br>
+			<!--- Aviso aos SCOI por e-mail aos SCOI sobre  Gestão das DespesasAvaliação --->
+			<cfquery name="rsRotina28" datasource="#dsn_inspecao#">
+				SELECT Dir_Codigo, Dir_Sigla 
+				FROM Diretoria 
+				where Dir_Codigo <> '01'
+				ORDER BY Dir_Sigla
+			</cfquery>
+			<cfoutput query="rsRotina28">
+				<cfquery name="rs28" datasource="#dsn_inspecao#">
+					SELECT INP_NumInspecao, INP_Unidade, Und_Descricao
+					FROM Inspecao INNER JOIN Unidades ON INP_Unidade = Und_Codigo
+					WHERE (INP_DTConcluir_Despesas Is Null)
+					AND (INP_DTConcluirAvaliacao Is Not Null) 
+					AND (Und_CodDiretoria='#rsRotina28.Dir_Codigo#')
+					ORDER BY INP_NumInspecao
+				</cfquery>	
+
+				<cfif rs28.recordcount gt 0>
+					<cfset sgcin_coordena = ''>			
+					<cfset sgcin_coordena = rsRotina28.Dir_Codigo>
+					<cfif sgcin_coordena eq '03' or sgcin_coordena eq '05' or sgcin_coordena eq '65'>
+						<cfset sgcin_coordena = '10'>
+					<cfelseif sgcin_coordena eq '70'>
+						<cfset sgcin_coordena = '04'>						 					 				 
+					</cfif>
+					<cfquery name="rsSGCIN" datasource="#dsn_inspecao#">
+						SELECT DISTINCT Ars_Email 
+						FROM Areas 
+						WHERE (left(Ars_Codigo,2)= '#sgcin_coordena#') AND (Ars_Descricao Like '%SUBG CONTR INT OPER/GCOP%')
+					</cfquery>
+					<cfset rot28_sdestina = rsSGCIN.Ars_Email>	
+									
+					<cfquery name="rsSCOI" datasource="#dsn_inspecao#">
+					 SELECT DISTINCT Ars_Codigo, Ars_Sigla, Ars_Descricao, Ars_Email, Ars_EmailCoordenador
+					 FROM Areas 
+					 WHERE Left(Ars_Codigo,2) = '#sgcin_coordena#' and (Ars_Descricao Like '%SEC AVAL CONT INTERNO/SGCIN%')
+					 ORDER BY Ars_Sigla
+					</cfquery>					
+					<!---  --->				
+			
+					<cfset auxnomearea = rsSCOI.Ars_Sigla>
+					<cfset rot28_sdestina = rot28_sdestina & ';' & rsSCOI.Ars_Email>
+					<cfset rot28_sdestina = rot28_sdestina & ';' & rsSCOI.Ars_EmailCoordenador>
+					
+					<cfif findoneof("@", #trim(rot28_sdestina)#) eq 0>
+						 <cfset rot28_sdestina = "gilvanm@correios.com.br">
+					</cfif>
+				
+					<cfmail from="SNCI@correios.com.br" to="#rot28_sdestina#" subject="Gestão das Despesas Alocadas" type="HTML"> 
+					Mensagem automática. Não precisa responder!<br><br>
+					<strong>
+					Ao Gestor(a) da #Ucase(auxnomearea)#. <br><br><br>
+			
+			&nbsp;&nbsp;&nbsp;Comunicamos que há avaliação de Controle Interno  para Gestão das Despesas Alocadas desse Órgão.<br><br>
+			&nbsp;&nbsp;&nbsp;Para registro de suas análises ou encaminhamentos acesse o SNCI (endereço: http://intranetsistemaspe/snci/rotinas_inspecao.cfm) clicando no link: <a href="http://intranetsistemaspe/snci/rotinas_inspecao.cfm">SNCI</a><br><br>
+					
+						<table>
+						<tr>
+						<td><strong>Unidade</strong></td>
+						<td><strong>Nome da Unidade</strong></td>
+						<td><strong>Avaliação</strong></td>
+						</tr>
+						<tr>
+						<td>----------------</td>
+						<td>-----------------------------------------------</td>
+						<td>----------------</td>
+						</tr>
+						<cfloop query="rs28">
+							<tr>
+							<td align="left"><strong>#rs28.INP_Unidade#</strong></td>
+							<td align="left"><strong>#rs28.Und_Descricao#</strong></td>
+							<td align="center"><strong>#rs28.INP_NumInspecao#</strong></td>
+							</tr>
+						</cfloop>
+						</table>
+						<br>
+						&nbsp;&nbsp;&nbsp;Desde já agradecemos a sua atenção.
+						</strong>
+					</cfmail> 
+				</cfif> 
+				    
+		  </cfoutput> 
+ 	<!--- final  Aviso aos SCOI por e-mail aos SCOI sobre  Gestão das DespesasAvaliação --->	
   </cfif>
 
 <!--- alerta quanto a necessidade de realizar Pesquisa_Pos_Avaliacao das Avaliações--->

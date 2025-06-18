@@ -813,7 +813,7 @@ z-index:1000;visibility:hidden;position:absolute;" >
 				<tr>
 					<td>
 						<label for="inpvalorprevisto" style="color:grey">Valor previsto R$: &nbsp;</label>
-						<input name="inpvalorprevisto" id="inpvalorprevisto" type="text" value="" style="text-align:left" size="18" maxlength="18" onKeyPress="numericos()" onKeyUp="moedadig(this.name)">					
+						<input name="inpvalorprevisto" id="inpvalorprevisto" type="text" value="0,00" style="text-align:left" size="18" maxlength="18" onKeyPress="numericos()" onKeyUp="moedadig(this.name)">					
 						<input type="checkbox" id="cbvlrprev" name="cbvlrprev" title="inativo"><label>Não se Aplica</label>
 					</td>					
 				</tr>
