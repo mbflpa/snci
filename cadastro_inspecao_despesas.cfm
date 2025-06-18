@@ -54,13 +54,14 @@
 					WHERE INP_NumInspecao = '#url.numInspecao#'
 			</cfquery>
 			<script>
-				alert('Gestor(a), Recursos alocados salvos com sucesso!')
+				alert('Gestor(a), transação realizada com sucesso!')
+				window.close()
 			</script>
 	</cfif>
 <cfquery name="rsResult" datasource="#dsn_inspecao#">
 	SELECT 
 	  INP_Unidade
-	, Und_Descricao
+	, trim(Und_Descricao) as Und_Descricao
 	, INP_NumInspecao
 	, INP_Responsavel
 	, INP_HrsPreInspecao
@@ -524,8 +525,8 @@ label {
 						<input type="hidden" id="acao" name="acao" value="">
 						<input type="hidden" id="inspecao" name="inspecao" value="#url.numInspecao#">
 						<input type="hidden" id="naoaplvlrprev" name="naoaplvlrprev" value="#rsResult.INP_NaoAplicarValorPrevisto#">
-						
-						
+						<input type="hidden" id="unid" name="unid" value="#rsResult.INP_Unidade# - #rsResult.Und_Descricao#">
+
 						<table width="40%" align="left" class="table table-bordered table-hover">
 							<tr>
 								<td colspan="2" align="center"><div><label>Recursos Alocados</label></div></td>
@@ -648,13 +649,13 @@ label {
 	$(function(e){
 		fazersoma()
 		let naoaplvlrprev = $('#naoaplvlrprev').val()
-		
+
 		if(naoaplvlrprev == 1) 
 		{
 			$("#cbvlrprev").prop("checked", true)
 		}
 		$("#inpvalorprevisto").prop('readonly', true)
-		$("#cbvlrprev").attr('disabled', true);
+		$("#cbvlrprev").attr('disabled', true)
 	})
 
 	function numericos() {
@@ -783,31 +784,43 @@ label {
 				return false
 		}	
 		*/
-		if (($('#totrealizado').val() =='' || $('#totrealizado').val() == '0,00') && $("#cbrecursos").prop("checked") == false)
+		if (($('#totrealizado').val() == '' || $('#totrealizado').val() == '0,00') && $("#cbrecursos").prop("checked") == false)
 			{
-				alert('Gestor(a), informar os recursos alocados ou \n\nselecione Não se Aplica (Recursos alocados)')
+				alert('Gestor(a), informar os recursos alocados ou \nselecione Não se Aplica (Recursos Alocados)\npara a Avaliação da unidade '+$('#unid').val())
 				$('#inpadinoturno').focus()
 				return false
 		}
 		
-		if($('#inpadinoturno').val() == '0,00' || $('#inpdeslocamento').val() == '0,00' || $('#inpdiarias').val() == '0,00' || $('#inppassagemarea').val() == '0,00' || $('#inpreembveicproprio').val() == '0,00' || $('#inprepousoremunerado').val() == '0,00' || $('#inpressarcirempregado').val() == '0,00' || $('#inpoutros').val() == '0,00')
+		if($('#totrealizado').val() == '0,00')
 		{
-			if(confirm("Gestor(a), há recurso(s) alocado(s) com valore(s) igual '0,00'. \n\nConfirma continuar assim?")){		
+			let msg = 'Confirma que não foram alocados recursos para realização \nda Avaliação da unidade '+$('#unid').val()+'?'
+			if(confirm(msg)){		
 				//return true
 			}
 			else{
 				return false
 			}	
 		}
-
-		if(confirm("Gestor(a), Confirma salvar?")){
-			$('#acao').val('salvar')			
-			$('#form1').submit()
+		if($('#totrealizado').val() != '0,00')
+		{
+			let msg = 'Confirma os valores alocados para Avaliação da \nunidade '+$('#unid').val()+'?'
+			if(confirm(msg)){		
+				//return true
+			}
+			else{
+				return false
+			}	
 		}
-		else{
-			$('#acao').val('')
-			return false
-		}			
+		$('#acao').val('salvar')			
+		$('#form1').submit()
+		//if(confirm("Confirma os valores alocados?")){
+		//	$('#acao').val('salvar')			
+		//	$('#form1').submit()
+		//}
+		//else{
+		//	$('#acao').val('')
+		//	return false
+		//}			
 	})
 /*
 	$('#cbvlrprev').click(function(){  
