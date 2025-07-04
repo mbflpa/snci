@@ -3,8 +3,6 @@
  	   <cfinclude template="aviso_sessao_encerrada.htm">
 	  <cfabort>   
 </cfif>         
-
- 
 <cfset area = 'sins'>
 <cfset Encaminhamento = 'Ao SGCIN'>
 <cfset nID_Resp = 1>
@@ -118,7 +116,6 @@
 	<td>
 	   Não há itens pendentes para este Relatório/Unidade de Avaliação de Controle Interno.
 	<br><br>
-
 	<input name="" value="fechar" type="button" onClick="self.close(); ">
 	</td>
 	</tr>
@@ -425,7 +422,7 @@
 		</cfoutput>
 	<cfelse>
 		<cfoutput>
-			<!--- contar 30 dias úteis para AGF e ACC --->			
+			<!--- contar 30 dias corridos para AGF e ACC --->			
 			<cfset dtnovoprazo = CreateDate(year(rsItem.INP_DTConcluirRevisao),month(rsItem.INP_DTConcluirRevisao),day(rsItem.INP_DTConcluirRevisao))> 
 			<cfset dtnovoprazo = DateAdd( "d", 31, dtnovoprazo)>
 			<cfset nCont = 1>
@@ -569,13 +566,12 @@
  </cfif>
   </cfif>
  
-<!--- ============= --->
 <cfquery name="qSituacaoResp" datasource="#dsn_inspecao#">
   SELECT Pos_Situacao_Resp, Pos_NomeArea, Pos_Area
   FROM ParecerUnidade
   WHERE Pos_Unidade='#unid#' AND Pos_Inspecao='#ninsp#' AND Pos_NumGrupo=#ngrup# AND Pos_NumItem=#nitem#
 </cfquery>
-<!--- ============= --->
+
 <cfif left(ninsp,2) eq left(trim(qUsuario.Usu_Lotacao),2)>
 	<cfquery name="rsMod" datasource="#dsn_inspecao#">
 	  SELECT Und_Centraliza, Und_Descricao, Und_CodReop, Und_Codigo, Und_CodDiretoria, Und_TipoUnidade, Dir_Descricao, Dir_Codigo, Dir_Sigla
@@ -596,7 +592,6 @@
   WHERE  Ane_NumInspecao = '#ninsp#' AND Ane_Unidade = '#unid#' AND Ane_NumGrupo = #ngrup# AND Ane_NumItem = #nitem#
   order by Ane_Codigo 
 </cfquery>
-
 
 <html>
 <head>

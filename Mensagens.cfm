@@ -81,10 +81,10 @@
  	<cfset rotina = 1>
 </cfif> 
 <cfif rotinaSN is 'S'>
-	<!--- Obter o a data util para 10(dez) dias --->
+	<!--- Obter a data util para 10(dez) dias --->
 	<cfset dt10dduteis = CreateDate(year(now()),month(now()),day(now()))>
 	<cfset nCont = 1>
-	<cfloop condition="nCont lt 10">
+	<cfloop condition="nCont lt 11">
 		<cfset dt10dduteis = DateAdd( "d", 1, dt10dduteis)>
 		<cfset vDiaSem = DayOfWeek(dt10dduteis)>
 		<cfif vDiaSem neq 1 and vDiaSem neq 7>
@@ -106,7 +106,7 @@
 	<!--- Obter o a data util para 30(trinta) dias --->
 	<cfset dt30dduteis = CreateDate(year(now()),month(now()),day(now()))>
 	<cfset nCont = 1>
-	<cfloop condition="nCont lt 30">
+	<cfloop condition="nCont lt 31">
 		<cfset dt30dduteis = DateAdd( "d", 1, dt30dduteis)>
 		<cfset vDiaSem = DayOfWeek(dt30dduteis)>
 		<cfif vDiaSem neq 1 and vDiaSem neq 7>
@@ -1322,8 +1322,8 @@
 			<!--- complementar os 20 dias úteis da data de liberação para compor os 30  dias úteis--->
 			<cfset dt30terc = CreateDate(year(dt30terc),month(dt30terc),day(dt30terc))>
 			<cfset nCont = 1>
-			<cfloop condition="nCont lte 30">
-				<cfset dt30terc = DateAdd( "d", 1, dt30terc)>
+			<cfset dt30terc = DateAdd( "d", 31, dt30terc)>
+			<cfloop condition="nCont lte 1">
 				<cfset vDiaSem = DayOfWeek(dt30terc)>
 				<cfif vDiaSem neq 1 and vDiaSem neq 7>
 				<!--- verificar se Feriado Nacional --->
@@ -1332,11 +1332,13 @@
 				</cfquery>
 				<cfif rsFeriado.recordcount gt 0>
 					<cfset nCont = nCont - 1>
+					<cfset dt30terc = DateAdd( "d", 1, dt30terc)>
 				</cfif>
 				</cfif>
 				<!--- Verifica se final de semana  --->
 				<cfif vDiaSem eq 1 or vDiaSem eq 7>
-				<cfset nCont = nCont - 1>
+					<cfset nCont = nCont - 1>
+					<cfset dt30terc = DateAdd( "d", 1, dt30terc)>
 				</cfif>
 				<cfset nCont = nCont + 1>
 			</cfloop> 	
@@ -1820,7 +1822,7 @@
 	</cfif>	
 	<!--- ###### FIM - UNIDADES ###### --->
 	<!--- ###### SUBORDINADORES ###### --->
-<cfif rotina eq 16 and rotinaSN is 'S'>
+	<cfif rotina eq 16 and rotinaSN is 'S'>
 			<cfoutput>Modulo de nº : #rotina# em execucao</cfoutput><br>
 	  <!--- pré-alerta Orgao subordinador com e-mail agrupado e classif. (Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem) --->
 	 <!--- status 16 e data Pos_DtPrev_Solucao ESTÁ DE 0 A 5 DIAS DO VENCTO --->
@@ -1897,7 +1899,7 @@
 	</cfif>	
 	<!--- ###### FIM - SUBORDINADORES ###### --->
 	<!--- ###### AREAS ###### --->
-<cfif rotina eq 17 and rotinaSN is 'S'>
+	<cfif rotina eq 17 and rotinaSN is 'S'>
 	    <cfoutput>Modulo de nº : #rotina# em execucao</cfoutput><br>
         <!--- pré-alerta Área com e-mail agrupado e classif. (Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem) --->
 	    <!--- status 19 e data Pos_DtPrev_Solucao ESTÁ DE 0 A 5 DIAS DO VENCTO --->
@@ -3001,7 +3003,7 @@
   <!---  --->
   <cfif rotina eq 28 and rotinaSN is 'S'>
 			<cfoutput>Modulo de nº : #rotina# em execucao</cfoutput><br>
-			<!--- Aviso aos SCOI por e-mail aos SCOI sobre  Gestão das DespesasAvaliação --->
+			<!--- Aviso aos SCOI por e-mail aos SCOI sobre  Gestão das Despesas Avaliação --->
 			<cfquery name="rsRotina28" datasource="#dsn_inspecao#">
 				SELECT Dir_Codigo, Dir_Sigla 
 				FROM Diretoria 
