@@ -2244,6 +2244,7 @@
 				var dataPrevista='';
 				var dataPrevistaFormatada ='';
 				if($('#pcOrientacaoStatus').val() == 5){
+					alert("tratamento")
 					<cfoutput>
 						<cfobject component = "pc_cfcPaginasApoio" name = "pc_cfcPaginasApoio"/>
 						<cfinvoke component="#pc_cfcPaginasApoio#" method="obterDataPrevista" returnVariable="obterDataPrevista" qtdDias='15' />
@@ -2251,6 +2252,12 @@
 						dataPrevista = dataPrev.toISOString().split('T')[0];
 						dataPrevistaFormatada = '#obterDataPrevista.Data_Prevista_Formatada#';
 					</cfoutput>
+					$("#pcOrgaoRespAcompDiv").attr("hidden",false)	
+					$("#pcDataPrevRespAcompDiv").attr("hidden",false)
+					$("#pcNumProcJudicialDiv").attr("hidden",true)
+					$("#pcDataPrevRespAcomp").val(dataPrevista)
+					$("#pcNumProcJudicial").val(null)
+					$("#dataPrevistaCalculada").html("Prazo de 15 dias úteis: " + dataPrevistaFormatada + "</br>");
 				} 
 				
 				if($('#pcOrientacaoStatus').val() == 16){
@@ -2269,53 +2276,47 @@
                     var manifestacaoSalva = '#rsManifestacaoSalva.recordcount#';
 					var numProcJudicial = '#rsManifestacaoSalva.pc_aval_posic_numProcJudicial#';
 				</cfoutput>
-			if (!$('#pcOrientacaoStatus').val() == 14){
-				if(manifestacaoSalva === '0'){
-					$('#pcOrientacaoStatus').val(5)
-					$("#pcOrgaoRespAcompDiv").attr("hidden",false)
-					$("#pcDataPrevRespAcompDiv").attr("hidden",false)	
-					$("#pcDataPrevRespAcomp").val(dataPrevista)
-					$("#dataPrevistaCalculada").html("Prazo de 15 dias úteis: " + dataPrevistaFormatada + "</br>");
-
-				}else{
-					if ($('#pcOrientacaoStatus').val() == 5){
-						$("#pcOrgaoRespAcompDiv").attr("hidden",false)	
-						$("#pcDataPrevRespAcompDiv").attr("hidden",false)
-						$("#pcNumProcJudicialDiv").attr("hidden",true)
+				if (!$('#pcOrientacaoStatus').val() == 14){
+					if(manifestacaoSalva === '0'){
+						$('#pcOrientacaoStatus').val(5)
+						$("#pcOrgaoRespAcompDiv").attr("hidden",false)
+						$("#pcDataPrevRespAcompDiv").attr("hidden",false)	
 						$("#pcDataPrevRespAcomp").val(dataPrevista)
-						$("#pcNumProcJudicial").val(null)
 						$("#dataPrevistaCalculada").html("Prazo de 15 dias úteis: " + dataPrevistaFormatada + "</br>");
-					}else if ($('#pcOrientacaoStatus').val() == 15){
-						$("#pcNumProcJudicialDiv").attr("hidden",false)
-						$("#pcDataPrevRespAcompDiv").attr("hidden",true)
-						$("#pcOrgaoRespAcompDiv").attr("hidden",true)
-						$("#pcDataPrevRespAcomp").val(null)	
-						$("#pcNumProcJudicial").val(numProcJudicial)
-						//$("#pcPosicAcomp").prop("disabled", true);
-					}else if ($('#pcOrientacaoStatus').val() == 16){
-						$("#pcOrgaoRespAcompDiv").attr("hidden",false)	
-						$("#pcDataPrevRespAcompDiv").attr("hidden",false)
-						$("#pcNumProcJudicialDiv").attr("hidden",true)
-						$("#pcDataPrevRespAcomp").val(dataPrevista)
-						$("#pcNumProcJudicial").val(null)
-						$("#dataPrevistaCalculada").html("Prazo de 90 dias corridos: " + dataPrevistaFormatada + "</br>");
-						$("#pcPosicAcomp").prop("disabled", true);
-					}else{
-						$("#pcDataPrevRespAcompDiv").attr("hidden",true)
-						$("#pcOrgaoRespAcompDiv").attr("hidden",true)
-						$("#pcNumProcJudicialDiv").attr("hidden",true)
-						$("#pcDataPrevRespAcomp").val(null)	
-						$("#pcNumProcJudicial").val(null)	
-					}
 
+					}else{
+						if ($('#pcOrientacaoStatus').val() == 5){
+							$("#pcOrgaoRespAcompDiv").attr("hidden",false)	
+							$("#pcDataPrevRespAcompDiv").attr("hidden",false)
+							$("#pcNumProcJudicialDiv").attr("hidden",true)
+							$("#pcDataPrevRespAcomp").val(dataPrevista)
+							$("#pcNumProcJudicial").val(null)
+							$("#dataPrevistaCalculada").html("Prazo de 15 dias úteis: " + dataPrevistaFormatada + "</br>");
+						}else if ($('#pcOrientacaoStatus').val() == 15){
+							$("#pcNumProcJudicialDiv").attr("hidden",false)
+							$("#pcDataPrevRespAcompDiv").attr("hidden",true)
+							$("#pcOrgaoRespAcompDiv").attr("hidden",true)
+							$("#pcDataPrevRespAcomp").val(null)	
+							$("#pcNumProcJudicial").val(numProcJudicial)
+							//$("#pcPosicAcomp").prop("disabled", true);
+						}else if ($('#pcOrientacaoStatus').val() == 16){
+							$("#pcOrgaoRespAcompDiv").attr("hidden",false)	
+							$("#pcDataPrevRespAcompDiv").attr("hidden",false)
+							$("#pcNumProcJudicialDiv").attr("hidden",true)
+							$("#pcDataPrevRespAcomp").val(dataPrevista)
+							$("#pcNumProcJudicial").val(null)
+							$("#dataPrevistaCalculada").html("Prazo de 90 dias corridos: " + dataPrevistaFormatada + "</br>");
+							$("#pcPosicAcomp").prop("disabled", true);
+						}else{
+							$("#pcDataPrevRespAcompDiv").attr("hidden",true)
+							$("#pcOrgaoRespAcompDiv").attr("hidden",true)
+							$("#pcNumProcJudicialDiv").attr("hidden",true)
+							$("#pcDataPrevRespAcomp").val(null)	
+							$("#pcNumProcJudicial").val(null)	
+						}
+
+					}
 				}
-			}else{
-				$("#pcDataPrevRespAcompDiv").attr("hidden",true)
-				$("#pcOrgaoRespAcompDiv").attr("hidden",true)
-				$("#pcNumProcJudicialDiv").attr("hidden",true)
-				$("#pcDataPrevRespAcomp").val(null)	
-				$("#pcNumProcJudicial").val(null)	
-			}
 					
 					
 					
@@ -2390,7 +2391,7 @@
 				
 				// DropzoneJS Demo Code End
 
-		})
+			})
 
 
 			
