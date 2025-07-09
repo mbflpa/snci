@@ -264,6 +264,23 @@
     <title>FICHA AVALIAÇÃO</title>
     <link rel="stylesheet" href="public/bootstrap/bootstrap.min.css">
     <!--- <link rel="stylesheet" href="public/app.css">   --->
+    <style>
+        .botaosalvar{
+            margin-top: 0.2em;
+            padding: 0.1em;
+            display: inline-block;
+            /*definimos a largura do box*/
+            width:680px;
+            /* definimos a altura do box */
+            height:40px;
+            /* definimos a cor de fundo do box */
+            background-color: #f9b4128e;
+            /* definimos o quão arredondado irá ficar nosso box */
+            border-radius: 10px 20px;
+            text-align: center;
+            cursor: pointer;
+        }	
+    </style>
 </head>
 
 <!--- <body onload="meta2(true,1,1,85051071);colecao_meta2(85051071)"> --->
@@ -460,7 +477,7 @@
             <td colspan="8" align="center"><div class="btn btn-info disabled"><strong>Meta 3 - Liberar 100% das Avaliações de Controle para revisão dentro do prazo estabelecido pela SGCIN. (Liberar para revisão no prazo)</strong></div></td>
         </tr> 
         <tr>
-            <td colspan="1"><div class="btn btn-outline-primary disabled">Data Transmissão Planejada</div></td>
+            <td colspan="1"><div class="btn btn-outline-primary disabled">Data Transmissão Planejada (consultar planilha)</div></td>
             <td colspan="3"><div class="btn btn-outline-primary disabled">Diferença(dia)</div></td> 
             <td colspan="4"><div class="btn btn-outline-primary disabled">Percentual</div></td>
         </tr> 
@@ -491,7 +508,7 @@
             <cfset habilitarmeta1meta2SN = 'N'>
         </cfif>
         
-        <tr><td colspan="8" align="center"><input class="btn btn-warning btn-lg" type="button" onclick="validarform()" value="<cfoutput>#auxcompl#</cfoutput>" #habsn#></td></tr>
+        <tr><td colspan="8" align="center"><input class="btn btn-warning btn-lg botaosalvar" type="button" onclick="validarform()" value="<cfoutput>#auxcompl#</cfoutput>" #habsn#></td></tr>
         <tr><td colspan="8" align="center"><input class="btn btn-info" type="button" onClick="window.open('ficha_facin_Ref.cfm?numinsp=#form.numinsp#&acao=buscar','_self')" value="Voltar"></td></tr>            
     </table>    
 </cfoutput>
@@ -885,17 +902,14 @@
         diff = Math.floor(diff / day);
         //alert(diff);
         if(diff < 0){
-            //diff = 0;
-            //document.formx.facdataplanmeta3.value = a;
-        }
-        
-        if(diff < 0){
             // alert('linha 168')
             if(diff == -1) {percent = 60}  
             if(diff == -2) {percent = 40}
-            if(diff <= -3) {percent = 0;}
+            if(diff <= -3) {percent = 0}
         }else{
-            if(diff > 0) {percent = 110;}
+            if(diff > 0) {
+                percent = 110
+                }
         }
         //alert(percent)
         $('#meta3dif').html('<strong>'+diff+'</strong>')
