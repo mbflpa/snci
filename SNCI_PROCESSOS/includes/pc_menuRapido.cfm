@@ -22,6 +22,14 @@
                 </a>
             </cfoutput>
         </cfloop>
+      
+        <a href="https://app.powerbi.com/groups/me/reports/83d6cfd8-ea74-4548-a3a5-7e2692113a1b/ReportSection?ctid=00069df5-ac2f-4ca7-b9a5-d99fea37ab02&experience=power-bi"
+         target="_blank">
+            <div class="menuRapido_iconGrid">
+                <i class="fa-solid fa-tachograph-digital"></i>
+                <span class="font-weight-light">AVALIAÇÃO AUTOMATIZADA</span>
+            </div>
+        </a>
     </div>
 </div>
  <script language="JavaScript">
