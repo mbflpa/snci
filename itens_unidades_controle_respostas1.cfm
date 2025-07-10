@@ -449,6 +449,9 @@
 		</cfoutput>		
 	</cfif>	  
     <cfset posdtprevsoltxt = 'Data de Previsão da Solução: '>
+	<cfif dateformat(dtnovoprazo,"YYYYMMDD") lt form.posdtprevsolucao>
+		<cfset dtnovoprazo = CreateDate(left(form.posdtprevsolucao,4),mid(form.posdtprevsolucao,5,2),right(form.posdtprevsolucao,2))> 
+	</cfif>
 	 <cfquery datasource="#dsn_inspecao#">
 	   UPDATE ParecerUnidade SET Pos_Situacao_Resp = #FORM.frmResp#
    			  , Pos_Area = '#auxposarea#'
@@ -456,13 +459,13 @@
 		<cfswitch expression="#Form.frmResp#">
 			<cfcase value=1>
 			  , Pos_Situacao = 'RU'
-			  , Pos_DtPrev_Solucao = #createodbcdate(createdate(year(dtnovoprazo),month(dtnovoprazo),day(dtnovoprazo)))#
+			  , Pos_DtPrev_Solucao = #createodbcdate(createdate(year(dtnovoprazo),month(dtnovoprazo),day(dtnovoprazo)))# 
 			  <cfset Encaminhamento = 'Ao SGCIN'>
 			  <cfset situacao = 'RESPOSTA DA UNIDADE'>
 			</cfcase>
 			<cfcase value=15>
 			  , Pos_Situacao = 'TU'
-			  , Pos_DtPrev_Solucao = #createodbcdate(createdate(year(dtnovoprazo),month(dtnovoprazo),day(dtnovoprazo)))#
+			  , Pos_DtPrev_Solucao = #createodbcdate(createdate(year(dtnovoprazo),month(dtnovoprazo),day(dtnovoprazo)))# 
 			  <cfset Encaminhamento = 'A UNIDADE'>
 			  <cfset situacao = 'TRATAMENTO UNIDADE'>
 			</cfcase>
@@ -475,7 +478,7 @@
 			</cfcase>
 			<cfcase value=18>
 			  , Pos_Situacao = 'TF'
-			  , Pos_DtPrev_Solucao = #createodbcdate(createdate(year(dtnovoprazo),month(dtnovoprazo),day(dtnovoprazo)))# 
+ 		  	  , Pos_DtPrev_Solucao = #createodbcdate(createdate(year(dtnovoprazo),month(dtnovoprazo),day(dtnovoprazo)))# 
 			  <cfset Encaminhamento = 'A UNIDADE TERCEIRIZADA'>
 			  <cfset situacao = 'TRATAMENTO DE TERCEIRIZADA'>
 			  <cfset posdtprevsoltxt = 'Data Final da Solução: '>
@@ -1356,8 +1359,7 @@ function mensagem(){
     </cfloop>
 <!---  --->  	
 <cfoutput>
-    <cfset posdtprevsolucao = CreateDate(year(now()),month(now()),day(now()))>
-	<cfset posdtprevsolucao = dateformat(qResposta.Pos_DtPrev_Solucao,"YYYYMMDD")>
+	<cfset posdtprevsolucao = #dateformat(qResposta.Pos_DtPrev_Solucao,"YYYYMMDD")#>
 	<cfset dtbase = CreateDate(year(now()),month(now()),day(now()))>
 	<cfset dtrespos = CreateDate(year(now()),month(now()),day(now()))>
 	<cfset dttratam = CreateDate(year(now()),month(now()),day(now()))>
@@ -1521,6 +1523,7 @@ function mensagem(){
 	<input type="hidden" name="MM_UpdateRecord" value="form1">
 	<input type="hidden" name="rdCentraliz" id="rdCentraliz" value="#rdCentraliz#">	
 	<input type="hidden" name="PosClassificacaoPonto" id="PosClassificacaoPonto" value="#trim(qResposta.Pos_ClassificacaoPonto)#">
+	<input type="hidden" name="posdtprevsolucao" id="posdtprevsolucao" value="#dateformat(qResposta.Pos_DtPrev_Solucao,"YYYYMMDD")#">
 	<input type="hidden" name="undtipounidade" id="undtipounidade" value="#trim(rsItem.Und_TipoUnidade)#">
 	<input type="hidden" name="encerrarSN" id="encerrarSN" value="#encerrarSN#">
 	<!--- encerrarSN: #encerrarSN# somafalta: #somafalta# --->
