@@ -1,6 +1,29 @@
 <cfprocessingdirective pageencoding = "utf-8">
 	 <cfinclude template="aa_Modal_preloader.cfm">
 	 <cfinclude template="aa_modal_overlay.cfm">
+
+	 <style>
+		.tituloPagina{
+            color: var(--azul_correios);
+            margin: 0;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+			display:block; 
+			text-align:left;
+			font-size:1.3rem;
+			font-weight:600;
+			color:var(--azul_correios);
+          }
+		  .nomeModulo{
+			color: var(--azul_correios);
+            margin: 0;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+			display:block; 
+			text-align:left;
+			font-size:1.3rem;
+			font-weight:600;
+			color:var(--azul_correios);
+		  }
+	 </style>
 	<!-- Navbar -->
 		<link rel="stylesheet" href="../SNCI_AVALIACOES_AUTOMATIZADAS/dist/css/animate.min.css">
 		<nav class="main-header navbar navbar-expand navbar-light shadow-sm " style="height:56px;padding-right: 0;">
@@ -10,8 +33,8 @@
 						<i class="fas fa-bars" style="font-size:2rem;color:gray"></i>
 					</a>
 				</li>
-				<li class="nav-item d-none d-sm-inline-block" style="overflow:hidden;margin-left:20px;">
-					<span style="display:block; text-align:left;font-size:1.3rem;font-weight:600;color:var(--azul_correios);">Análise das Não Conformidades - AC Luis Eduardo Magalhães</span>
+				<li class="nav-item d-none d-sm-inline-block " style="overflow:hidden;margin-left:20px;">
+					<span class="tituloPagina">Análise das Não Conformidades - AC Luis Eduardo Magalhães</span>
 				</li>
 			
 				<li class="nav-item d-none d-sm-inline-block ml-auto" style="background-color:var(--amarelo_prisma_escuro_correios);height:56px;position:relative;overflow:hidden;">
@@ -22,7 +45,7 @@
 						<img src="../SNCI_PROCESSOS/dist/img/icone_sistema_standalone_ico.png" class="brand-image"
 							style="height:44px;width:auto;margin-right:16px;vertical-align:middle;">
 						<div style="display:flex;flex-direction:column;line-height:1.1;position:relative;">
-							<span style="font-size:1.3rem;font-weight:600;color:var(--azul_correios);">SNCI - Avaliações Automatizadas</span>
+							<span class="nomeModulo">SNCI - Avaliações Automatizadas</span>
 							<span style="font-size:11px;color:red;position:absolute;top:22px;left:0;">
 								<cfif FindNoCase("homologacaope", application.auxsite) or FindNoCase("desenvolvimentope", application.auxsite) or FindNoCase("localhost", application.auxsite)>
 									<cfoutput>SERVIDOR: #Ucase(application.auxsite)#</cfoutput>

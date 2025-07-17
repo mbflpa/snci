@@ -79,8 +79,8 @@
           }
 
           .modern-nav-link {
-            margin: 8px 15px;
-            padding: 15px 20px;
+            margin: 8px 10px;
+            padding: 10px 10px;
             background: rgba(255, 255, 255, 0.1);
             border-radius: 12px;
             border: 1px solid rgba(255, 255, 255, 0.15);
@@ -236,14 +236,14 @@
             }
             
             .modern-nav-link {
-              margin: 5px 10px;
-              padding: 12px 15px;
+              margin: 5px 10px!important
+              padding: 10px 15px!important
             }
             
             .modern-nav-header,
             .modern-profile-section {
-              margin: 10px;
-              padding: 15px;
+              margin: 10px!important
+              padding: 15px!important
             }
           }
         
@@ -291,7 +291,7 @@
                 </a>
               </li>
               <li class="nav-item" style="margin-bottom: 0;">
-                <a href="index.cfm" class="nav-link modern-nav-link">
+                <a href="teste.cfm" class="nav-link modern-nav-link">
                   <div class="modern-nav-icon">
                     <i class="fas fa-book"></i>
                   </div>
@@ -299,7 +299,7 @@
                 </a>
               </li>
               <li class="nav-item" style="margin-bottom: 0;">
-                <a href="index.cfm" class="nav-link modern-nav-link">
+                <a href="teste.cfm" class="nav-link modern-nav-link">
                   <div class="modern-nav-icon">
                     <i class="fas fa-vial"></i>
                   </div>
