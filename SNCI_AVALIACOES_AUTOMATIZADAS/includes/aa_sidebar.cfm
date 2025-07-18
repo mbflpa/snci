@@ -61,7 +61,7 @@
           }
 
           .modern-nav-header {
-            background: rgb(248 249 250);
+            background: none;
             border-radius: 15px;
             margin: 15px;
             padding: 5px;
@@ -71,7 +71,7 @@
           }
 
           .modern-nav-header h3 {
-            color: var(--azul_correios);
+            color: rgba(255, 255, 255, 0.9) !important;
             font-weight: 600;
             margin: 0;
             font-size: 1.2rem;
@@ -207,6 +207,10 @@
             background: rgba(255, 255, 255, 0.5);
           }
 
+          .nav-pills .nav-link {
+              border-radius: .7rem;
+          }
+
           /* Animações */
           @keyframes slideInLeft {
             from {
@@ -253,9 +257,9 @@
 
 
       <!-- Main Sidebar Container -->
-      <aside class="main-sidebar sidebar-dark-primary elevation-4 modern-sidebar" style="overflow-y: auto!important; height:100vh;">
+      <aside class="main-sidebar sidebar-dark-primary elevation-4 modern-sidebar" style="margin-top: 0;">
         <!-- Sidebar -->
-        <div class="sidebar os-host os-theme-light os-host-overflow os-host-resize-disabled os-host-transition os-host-overflow-y os-host-scrollbar-horizontal-hidden" style="height:100vh;">
+        <div class="sidebar os-host os-theme-light os-host-overflow os-host-resize-disabled os-host-transition os-host-overflow-y os-host-scrollbar-horizontal-hidden" style="margin-top: 0;" >
          
           <!-- Header do Sidebar -->
           <div class="modern-nav-header">

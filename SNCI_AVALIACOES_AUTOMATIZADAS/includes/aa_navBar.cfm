@@ -9,7 +9,7 @@
             text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 			display:block; 
 			text-align:left;
-			font-size:1.3rem;
+			font-size:1.1rem;
 			font-weight:600;
 			color:var(--azul_correios);
           }
@@ -19,7 +19,7 @@
             text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 			display:block; 
 			text-align:left;
-			font-size:1.3rem;
+			font-size:1rem;
 			font-weight:600;
 			color:var(--azul_correios);
 		  }
@@ -33,7 +33,7 @@
 						<i class="fas fa-bars" style="font-size:2rem;color:gray"></i>
 					</a>
 				</li>
-				<li class="nav-item d-none d-sm-inline-block " style="overflow:hidden;margin-left:20px;">
+				<li class="nav-item d-none d-sm-inline-block " style="overflow:hidden;">
 					<span class="tituloPagina">Análise das Não Conformidades - AC Luis Eduardo Magalhães</span>
 				</li>
 			
@@ -43,7 +43,7 @@
 					</div>
 					<div style="display:flex;align-items:center;height:100%;margin-left:32px;margin-right: 5px;">
 						<img src="../SNCI_PROCESSOS/dist/img/icone_sistema_standalone_ico.png" class="brand-image"
-							style="height:44px;width:auto;margin-right:16px;vertical-align:middle;">
+							style="height:44px;width:auto;margin-right:5px;vertical-align:middle;">
 						<div style="display:flex;flex-direction:column;line-height:1.1;position:relative;">
 							<span class="nomeModulo">SNCI - Avaliações Automatizadas</span>
 							<span style="font-size:11px;color:red;position:absolute;top:22px;left:0;">

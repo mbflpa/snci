@@ -94,8 +94,8 @@
         }
     </style>
 </head>
-<body>
-    
+<body class="hold-transition layout-fixed layout-navbar-fixed layout-footer-fixed" data-panel-auto-height-mode="height" >
+
 	<div class="wrapper">
         <cfinclude template="includes/aa_navBar.cfm">
         <cfinclude template="includes/aa_sidebar.cfm">
