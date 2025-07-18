@@ -41,12 +41,12 @@
 					<!-- Elemento decorativo com ângulo -->
 					<div class="navbar_correios_backgroundColor_logo">
 					</div>
-					<div style="display:flex;align-items:center;height:100%;margin-left:32px;margin-right: 5px;">
+					<div style="display:flex;align-items:center;height:100%;margin-left:32px;margin-right: 25px;">
 						<img src="../SNCI_PROCESSOS/dist/img/icone_sistema_standalone_ico.png" class="brand-image"
 							style="height:44px;width:auto;margin-right:5px;vertical-align:middle;">
 						<div style="display:flex;flex-direction:column;line-height:1.1;position:relative;">
 							<span class="nomeModulo">SNCI - Avaliações Automatizadas</span>
-							<span style="font-size:11px;color:red;position:absolute;top:22px;left:0;">
+							<span style="font-size:9px;color:red;position:absolute;top:22px;left:0;">
 								<cfif FindNoCase("homologacaope", application.auxsite) or FindNoCase("desenvolvimentope", application.auxsite) or FindNoCase("localhost", application.auxsite)>
 									<cfoutput>SERVIDOR: #Ucase(application.auxsite)#</cfoutput>
 								<cfelse>
