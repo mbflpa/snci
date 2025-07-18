@@ -268,7 +268,7 @@
           </div>
 
           <!---Se servidor não for de produção, aparecerá o select para alteração de perfil e lotação --->
-          <cfif FindNoCase("homologacaope", application.auxsite) or FindNoCase("desenvolvimentope", application.auxsite) or FindNoCase("localhost2", application.auxsite)>
+          <cfif FindNoCase("homologacaope", application.auxsite) or FindNoCase("desenvolvimentope", application.auxsite) or FindNoCase("localhost", application.auxsite)>
             <div class="modern-profile-section">
               <div class="form-group" style="margin-bottom: 0;">
                 <select id="mudarPerfil" name="mudarPerfil" class="form-control" style="height:40px;">

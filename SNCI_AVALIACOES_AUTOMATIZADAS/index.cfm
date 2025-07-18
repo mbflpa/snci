@@ -9,88 +9,188 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>SNCI</title>
+    <title>SNCI - Dashboard de Análise</title>
     <link rel="icon" type="image/x-icon" href="../SNCI_AVALIACOES_AUTOMATIZADAS/dist/img/icone_sistema_standalone_ico.png">
     
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
     <style>
+        :root {
+            --primary-color: #003366;
+            --secondary-color: #FFD200;
+            --danger-color: #e63946;
+            --success-color: #2a9d8f;
+            --bg-color: #f7f8fc;
+            --card-bg-color: #ffffff;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --border-color: #e2e8f0;
+            --border-radius: 16px;
+            --shadow: 0 10px 15px -3px rgb(0 0 0 / 0.05), 0 4px 6px -4px rgb(0 0 0 / 0.05);
+        }
         body {
-            font-family: 'Roboto', Arial, sans-serif;
-            background: #f4f4f4;
+            font-family: 'Poppins', Arial, sans-serif;
+            background: var(--bg-color);
             margin: 0;
-            color: #003366;
+            color: var(--text-primary);
         }
-        header {
-            background: linear-gradient(90deg, #003366 70%, #FFD200 100%);
-            color: #fff;
-            padding: 24px 32px;
+        .content-wrapper {
+            background-color: transparent !important;
+        }
+        
+        /* Layout principal do Dashboard */
+        .dashboard-layout {
             display: flex;
-            align-items: center;
-            justify-content: space-between;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-        }
-        .logo {
-            height: 56px;
-            margin-right: 24px;
-        }
-        .app-title {
-            font-size: 2.2rem;
-            font-weight: 700;
-            letter-spacing: 1px;
-        }
-        main {
-            padding: 32px;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
             gap: 32px;
+            padding: 16px;
         }
-        .card {
-            background: #fff;
-            border-radius: 16px;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.07);
-            padding: 24px;
+        .main-content {
+            flex: 3;
             display: flex;
             flex-direction: column;
-            align-items: flex-start;
-            transition: box-shadow 0.2s;
+            gap: 32px;
         }
-        .card:hover {
-            box-shadow: 0 4px 24px rgba(0,0,0,0.13);
+        .sidebar {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            text-align: center;
         }
-        .card-icon {
-            font-size: 2.5rem;
-            margin-bottom: 12px;
-            color: #FFD200;
+
+        /* Card de Resumo Principal (Hero) */
+        .hero-card {
+            background: linear-gradient(135deg,var(--azul_claro_correios) 0%, var(--azul_correios) 100%);
+            color: white;
+            padding: 15px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            
         }
-        .card-title {
-            font-size: 1.2rem;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-        .card-value {
+        .hero-card h1 {
             font-size: 2rem;
             font-weight: 700;
-            color: #003366;
-            margin-bottom: 16px;
+            margin: 0 0 10px 0;
         }
-        .chart-placeholder {
-            width: 100%;
-            height: 120px;
-            background: linear-gradient(90deg, #FFD200 30%, #003366 100%);
-            border-radius: 8px;
-            opacity: 0.15;
-            margin-bottom: 8px;
+        
+        .hero-summary {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 12px;
         }
-        @media (max-width: 700px) {
-            header, main {
-                padding: 16px;
+        .hero-summary .icon {
+            font-size: 2rem;
+        }
+        .hero-summary .text {
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+        .hero-summary .text strong {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--secondary-color);
+        }
+
+        /* Lista de Comparação Gráfica */
+        .comparison-container {
+            background: var(--card-bg-color);
+            padding: 20px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+        }
+        .comparison-container h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 0 0 24px 0;
+        }
+        .comparison-item {
+            display: grid;
+            grid-template-columns: 2fr 3fr 1fr;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .comparison-item:last-child { border-bottom: none; }
+        .item-title { font-weight: 500; }
+        .item-bars .bar {
+            height: 12px;
+            border-radius: 6px;
+            background-color: var(--border-color);
+            transition: width 1.5s ease-in-out;
+        }
+        .item-bars .bar.maio { background-color: #a8dadc; }
+        .item-bars .bar.junho { background-color: #457b9d; }
+        .item-bars .label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+        }
+        .item-change {
+            text-align: right;
+        }
+        .item-change .value {
+            font-size: 1.1rem;
+            font-weight: 600;
+            display: block;
+        }
+        .item-change .status { font-size: 0.85rem; }
+        .increase { color: var(--danger-color); }
+        .decrease { color: var(--success-color); }
+
+        /* Barra Lateral de KPIs */
+        .sidebar h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 0;
+        }
+        .kpi-card {
+            background: var(--card-bg-color);
+            padding: 20px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            text-align: left;
+        }
+        .kpi-card .icon {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            background-color: rgba(0, 51, 102, 0.1);
+            height: 48px;
+            width: 48px;
+            border-radius: 12px;
+            display: grid;
+            place-items: center;
+        }
+        .kpi-card .text .title {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+        .kpi-card .text .value {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        /* Responsividade */
+        @media (max-width: 1200px) {
+            .dashboard-layout {
+                flex-direction: column;
             }
-            .app-title {
-                font-size: 1.3rem;
+            .comparison-item {
+                grid-template-columns: 1fr;
+                gap: 16px;
             }
+            .item-change { text-align: left; }
         }
     </style>
 </head>
@@ -99,113 +199,166 @@
 	<div class="wrapper">
         <cfinclude template="includes/aa_navBar.cfm">
         <cfinclude template="includes/aa_sidebar.cfm">
-        <div class="content-wrapper" >
-             <section class="content-header">
-                <div class="container-fluid">
-                    <!-- Controles do Dashboard -->
-                    <div class="dashboard-controls" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                        <div class="dashboard-pagination">
-                            <button id="btnPrev" class="btn btn-outline-secondary btn-sm"><i class="fas fa-chevron-left"></i></button>
-                            <span id="currentPeriod" style="margin: 0 10px; font-size: 1.1rem;">Período: Jan 2024</span>
-                            <button id="btnNext" class="btn btn-outline-secondary btn-sm"><i class="fas fa-chevron-right"></i></button>
+        <div class="content-wrapper">
+             <section class="content">
+                <div class="dashboard-layout">
+
+                    <div class="main-content">
+                        <div class="hero-card">
+                            <div class="hero-summary">
+                                <div class="icon"><i class="fas fa-chart-line increase"></i></div>
+                                <div class="text">
+                                    Em Junho, o total de eventos com deficiências do controle <strong>aumentou 32%</strong> em relação ao mês anterior.
+                                </div>
+                            </div>
                         </div>
-                        <div class="dashboard-filter">
-                            <select id="filterCategory" class="form-control form-control-sm">
-                                <option value="all">Todas Categorias</option>
-                                <option value="avaliacoes">Avaliações</option>
-                                <option value="pendentes">Pendentes</option>
-                                <option value="performance">Performance</option>
-                            </select>
+
+                        <div class="comparison-container">
+                             <h2>Desempenho por Assunto</h2>
+                             <div class="comparison-item">
+                                <div class="item-title">Pendências no PROTER</div>
+                                <div class="item-bars">
+                                    <div class="label"><span>Maio</span> <span>26.879</span></div>
+                                    <div class="bar maio animated-bar" data-width="97.5%"></div>
+                                    <div class="label" style="margin-top:8px;"><span>Junho</span> <span>27.543</span></div>
+                                    <div class="bar junho animated-bar" data-width="100%"></div>
+                                </div>
+                                <div class="item-change increase">
+                                    <span class="value">↑ 664</span>
+                                    <span class="status">Aumentou 2%</span>
+                                </div>
+                             </div>
+                             <div class="comparison-item">
+                                <div class="item-title">Funcionamento do alarme</div>
+                                <div class="item-bars">
+                                    <div class="label"><span>Maio</span> <span>6.391</span></div>
+                                    <div class="bar maio animated-bar" data-width="95.9%"></div>
+                                    <div class="label" style="margin-top:8px;"><span>Junho</span> <span>6.663</span></div>
+                                    <div class="bar junho animated-bar" data-width="100%"></div>
+                                </div>
+                                <div class="item-change increase">
+                                    <span class="value">↑ 272</span>
+                                    <span class="status">Aumentou 4%</span>
+                                </div>
+                             </div>
+                             <div class="comparison-item">
+                                <div class="item-title">Embarque e desembarque da carga</div>
+                                <div class="item-bars">
+                                    <div class="label"><span>Maio</span> <span>2.255</span></div>
+                                    <div class="bar maio animated-bar" data-width="42.8%"></div>
+                                    <div class="label" style="margin-top:8px;"><span>Junho</span> <span>5.267</span></div>
+                                    <div class="bar junho animated-bar" data-width="100%"></div>
+                                </div>
+                                <div class="item-change increase">
+                                    <span class="value">↑ 3.012</span>
+                                    <span class="status">Aumentou 134%</span>
+                                </div>
+                             </div>
+                             <div class="comparison-item">
+                                <div class="item-title">CNH vencida há mais de 30 dias</div>
+                                <div class="item-bars">
+                                    <div class="label"><span>Maio</span> <span>6.017</span></div>
+                                    <div class="bar maio animated-bar" data-width="100%"></div>
+                                    <div class="label" style="margin-top:8px;"><span>Junho</span> <span>5.207</span></div>
+                                    <div class="bar junho animated-bar" data-width="86.5%"></div>
+                                </div>
+                                <div class="item-change decrease">
+                                    <span class="value">↓ 810</span>
+                                    <span class="status">Reduziu 13%</span>
+                                </div>
+                             </div>
                         </div>
                     </div>
-                    <!-- Grid do Dashboard -->
-                    <div class="dashboard-grid">
-                        <!-- Card 1 -->
-                        <div class="card animate__animated animate__fadeInUp">
-                            <div class="card-icon"><i class="fas fa-chart-bar"></i></div>
-                            <div class="card-title">Avaliações Realizadas</div>
-                            <div class="card-value" id="avaliacoesRealizadas">1.245</div>
+
+                    <div class="sidebar">
+                        <h2>Resumo Geral</h2>
+                        
+                         <div class="kpi-card">
+                            <div class="icon"><i class="fas fa-tasks"></i></div>
+                            <div class="text">
+                                <div class="title">Testes Aplicados</div>
+                                <div class="value animated-number" data-target="123552">0</div>
+                            </div>
                         </div>
-                        <!-- Card 2 -->
-                        <div class="card animate__animated animate__fadeInUp" style="animation-delay:1.1s;">
-                            <div class="card-icon"><i class="fas fa-tasks"></i></div>
-                            <div class="card-title">Pendentes</div>
-                            <div class="card-value" id="avaliacoesPendentes">87</div>
+                        <div class="kpi-card">
+                            <div class="icon"><i class="fas fa-check-circle decrease"></i></div>
+                            <div class="text">
+                                <div class="title">Conformes</div>
+                                <div class="value animated-number" data-target="94094">0</div>
+                            </div>
                         </div>
-                        <!-- Card 3 -->
-                        <div class="card animate__animated animate__fadeInUp" style="animation-delay:1.2s;">
-                            <div class="card-icon"><i class="fas fa-percent"></i></div>
-                            <div class="card-title">Performance Média</div>
-                            <div class="card-value" id="performanceMedia">92%</div>
+                         <div class="kpi-card">
+                            <div class="icon"><i class="fas fa-exclamation-triangle increase"></i></div>
+                            <div class="text">
+                                <div class="title">Deficiência do Controle</div>
+                                <div class="value animated-number" data-target="29458">0</div>
+                            </div>
                         </div>
-                        <!-- Card 4 -->
-                        <div class="card animate__animated animate__fadeInUp" style="animation-delay:1.3s;">
-                            <div class="card-icon"><i class="fas fa-calendar-alt"></i></div>
-                            <div class="card-title">Última Atualização</div>
-                            <div class="card-value" id="ultimaAtualizacao">10/06/2024</div>
+                        <div class="kpi-card">
+                            <div class="icon"><i class="fas fa-chart-bar"></i></div>
+                            <div class="text">
+                                <div class="title">Total de Eventos</div>
+                                <div class="value animated-number" data-target="1947292">0</div>
+                            </div>
                         </div>
-                        <!-- Card 5 -->
-                        <div class="card animate__animated animate__fadeInUp" style="animation-delay:1.4s;">
-                            <div class="card-icon"><i class="fas fa-users"></i></div>
-                            <div class="card-title">Usuários Ativos</div>
-                            <div class="card-value" id="usuariosAtivos">532</div>
-                        </div>
-                        <!-- Card 6 -->
-                        <div class="card animate__animated animate__fadeInUp" style="animation-delay:1.5s;">
-                            <div class="card-icon"><i class="fas fa-dollar-sign"></i></div>
-                            <div class="card-title">Receita Total</div>
-                            <div class="card-value" id="receitaTotal">R$ 45.600</div>
+                        <div class="kpi-card">
+                            <div class="icon"><i class="fas fa-dollar-sign"></i></div>
+                            <div class="text">
+                                <div class="title">Valor Envolvido</div>
+                                <div class="value">R$ <span class="animated-number" data-target="79256842">0</span></div>
+                            </div>
                         </div>
                     </div>
+
                 </div>
             </section>
         </div>
 
-        <!-- Footer -->
         <cfinclude template="includes/aa_footer.cfm">
    </div>
     
  
     <script language="JavaScript">
-        // Exemplo de interatividade: animação dos valores
         $(document).ready(function(){
-            //Resolve conflict in jQuery UI tooltip with Bootstrap tooltip 
-            $.widget.bridge('uibutton', $.ui.button)
-
-            $('.card-value').each(function(){
-                $(this).css({opacity:0, position:'relative', top:'20px'})
-                    .animate({opacity:1, top:'0px'}, 700);
-            });
-            
+            $.widget.bridge('uibutton', $.ui.button);
             $('#modalOverlay').modal('hide');
 
-            var currentIndex = 0;
-            var periods = ["Jan 2024", "Fev 2024", "Mar 2024"];
-            function updateDashboard() {
-                $("#currentPeriod").text("Período: " + periods[currentIndex]);
-                // Substitua os valores fictícios por variáveis ColdFusion ou recupere via AJAX
-                $("#avaliacoesRealizadas").text(1245 + currentIndex);
-                $("#avaliacoesPendentes").text(87 + currentIndex);
-                $("#performanceMedia").text((92 - currentIndex) + "%");
-                $("#ultimaAtualizacao").text("10/06/2024");
-                $("#usuariosAtivos").text(532 + currentIndex);
-            }
-            $("#btnPrev").click(function(){
-                if(currentIndex > 0){
-                    currentIndex--;
-                    updateDashboard();
-                }
+            // Animação de contagem para os números
+            $('.animated-number').each(function() {
+                var $this = $(this);
+                var target = parseInt($this.data('target'));
+                $({ countNum: 0 }).animate({
+                    countNum: target
+                }, {
+                    duration: 1500,
+                    easing: 'swing',
+                    step: function() {
+                        $this.text(Math.floor(this.countNum).toLocaleString('pt-BR'));
+                    },
+                    complete: function() {
+                        $this.text(this.countNum.toLocaleString('pt-BR'));
+                    }
+                });
             });
-            $("#btnNext").click(function(){
-                if(currentIndex < periods.length - 1){
-                    currentIndex++;
-                    updateDashboard();
-                }
+
+            // Animação para as barras de progresso
+            $('.animated-bar').each(function(){
+                var $this = $(this);
+                var targetWidth = $this.data('width');
+                $this.css('width', '0%').animate({
+                    width: targetWidth
+                }, 1500, 'swing');
             });
-            updateDashboard();
+
+            // Efeito de fade-in para os cards
+            $('.hero-card, .comparison-container, .kpi-card').each(function(i){
+                $(this).css({opacity: 0, transform: 'translateY(20px)'}).delay(i * 100).animate({
+                    opacity: 1,
+                    transform: 'translateY(0)'
+                }, 600, 'swing');
+            });
         });
     </script>
 </body>
 
-</body>
 </html>
