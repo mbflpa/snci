@@ -122,14 +122,14 @@
 					</cfif>
 				</cfif>
 			<cfelse>
-				<!---Se o perfil for 13 - 'CONSULTA' (AUDIT e RISCO)--->
+				<!---Se o perfil for 13 - 'GOVERNAN�A'--->
 				<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 13 >
-						AND pc_num_status not in(6,7)
+						AND pc_num_status not in(6,7,8)
 				</cfif>
 
 				<!---Se o perfil for 15 - 'DIRETORIA'--->
 				<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 15 >
-						AND pc_num_status not in(6,7)
+						AND pc_num_status not in(6,7,8)
 						AND (
 							pc_aval_orientacao_mcu_orgaoResp = '#application.rsUsuarioParametros.pc_usu_lotacao#' 
 							OR pc_aval_melhoria_num_orgao =  '#application.rsUsuarioParametros.pc_usu_lotacao#' 
@@ -360,14 +360,14 @@
 					</cfif>
 				</cfif>
 			<cfelse>
-				<!---Se o perfil for 13 - 'CONSULTA' (AUDIT e RISCO)--->
+				<!---Se o perfil for 13 - 'GOVERNANÇA'--->
 				<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 13>
-					AND pc_aval_status_id not in(1,2,3,5,8)	AND pc_num_status not in(6,7)
+					AND pc_aval_status_id not in(1,2,3,5,8)	AND pc_num_status not in(6,7,8)
 				</cfif>
 
 				<!---Se o perfil for 15 - 'DIRETORIA' --->
 				<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 15>
-					AND pc_aval_status_id not in(1,2,3,5,8)	AND pc_num_status not in(6,7)
+					AND pc_aval_status_id not in(1,2,3,5,8)	AND pc_num_status not in(6,7,8)
 					AND (
 							pc_aval_orientacao_mcu_orgaoResp = '#application.rsUsuarioParametros.pc_usu_lotacao#' 
 							OR pc_aval_melhoria_num_orgao =  '#application.rsUsuarioParametros.pc_usu_lotacao#' 
@@ -648,10 +648,10 @@
 			<cfelse>
 				<!---Se o perfil for 13 - 'CONSULTA' (AUDIT e RISCO)--->
 				<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 13 >
-						AND  pc_aval_orientacao_status not in (0,9,12,14) and pc_num_status not in(6,7)
+						AND  pc_aval_orientacao_status not in (0,9,12,14) and pc_num_status not in(6,7,8)
 				<cfelse>
 					<!---Não exibe orientações pendentes de posicionamento inicial do controle interno, canceladas, improcedentes e bloqueadas--->
-				    AND pc_aval_orientacao_status not in (0,1,9,12,14) and pc_num_status not in(6,7)
+				    AND pc_aval_orientacao_status not in (0,1,9,12,14) and pc_num_status not in(6,7,8)
 					AND (
 							pc_num_orgao_avaliado = '#application.rsUsuarioParametros.pc_usu_lotacao#' 
 							OR  pc_aval_orientacao_mcu_orgaoResp = '#application.rsUsuarioParametros.pc_usu_lotacao#' 
@@ -929,9 +929,9 @@
 			<cfelse>
 				<!---Se o perfil for 13 - 'CONSULTA' (AUDIT e RISCO), não mostra processos e melhorias bloqueadas--->
 				<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 13 >
-					AND pc_aval_melhoria_status not in('B') AND  pc_num_status not in(6,7)
+					AND pc_aval_melhoria_status not in('B') AND  pc_num_status not in(6,7,8)
 				<cfelse>
-				    AND pc_aval_melhoria_status not in('B') AND  pc_num_status not in(6,7)
+				    AND pc_aval_melhoria_status not in('B') AND  pc_num_status not in(6,7,8)
 					AND (
 							pc_processos.pc_num_orgao_avaliado = '#application.rsUsuarioParametros.pc_usu_lotacao#' 
 							OR  pc_aval_melhoria_num_orgao = '#application.rsUsuarioParametros.pc_usu_lotacao#' 
