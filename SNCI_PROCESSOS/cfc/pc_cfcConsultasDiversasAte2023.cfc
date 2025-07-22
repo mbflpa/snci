@@ -58,14 +58,14 @@
 					</cfif>
 				</cfif>
 			<cfelse>
-				<!---Se o perfil for 13 - 'CONSULTA' (AUDIT e RISCO)--->
+				<!---Se o perfil for 13 - 'GOVERNANÇA'--->
 				<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 13 >
-						AND pc_num_status not in(6,7)
+						AND pc_num_status not in(6,7,8)
 				</cfif>
 
 				<!---Se o perfil for 15 - 'DIRETORIA'--->
 				<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 15 >
-						AND pc_num_status not in(6,7)
+						AND pc_num_status not in(6,7,8)
 						AND (
 							pc_aval_orientacao_mcu_orgaoResp = '#application.rsUsuarioParametros.pc_usu_lotacao#' 
 							OR pc_aval_melhoria_num_orgao =  '#application.rsUsuarioParametros.pc_usu_lotacao#' 

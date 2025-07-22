@@ -59,31 +59,35 @@
 			
 			<cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'S'>
 				<!---Se  processoEmAcompanhamento igual a true só mostra orientações de processos em acompanhamento e bloqueados, caso contrário, mostra processos finalizados--->
-				<cfif '#arguments.processoEmAcompanhamento#' eq true >
-					AND pc_num_status in(4,6)
-				<cfelse>
-					AND pc_num_status in(5,8)
-				</cfif>	
-				<!---Se o perfil for 16 - 'CI - CONSULTAS', mostra todas as orientações--->
-				<cfif ListFind("16",#application.rsUsuarioParametros.pc_usu_perfil#) >
-					AND pc_processo_id IS NOT NULL 
-				<cfelse>
-					<!---Se o perfil não for 3 - DESENVOLVEDOR ou 8 - GESTOR MASTER OU 11 - CI - MASTER ACOMPANHAMENTO (DA GPCI) oculta o status 13 - EM ANÁLISE--->
-					<cfif #application.rsUsuarioParametros.pc_usu_perfil# neq 3 and #application.rsUsuarioParametros.pc_usu_perfil# neq 8 and #application.rsUsuarioParametros.pc_usu_perfil# neq 11>
-							AND not pc_aval_orientacao_status in (13)	
+				<cfif '#arguments.processoEmAcompanhamento#' eq true>
+					<cfif ListFind("8,11,16",#application.rsUsuarioParametros.pc_usu_perfil#)>
+						AND pc_num_status in(4,6)
+					<cfelse>
+						AND pc_num_status in(4)
 					</cfif>
-					
-					
-					<!---Se o perfil for 4 - 'CI - AVALIADOR (EXECUÇÃO)') --->
-					<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 4 >
-						AND pc_avaliador_matricula = #application.rsUsuarioParametros.pc_usu_matricula#	or pc_usu_matricula_coordenador = #application.rsUsuarioParametros.pc_usu_matricula# or pc_usu_matricula_coordenador_nacional = #application.rsUsuarioParametros.pc_usu_matricula#
-					</cfif>
-
-					<!---Se o perfil for 7 - 'CI - REGIONAL (Gestor Nível 1)'  ou 14 -'CI - REGIONAL - SCIA - Acompanhamento'--->
-					<cfif ListFind("7,14",#application.rsUsuarioParametros.pc_usu_perfil#) >
-						AND pc_orgaos.pc_org_se = '#application.rsUsuarioParametros.pc_org_se#' OR pc_orgaos.pc_org_se in(#application.seAbrangencia#)
+				<cfelse>
+					<cfif ListFind("8,11,16",#application.rsUsuarioParametros.pc_usu_perfil#)>
+						AND pc_num_status in(5,8)
+					<cfelse>
+						AND pc_num_status in(5)
 					</cfif>
 				</cfif>
+				<!---Se o perfil não for 3 - DESENVOLVEDOR ou 8 - GESTOR MASTER OU 11 - CI - MASTER ACOMPANHAMENTO (DA GPCI) oculta o status 13 - EM ANÁLISE--->
+				<cfif #application.rsUsuarioParametros.pc_usu_perfil# neq 3 and #application.rsUsuarioParametros.pc_usu_perfil# neq 8 and #application.rsUsuarioParametros.pc_usu_perfil# neq 11>
+						AND not pc_aval_orientacao_status in (13)	
+				</cfif>
+				
+				
+				<!---Se o perfil for 4 - 'CI - AVALIADOR (EXECUÇÃO)') --->
+				<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 4 >
+					AND (pc_avaliador_matricula = #application.rsUsuarioParametros.pc_usu_matricula#	or pc_usu_matricula_coordenador = #application.rsUsuarioParametros.pc_usu_matricula# or pc_usu_matricula_coordenador_nacional = #application.rsUsuarioParametros.pc_usu_matricula#)
+				</cfif>
+
+				<!---Se o perfil for 7 - 'CI - REGIONAL (Gestor Nível 1)'  ou 14 -'CI - REGIONAL - SCIA - Acompanhamento'--->
+				<cfif ListFind("7,14",#application.rsUsuarioParametros.pc_usu_perfil#) >
+					AND (pc_orgaos.pc_org_se = '#application.rsUsuarioParametros.pc_org_se#' OR pc_orgaos.pc_org_se in(#application.seAbrangencia#))
+				</cfif>
+				
 				
 
 			<cfelse>

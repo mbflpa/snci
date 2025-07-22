@@ -69,32 +69,28 @@
 								<cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'S'>
 									<!---Se  processoEmAcompanhamento igual a true só mostra orientações de processos em acompanhamento e bloqueados, caso contrário, mostra processos finalizados--->
 									<cfif '#arguments.processoEmAcompanhamento#' eq true>
-										<cfif ListFind("8,11",#application.rsUsuarioParametros.pc_usu_perfil#)>
+										<cfif ListFind("8,11,16",#application.rsUsuarioParametros.pc_usu_perfil#)>
 											AND pc_num_status in(4,6)
 										<cfelse>
 											AND pc_num_status in(4)
 										</cfif>
 									<cfelse>
-										<cfif ListFind("8,11",#application.rsUsuarioParametros.pc_usu_perfil#)>
+										<cfif ListFind("8,11,16",#application.rsUsuarioParametros.pc_usu_perfil#)>
 											AND pc_num_status in(5,8)
 										<cfelse>
 											AND pc_num_status in(5)
 										</cfif>
 									</cfif>
-									<!---Se o perfil for 16 - 'CI - CONSULTAS', mostra todas as orientações--->
-									<cfif ListFind("16",#application.rsUsuarioParametros.pc_usu_perfil#) >
-										AND pc_processo_id IS NOT NULL 
-									<cfelse>
-										
-										<!---Se a lotação do usuario não for um orgao origem de processos(status 'A') e o perfil for 4 - 'AVALIADOR') --->
-										<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 4 and '#application.rsUsuarioParametros.pc_org_status#' eq 'A'>
-											AND pc_avaliador_matricula = #application.rsUsuarioParametros.pc_usu_matricula#	or pc_usu_matricula_coordenador = #application.rsUsuarioParametros.pc_usu_matricula# or pc_usu_matricula_coordenador_nacional = #application.rsUsuarioParametros.pc_usu_matricula#
-										</cfif>
-										<!---Se o perfil for 7 - 'CI - REGIONAL (Gestor Nível 1)' - o órgão de origem será sempre GCOP--->
-										<cfif ListFind("7,14",#application.rsUsuarioParametros.pc_usu_perfil#) and '#application.rsUsuarioParametros.pc_org_status#' neq 'O'  and '#application.rsUsuarioParametros.pc_org_status#' eq 'A'>
-											AND pc_orgaos.pc_org_se = '#application.rsUsuarioParametros.pc_org_se#' OR pc_orgaos.pc_org_se in(#application.seAbrangencia#)
-										</cfif>
+																		
+									<!---Se a lotação do usuario não for um orgao origem de processos(status 'A') e o perfil for 4 - 'AVALIADOR') --->
+									<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 4 and '#application.rsUsuarioParametros.pc_org_status#' eq 'A'>
+										AND (pc_avaliador_matricula = #application.rsUsuarioParametros.pc_usu_matricula#	or pc_usu_matricula_coordenador = #application.rsUsuarioParametros.pc_usu_matricula# or pc_usu_matricula_coordenador_nacional = #application.rsUsuarioParametros.pc_usu_matricula#)
 									</cfif>
+									<!---Se o perfil for 7 - 'CI - REGIONAL (Gestor Nível 1)' - o órgão de origem será sempre GCOP--->
+									<cfif ListFind("7,14",#application.rsUsuarioParametros.pc_usu_perfil#) and '#application.rsUsuarioParametros.pc_org_status#' neq 'O'  and '#application.rsUsuarioParametros.pc_org_status#' eq 'A'>
+										AND (pc_orgaos.pc_org_se = '#application.rsUsuarioParametros.pc_org_se#' OR pc_orgaos.pc_org_se in(#application.seAbrangencia#))
+									</cfif>
+									
 								<cfelse>
 							        <!---Se  processoEmAcompanhamento igual a true só mostra orientações de processos em acompanhamento, caso contrário, mostra processos finalizados--->
 									<cfif '#arguments.processoEmAcompanhamento#' eq true>
@@ -240,7 +236,7 @@
 																WHERE pc_aval_processo = '#pc_processo_id#' AND pc_aval_melhoria_status not in('P')
 															</cfquery>
 
-															<cfif application.rsUsuarioParametros.pc_org_mcu eq pc_num_orgao_origem AND application.rsUsuarioParametros.pc_usu_perfil eq 8>
+															<cfif (application.rsUsuarioParametros.pc_org_mcu eq pc_num_orgao_origem AND application.rsUsuarioParametros.pc_usu_perfil eq 8) OR application.rsUsuarioParametros.pc_usu_perfil eq 11>
 																<div style="position: relative; display: inline-block;">
 																	<div style="position: absolute; bottom:37px; z-index: 1; width: 270px;">
 																		<cfif pc_num_status eq 6 >
