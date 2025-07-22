@@ -69,24 +69,28 @@
 								<cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'S'>
 									<!---Se  processoEmAcompanhamento igual a true só mostra orientações de processos em acompanhamento e bloqueados, caso contrário, mostra processos finalizados--->
 									<cfif '#arguments.processoEmAcompanhamento#' eq true>
+										<cfif ListFind("8,11,16",#application.rsUsuarioParametros.pc_usu_perfil#)>
 											AND pc_num_status in(4,6)
+										<cfelse>
+											AND pc_num_status in(4)
+										</cfif>
 									<cfelse>
+										<cfif ListFind("8,11,16",#application.rsUsuarioParametros.pc_usu_perfil#)>
 											AND pc_num_status in(5,8)
-									</cfif>
-									<!---Se o perfil for 16 - 'CI - CONSULTAS', mostra todas as orientações--->
-									<cfif ListFind("16",#application.rsUsuarioParametros.pc_usu_perfil#) >
-										AND pc_processo_id IS NOT NULL 
-									<cfelse>
-										
-										<!---Se a lotação do usuario não for um orgao origem de processos(status 'A') e o perfil for 4 - 'AVALIADOR') --->
-										<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 4 and '#application.rsUsuarioParametros.pc_org_status#' eq 'A'>
-											AND pc_avaliador_matricula = #application.rsUsuarioParametros.pc_usu_matricula#	or pc_usu_matricula_coordenador = #application.rsUsuarioParametros.pc_usu_matricula# or pc_usu_matricula_coordenador_nacional = #application.rsUsuarioParametros.pc_usu_matricula#
-										</cfif>
-										<!---Se o perfil for 7 - 'CI - REGIONAL (Gestor Nível 1)' - o órgão de origem será sempre GCOP--->
-										<cfif ListFind("7,14",#application.rsUsuarioParametros.pc_usu_perfil#) and '#application.rsUsuarioParametros.pc_org_status#' neq 'O'  and '#application.rsUsuarioParametros.pc_org_status#' eq 'A'>
-											AND pc_orgaos.pc_org_se = '#application.rsUsuarioParametros.pc_org_se#' OR pc_orgaos.pc_org_se in(#application.seAbrangencia#)
+										<cfelse>
+											AND pc_num_status in(5)
 										</cfif>
 									</cfif>
+																		
+									<!---Se a lotação do usuario não for um orgao origem de processos(status 'A') e o perfil for 4 - 'AVALIADOR') --->
+									<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 4 and '#application.rsUsuarioParametros.pc_org_status#' eq 'A'>
+										AND (pc_avaliador_matricula = #application.rsUsuarioParametros.pc_usu_matricula#	or pc_usu_matricula_coordenador = #application.rsUsuarioParametros.pc_usu_matricula# or pc_usu_matricula_coordenador_nacional = #application.rsUsuarioParametros.pc_usu_matricula#)
+									</cfif>
+									<!---Se o perfil for 7 - 'CI - REGIONAL (Gestor Nível 1)' - o órgão de origem será sempre GCOP--->
+									<cfif ListFind("7,14",#application.rsUsuarioParametros.pc_usu_perfil#) and '#application.rsUsuarioParametros.pc_org_status#' neq 'O'  and '#application.rsUsuarioParametros.pc_org_status#' eq 'A'>
+										AND (pc_orgaos.pc_org_se = '#application.rsUsuarioParametros.pc_org_se#' OR pc_orgaos.pc_org_se in(#application.seAbrangencia#))
+									</cfif>
+									
 								<cfelse>
 							        <!---Se  processoEmAcompanhamento igual a true só mostra orientações de processos em acompanhamento, caso contrário, mostra processos finalizados--->
 									<cfif '#arguments.processoEmAcompanhamento#' eq true>
@@ -232,16 +236,16 @@
 																WHERE pc_aval_processo = '#pc_processo_id#' AND pc_aval_melhoria_status not in('P')
 															</cfquery>
 
-															
+															<cfif (application.rsUsuarioParametros.pc_org_mcu eq pc_num_orgao_origem AND application.rsUsuarioParametros.pc_usu_perfil eq 8) OR application.rsUsuarioParametros.pc_usu_perfil eq 11>
 																<div style="position: relative; display: inline-block;">
 																	<div style="position: absolute; bottom:37px; z-index: 1; width: 270px;">
-																		<cfif #pc_num_status# eq 6 and #application.rsUsuarioParametros.pc_usu_perfil# neq 13>
+																		<cfif pc_num_status eq 6 >
 																			<div style="display: flex; justify-content: space-between; align-items: center; width: 100%;padding-left:5px;padding-right:5px;">
 																				<i id="btDesbloquear" onclick="<cfoutput>javascript:desbloquearProcesso('#pc_processo_id#','#siglaOrgAvaliado#');</cfoutput>" class="fas fa-unlock grow-icon" style="color: #fff; cursor:pointer;" title="Desbloquear Processo" data-toggle="popover" data-trigger="hover" data-placement="bottom" data-content="Desbloquear o Processo Nº <cfoutput>#pc_processo_id#</cfoutput>."></i>
 																				<i id="btFinalizaBloqueado" onclick="javascript:finalizaBloqueado(<cfoutput>'#rsProcCard.pc_processo_id#'</cfoutput>)" class="fas fa-shield-alt grow-icon" style="color: #fff; cursor:pointer;" title="Finalizar Processo mantendo o Bloqueio" data-toggle="popover" data-trigger="hover" data-placement="bottom" data-content="Finalizar c/ Bloqueio o Processo Nº <cfoutput>#pc_processo_id#</cfoutput>."></i>
 																			</div>
 																		<cfelse>
-																			<cfif pc_num_status eq 4 AND pc_modalidade eq "E" AND rsProcComPosicOrgAvaliado.recordcount eq 0 AND rsProcComPropMelhoriaAvaliada.recordcount eq 0 and #application.rsUsuarioParametros.pc_org_controle_interno# eq 'S' and #application.rsUsuarioParametros.pc_usu_perfil# neq 13>
+																			<cfif pc_num_status eq 4 AND pc_modalidade eq "E" AND rsProcComPosicOrgAvaliado.recordcount eq 0 AND rsProcComPropMelhoriaAvaliada.recordcount eq 0 >
 																				<div style="display: flex; justify-content: space-between; align-items: center; width: 100%;padding-left:5px;padding-right:5px;">
 																					<i id="btBloquear" onclick="<cfoutput>javascript:bloquearProcesso('#pc_processo_id#','#siglaOrgAvaliado#');</cfoutput>" class="fas fa-lock grow-icon" style="color: #cd0316; cursor:pointer;" title="Bloquear Processo" data-toggle="popover" data-trigger="hover" data-placement="bottom" data-content="Bloquear o Processo Nº <cfoutput>#pc_processo_id#</cfoutput>."></i>
 																				</div>
@@ -249,6 +253,7 @@
 																		</cfif>
 																	</div>
 																</div>
+															</cfif>
 															
 														</section>
 													</td>
@@ -2543,7 +2548,7 @@
 			</cfquery>
 			<!--fim COLOCA O PROCESSO EM STATUS 6 - BLOQUEADO-->
 
-			<!--COLOCA TODOS OS ITENS DO PROCESSO COM STATUS 8 - BLOQUEADO, EXCETO OS ITENS COM STATUS 7 - FINALIZADO (POIS A FINALIZAÇÃO DO ITEM JÁ FOI TRATADA NA FINALIZAÇÃO DO CADASTRO DO PROCESSO - 6° PASSO)-->
+			<!--COLOCA TODOS OS ITENS DO PROCESSO COM STATUS 8 - BLOQUEADO, EXCETO OS ITENS COM STATUS 7 - FINALIZADO (POIS A FINALIZAÇÃO DO ITEM JÝ FOI TRATADA NA FINALIZAÇÃO DO CADASTRO DO PROCESSO - 6° PASSO)-->
 			<cfquery datasource="#application.dsn_processos#" >
 				UPDATE 	pc_avaliacoes
 				SET 	pc_aval_status=8,
@@ -2551,7 +2556,7 @@
 						pc_aval_atualiz_login = '#application.rsUsuarioParametros.pc_usu_login#' 
 				WHERE 	pc_aval_processo = <cfqueryparam value="#arguments.numProcesso#" cfsqltype="cf_sql_varchar"> AND pc_aval_status not in (7)
 			</cfquery>
-			<!--fim COLOCA TODOS OS ITENS DO PROCESSO COM STATUS 8 - BLOQUEADO, EXCETO OS ITENS COM STATUS 7 - FINALIZADO (POIS A FINALIZAÇÃO DO ITEM JÁ FOI TRATADA NA FINALIZAÇÃO DO CADASTRO DO PROCESSO - 6° PASSO)-->
+			<!--fim COLOCA TODOS OS ITENS DO PROCESSO COM STATUS 8 - BLOQUEADO, EXCETO OS ITENS COM STATUS 7 - FINALIZADO (POIS A FINALIZAÇÃO DO ITEM JÝ FOI TRATADA NA FINALIZAÇÃO DO CADASTRO DO PROCESSO - 6° PASSO)-->
 
 			
 			<!--LISTA TODAS AS ORIENTAÇÕES DO PROCESSO-->
@@ -2620,7 +2625,7 @@
 			</cfquery>
 			<!--fim COLOCA O PROCESSO EM STATUS 4 - ACOMPANHAMENTO-->
 
-			<!--COLOCA TODOS OS ITENS DO PROCESSO COM STATUS 6 - ACOMPANHAMENTO, EXCETO OS ITENS COM STATUS 7 - FINALIZADO (POIS A FINALIZAÇÃO DO ITEM JÁ FOI TRATADA NA FINALIZAÇÃO DO CADASTRO DO PROCESSO - 6° PASSO)-->
+			<!--COLOCA TODOS OS ITENS DO PROCESSO COM STATUS 6 - ACOMPANHAMENTO, EXCETO OS ITENS COM STATUS 7 - FINALIZADO (POIS A FINALIZAÇÃO DO ITEM JÝ FOI TRATADA NA FINALIZAÇÃO DO CADASTRO DO PROCESSO - 6° PASSO)-->
 			<cfquery datasource="#application.dsn_processos#" >
 				UPDATE 	pc_avaliacoes
 				SET 	pc_aval_status=6,
@@ -2628,7 +2633,7 @@
 						pc_aval_atualiz_login = '#application.rsUsuarioParametros.pc_usu_login#' 
 				WHERE 	pc_aval_processo = <cfqueryparam value="#arguments.numProcesso#" cfsqltype="cf_sql_varchar"> AND pc_aval_status not in (7)
 			</cfquery>
-			<!--fim COLOCA TODOS OS ITENS DO PROCESSO COM STATUS 6 -  ACOMPANHAMENTO, EXCETO OS ITENS COM STATUS 7 - FINALIZADO (POIS A FINALIZAÇÃO DO ITEM JÁ FOI TRATADA NA FINALIZAÇÃO DO CADASTRO DO PROCESSO - 6° PASSO)-->
+			<!--fim COLOCA TODOS OS ITENS DO PROCESSO COM STATUS 6 -  ACOMPANHAMENTO, EXCETO OS ITENS COM STATUS 7 - FINALIZADO (POIS A FINALIZAÇÃO DO ITEM JÝ FOI TRATADA NA FINALIZAÇÃO DO CADASTRO DO PROCESSO - 6° PASSO)-->
 
 			
 		
