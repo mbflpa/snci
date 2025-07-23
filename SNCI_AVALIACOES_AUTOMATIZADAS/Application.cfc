@@ -31,10 +31,7 @@ component {
             local.loginUsuario = CGI.REMOTE_USER;
         }
 
-        
-      
-        
-        return true;
+         return true;
     }
 
    

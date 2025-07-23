@@ -1,6 +1,42 @@
 <cfprocessingdirective pageencoding = "utf-8">
 <cfinclude template="../SNCI_AVALIACOES_AUTOMATIZADAS/includes/aa_modal_overlay.cfm ">
 <cfinclude template="../SNCI_AVALIACOES_AUTOMATIZADAS/includes/aa_modal_preloader.cfm">
+
+<!--- Configuração dos dados para o componente de resumo --->
+<cfset dadosResumo = {
+    testesAplicados = {
+        valor = 123552,
+        icone = "fas fa-tasks",
+        titulo = "Testes Aplicados",
+        cor = ""
+    },
+    conformes = {
+        valor = 94094,
+        icone = "fas fa-check-circle",
+        titulo = "Conformes",
+        cor = "decrease"
+    },
+    deficienciasControle = {
+        valor = 29458,
+        icone = "fas fa-exclamation-triangle",
+        titulo = "Deficiência do Controle",
+        cor = "increase"
+    },
+    totalEventos = {
+        valor = 1947292,
+        icone = "fas fa-chart-bar",
+        titulo = "Total de Eventos",
+        cor = ""
+    },
+    valorEnvolvido = {
+        valor = 79256842,
+        icone = "fas fa-dollar-sign",
+        titulo = "Valor Envolvido",
+        cor = "",
+        formatacao = "moeda"
+    }
+}>
+
 <!DOCTYPE html>
 <html lang="pt-br">
 
@@ -51,10 +87,6 @@
         }
         .sidebar {
             flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            text-align: center;
         }
 
         /* Card de Resumo Principal (Hero) */
@@ -141,41 +173,6 @@
         .item-change .status { font-size: 0.85rem; }
         .increase { color: var(--danger-color); }
         .decrease { color: var(--success-color); }
-
-        /* Barra Lateral de KPIs */
-        .sidebar h2 {
-            font-size: 1.5rem;
-            font-weight: 600;
-            margin: 0;
-        }
-        .kpi-card {
-            background: var(--card-bg-color);
-            padding: 20px;
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow);
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            text-align: left;
-        }
-        .kpi-card .icon {
-            font-size: 1.5rem;
-            color: var(--primary-color);
-            background-color: rgba(0, 51, 102, 0.1);
-            height: 48px;
-            width: 48px;
-            border-radius: 12px;
-            display: grid;
-            place-items: center;
-        }
-        .kpi-card .text .title {
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-        }
-        .kpi-card .text .value {
-            font-size: 1.5rem;
-            font-weight: 600;
-        }
 
         /* Responsividade */
         @media (max-width: 1200px) {
@@ -267,43 +264,8 @@
                     </div>
 
                     <div class="sidebar">
-                        <h2>Resumo Geral</h2>
-                        
-                         <div class="kpi-card">
-                            <div class="icon"><i class="fas fa-tasks"></i></div>
-                            <div class="text">
-                                <div class="title">Testes Aplicados</div>
-                                <div class="value animated-number" data-target="123552">0</div>
-                            </div>
-                        </div>
-                        <div class="kpi-card">
-                            <div class="icon"><i class="fas fa-check-circle decrease"></i></div>
-                            <div class="text">
-                                <div class="title">Conformes</div>
-                                <div class="value animated-number" data-target="94094">0</div>
-                            </div>
-                        </div>
-                         <div class="kpi-card">
-                            <div class="icon"><i class="fas fa-exclamation-triangle increase"></i></div>
-                            <div class="text">
-                                <div class="title">Deficiência do Controle</div>
-                                <div class="value animated-number" data-target="29458">0</div>
-                            </div>
-                        </div>
-                        <div class="kpi-card">
-                            <div class="icon"><i class="fas fa-chart-bar"></i></div>
-                            <div class="text">
-                                <div class="title">Total de Eventos</div>
-                                <div class="value animated-number" data-target="1947292">0</div>
-                            </div>
-                        </div>
-                        <div class="kpi-card">
-                            <div class="icon"><i class="fas fa-dollar-sign"></i></div>
-                            <div class="text">
-                                <div class="title">Valor Envolvido</div>
-                                <div class="value">R$ <span class="animated-number" data-target="79256842">0</span></div>
-                            </div>
-                        </div>
+                        <!--- Incluindo o componente de resumo geral --->
+                        <cfinclude  template="includes/componentes_deficiencias_controle/resumo_geral.cfm">
                     </div>
 
                 </div>
@@ -319,24 +281,6 @@
             $.widget.bridge('uibutton', $.ui.button);
             $('#modalOverlay').modal('hide');
 
-            // Animação de contagem para os números
-            $('.animated-number').each(function() {
-                var $this = $(this);
-                var target = parseInt($this.data('target'));
-                $({ countNum: 0 }).animate({
-                    countNum: target
-                }, {
-                    duration: 1500,
-                    easing: 'swing',
-                    step: function() {
-                        $this.text(Math.floor(this.countNum).toLocaleString('pt-BR'));
-                    },
-                    complete: function() {
-                        $this.text(this.countNum.toLocaleString('pt-BR'));
-                    }
-                });
-            });
-
             // Animação para as barras de progresso
             $('.animated-bar').each(function(){
                 var $this = $(this);
@@ -346,8 +290,8 @@
                 }, 1500, 'swing');
             });
 
-            // Efeito de fade-in para os cards
-            $('.hero-card, .comparison-container, .kpi-card').each(function(i){
+            // Efeito de fade-in para os cards principais
+            $('.hero-card, .comparison-container').each(function(i){
                 $(this).css({opacity: 0, transform: 'translateY(20px)'}).delay(i * 100).animate({
                     opacity: 1,
                     transform: 'translateY(0)'
