@@ -13,6 +13,7 @@ component {
         application.dsn_avaliacoes_automatizadas = "DBSNCI";
         application.SESSIONTIMEOUT = 60;
         application.auxsite = CGI.SERVER_NAME;
+        application.loginCGI = CGI.REMOTE_USER;
         
         return true;
     }
@@ -31,8 +32,21 @@ component {
             local.loginUsuario = CGI.REMOTE_USER;
         }
 
+       application.rsUsuarioParametros = queryExecute(
+            "SELECT us.*, un.*
+            FROM Usuarios us
+            LEFT JOIN Unidades un ON un.Und_Codigo = us.Usu_Lotacao
+            WHERE trim(us.Usu_Login) = :login",
+            {login = {value=local.loginUsuario, cfsqltype="cf_sql_varchar"}},
+            {datasource=application.dsn_avaliacoes_automatizadas}
+        );
+
          return true;
+
     }
+
+
+        
 
    
 }
