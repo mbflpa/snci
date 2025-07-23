@@ -156,7 +156,7 @@
 
           .modern-nav-text {
             font-weight: 500;
-            font-size: 0.95rem;
+            font-size: 0.8rem;
             letter-spacing: 0.5px;
           }
 
@@ -291,7 +291,7 @@
                   <div class="modern-nav-icon">
                     <i class="fas fa-tasks"></i>
                   </div>
-                  <span class="modern-nav-text">Análises</span>
+                  <span class="modern-nav-text">Deficiências de Controle</span>
                 </a>
               </li>
               <li class="nav-item" style="margin-bottom: 0;">
@@ -299,7 +299,7 @@
                   <div class="modern-nav-icon">
                     <i class="fas fa-book"></i>
                   </div>
-                  <span class="modern-nav-text">Termos e Definições</span>
+                  <span class="modern-nav-text">Vulnerabilidades</span>
                 </a>
               </li>
               <li class="nav-item" style="margin-bottom: 0;">
@@ -307,28 +307,33 @@
                   <div class="modern-nav-icon">
                     <i class="fas fa-vial"></i>
                   </div>
-                  <span class="modern-nav-text">Testes Envolvidos</span>
+                  <span class="modern-nav-text">Testes Aplicados</span>
                 </a>
               </li>
-              
-              <!-- Exemplo de links adicionais que podem ser adicionados -->
               <li class="nav-item" style="margin-bottom: 0;">
                 <a href="relatorios.cfm" class="nav-link modern-nav-link">
                   <div class="modern-nav-icon">
                     <i class="fas fa-chart-bar"></i>
                   </div>
-                  <span class="modern-nav-text">Relatórios</span>
+                  <span class="modern-nav-text">Base de Eventos</span>
                 </a>
               </li>
               <li class="nav-item" style="margin-bottom: 0;">
-                <a href="configuracoes.cfm" class="nav-link modern-nav-link">
+                <a href="orientacoes.cfm" class="nav-link modern-nav-link">
                   <div class="modern-nav-icon">
-                    <i class="fas fa-cog"></i>
+                    <i class="fas fa-question-circle"></i>
                   </div>
-                  <span class="modern-nav-text">Configurações</span>
+                  <span class="modern-nav-text">Orientações</span>
                 </a>
               </li>
-             
+              <li class="nav-item" style="margin-bottom: 0;">
+                <a href="historicoAnual.cfm" class="nav-link modern-nav-link">
+                  <div class="modern-nav-icon">
+                    <i class="fas fa-history"></i>
+                  </div>
+                  <span class="modern-nav-text">Histórico Anual</span>
+                </a>
+              </li>
             </ul>
           </nav>
          
