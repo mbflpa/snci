@@ -927,7 +927,7 @@
 					</cfif>
 				</cfif>
 			<cfelse>
-				<!---Se o perfil for 13 - 'CONSULTA' (AUDIT e RISCO), não mostra processos e melhorias bloqueadas--->
+				<!---Se o perfil for 13 - 'GOVERNANÇA', não mostra processos e melhorias bloqueadas--->
 				<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 13 >
 					AND pc_aval_melhoria_status not in('B') AND  pc_num_status not in(6,7,8)
 				<cfelse>
