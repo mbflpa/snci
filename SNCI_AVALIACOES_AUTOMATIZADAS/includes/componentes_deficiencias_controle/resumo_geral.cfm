@@ -4,40 +4,72 @@
 <cfparam name="attributes.cssClass" default="">
 <cfparam name="attributes.showAnimation" default="true">
 <cfparam name="attributes.dados" default="#structNew()#">
+<!-- Verifica os dados da unidade de lotação do usuário na tabela fato_verificacao -->
+<cfquery name="rsDadosHistoricos" datasource="#application.dsn_avaliacoes_automatizadas#">
+    SELECT   COUNT(DISTINCT CASE WHEN suspenso = 0 THEN sk_grupo_item END) AS testesEnvolvidos
+            ,SUM(f.NC_Eventos) AS totalEventos
+            ,COUNT(CASE WHEN sigla_apontamento in('C','N') THEN sigla_apontamento END) AS testesAplicados
+            ,COUNT(CASE WHEN sigla_apontamento = 'C' THEN sigla_apontamento END) AS conformes
+            ,COUNT(CASE WHEN sigla_apontamento = 'N' THEN sigla_apontamento END) AS deficienciasControle
+            ,SUM(valor_falta + valor_Sobra + valor_risco) AS valorEnvolvido
+            ,SUM(nr_reincidente) AS reincidencia
+    FROM fato_verificacao f
+    WHERE f.sk_mcu = <cfqueryparam cfsqltype="cf_sql_integer" value="#application.rsUsuarioParametros.Und_MCU#"> 
+    </cfquery>
+
 
 <!--- Estrutura padrão dos dados caso não seja fornecida --->
 <cfif structIsEmpty(attributes.dados)>
     <cfset attributes.dados = {
+        testesEnvolvidos = {
+            valor = rsDadosHistoricos.testesEnvolvidos,
+            icone = "fas fa-list-ul",
+            titulo = "Testes Envolvidos",
+            cor = "",
+            ordem= 1
+        },
         testesAplicados = {
-            valor = 123552,
+            valor = rsDadosHistoricos.testesAplicados,
             icone = "fas fa-tasks",
             titulo = "Testes Aplicados",
-            cor = ""
+            cor = "",
+            ordem= 2
         },
         conformes = {
-            valor = 94094,
+            valor = rsDadosHistoricos.conformes,
             icone = "fas fa-check-circle",
             titulo = "Conformes",
-            cor = "decrease"
+            cor = "decrease",
+            ordem= 3
         },
         deficienciasControle = {
-            valor = 29458,
+            valor = rsDadosHistoricos.deficienciasControle,
             icone = "fas fa-exclamation-triangle",
             titulo = "Deficiência do Controle",
-            cor = "increase"
+            cor = "increase",
+            ordem= 4
         },
         totalEventos = {
-            valor = 1947292,
+            valor = rsDadosHistoricos.totalEventos,
             icone = "fas fa-chart-bar",
             titulo = "Total de Eventos",
-            cor = ""
+            cor = "",
+            ordem= 5
+        },
+        reincidencia= {
+            valor = rsDadosHistoricos.reincidencia,
+            icone = "fas fa-redo",
+            titulo = "Reincidência",
+            cor = "",
+            ordem= 6
         },
         valorEnvolvido = {
-            valor = 79256842,
+            valor = rsDadosHistoricos.valorEnvolvido,
             icone = "fas fa-dollar-sign",
             titulo = "Valor Envolvido",
             cor = "",
-            formatacao = "moeda"
+            formatacao = "moeda",
+            ordem= 7
         }
     }>
 </cfif>
@@ -46,7 +78,7 @@
     .resumo-geral-container {
         display: flex;
         flex-direction: column;
-        gap: 15px;
+        gap: 5px;
         text-align: center;
     }
     
@@ -59,12 +91,12 @@
     
     .kpi-card {
         background: var(--card-bg-color, #ffffff);
-        padding: 20px;
+        padding: 10px;
         border-radius: var(--border-radius, 16px);
         box-shadow: var(--shadow, 0 10px 15px -3px rgb(0 0 0 / 0.05), 0 4px 6px -4px rgb(0 0 0 / 0.05));
         display: flex;
         align-items: center;
-        gap: 16px;
+        gap: 5px;
         text-align: left;
         transition: all 0.3s ease;
         border: 1px solid var(--border-color, #e2e8f0);
@@ -137,7 +169,7 @@
     @media (max-width: 768px) {
         .kpi-card {
             padding: 16px;
-            gap: 12px;
+            gap: 10px;
         }
         
         .kpi-card .icon {
@@ -159,9 +191,28 @@
 <div class="resumo-geral-container <cfoutput>#attributes.cssClass#</cfoutput>">
     <h2 class="resumo-geral-titulo"><cfoutput>#attributes.titulo#</cfoutput></h2>
     
+    <!--- Criar array ordenado pela propriedade ordem --->
+    <cfset dadosOrdenados = arrayNew(1)>
     <cfloop collection="#attributes.dados#" item="chave">
         <cfset item = attributes.dados[chave]>
-        <div class="kpi-card <cfif attributes.showAnimation eq 'true'>fade-in-up</cfif>" data-delay="<cfoutput>#listFindNoCase(structKeyList(attributes.dados), chave) * 100#</cfoutput>">
+        <cfset item.chave = chave>
+        <cfset arrayAppend(dadosOrdenados, item)>
+    </cfloop>
+    
+    <!--- Ordenar por ordem usando bubble sort --->
+    <cfloop from="1" to="#arrayLen(dadosOrdenados)#" index="i">
+        <cfloop from="1" to="#arrayLen(dadosOrdenados)-1#" index="j">
+            <cfif dadosOrdenados[j].ordem GT dadosOrdenados[j+1].ordem>
+                <cfset temp = dadosOrdenados[j]>
+                <cfset dadosOrdenados[j] = dadosOrdenados[j+1]>
+                <cfset dadosOrdenados[j+1] = temp>
+            </cfif>
+        </cfloop>
+    </cfloop>
+    
+    <!--- Loop pelos dados ordenados --->
+    <cfloop array="#dadosOrdenados#" index="item">
+        <div class="kpi-card <cfif attributes.showAnimation eq 'true'>fade-in-up</cfif>" data-delay="<cfoutput>#item.ordem * 100#</cfoutput>">
             <div class="icon <cfif structKeyExists(item, 'cor') and len(item.cor)><cfoutput>#item.cor#</cfoutput></cfif>">
                 <i class="<cfoutput>#item.icone#</cfoutput>"></i>
             </div>

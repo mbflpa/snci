@@ -80,10 +80,10 @@
             padding: 16px;
         }
         .main-content {
-            flex: 3;
+            flex: 5;
             display: flex;
             flex-direction: column;
-            gap: 32px;
+            gap: 10px;
         }
         .sidebar {
             flex: 1;
@@ -93,7 +93,7 @@
         .hero-card {
             background: linear-gradient(135deg,var(--azul_claro_correios) 0%, var(--azul_correios) 100%);
             color: white;
-            padding: 15px;
+            padding: 5px;
             border-radius: var(--border-radius);
             box-shadow: var(--shadow);
             
@@ -195,7 +195,6 @@
         <div class="content-wrapper">
              <section class="content">
                 <div class="dashboard-layout">
-
                     <div class="main-content">
                         <div class="hero-card">
                             <div class="hero-summary">
