@@ -7,7 +7,7 @@
 <!-- Verifica os dados da unidade de lotação do usuário na tabela fato_verificacao -->
 <cfquery name="rsDadosHistoricos" datasource="#application.dsn_avaliacoes_automatizadas#">
     SELECT   COUNT(DISTINCT CASE WHEN suspenso = 0 THEN sk_grupo_item END) AS testesEnvolvidos
-            ,SUM(f.NC_Eventos) AS totalEventos
+            ,SUM(NC_Eventos) AS totalEventos
             ,COUNT(CASE WHEN sigla_apontamento in('C','N') THEN sigla_apontamento END) AS testesAplicados
             ,COUNT(CASE WHEN sigla_apontamento = 'C' THEN sigla_apontamento END) AS conformes
             ,COUNT(CASE WHEN sigla_apontamento = 'N' THEN sigla_apontamento END) AS deficienciasControle

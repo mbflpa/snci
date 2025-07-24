@@ -2,38 +2,36 @@
 <cfinclude template="../SNCI_AVALIACOES_AUTOMATIZADAS/includes/aa_modal_overlay.cfm ">
 <cfinclude template="../SNCI_AVALIACOES_AUTOMATIZADAS/includes/aa_modal_preloader.cfm">
 
-<!--- Configuração dos dados para o componente de resumo --->
-<cfset dadosResumo = {
-    testesAplicados = {
-        valor = 123552,
-        icone = "fas fa-tasks",
-        titulo = "Testes Aplicados",
-        cor = ""
+
+<!--- Configuração dos dados para o componente de desempenho --->
+<cfset dadosDesempenho = {
+    pendenciasProter = {
+        titulo = "Pendências no PROTER",
+        maio = { valor = 26879, percentual = 97.5 },
+        junho = { valor = 27543, percentual = 100 },
+        mudanca = { valor = 664, tipo = "increase", percentual = 2, texto = "Aumentou 2%" },
+        ordem = 1
     },
-    conformes = {
-        valor = 94094,
-        icone = "fas fa-check-circle",
-        titulo = "Conformes",
-        cor = "decrease"
+    funcionamentoAlarme = {
+        titulo = "Funcionamento do alarme",
+        maio = { valor = 6391, percentual = 95.9 },
+        junho = { valor = 6663, percentual = 100 },
+        mudanca = { valor = 272, tipo = "increase", percentual = 4, texto = "Aumentou 4%" },
+        ordem = 2
     },
-    deficienciasControle = {
-        valor = 29458,
-        icone = "fas fa-exclamation-triangle",
-        titulo = "Deficiência do Controle",
-        cor = "increase"
+    embarqueDesembarque = {
+        titulo = "Embarque e desembarque da carga",
+        maio = { valor = 2255, percentual = 42.8 },
+        junho = { valor = 5267, percentual = 100 },
+        mudanca = { valor = 3012, tipo = "increase", percentual = 134, texto = "Aumentou 134%" },
+        ordem = 3
     },
-    totalEventos = {
-        valor = 1947292,
-        icone = "fas fa-chart-bar",
-        titulo = "Total de Eventos",
-        cor = ""
-    },
-    valorEnvolvido = {
-        valor = 79256842,
-        icone = "fas fa-dollar-sign",
-        titulo = "Valor Envolvido",
-        cor = "",
-        formatacao = "moeda"
+    cnhVencida = {
+        titulo = "CNH vencida há mais de 30 dias",
+        maio = { valor = 6017, percentual = 100 },
+        junho = { valor = 5207, percentual = 86.5 },
+        mudanca = { valor = 810, tipo = "decrease", percentual = 13, texto = "Reduziu 13%" },
+        ordem = 4
     }
 }>
 
@@ -47,7 +45,6 @@
 
     <title>SNCI - Dashboard de Análise</title>
     <link rel="icon" type="image/x-icon" href="../SNCI_AVALIACOES_AUTOMATIZADAS/dist/img/icone_sistema_standalone_ico.png">
-    
     
     <style>
         :root {
@@ -63,12 +60,14 @@
             --border-radius: 16px;
             --shadow: 0 10px 15px -3px rgb(0 0 0 / 0.05), 0 4px 6px -4px rgb(0 0 0 / 0.05);
         }
+        
         body {
             font-family: 'Poppins', Arial, sans-serif;
             background: var(--bg-color);
             margin: 0;
             color: var(--text-primary);
         }
+        
         .content-wrapper {
             background-color: transparent !important;
         }
@@ -79,111 +78,20 @@
             gap: 32px;
             padding: 16px;
         }
+        
         .main-content {
             flex: 5;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
         }
+        
         .sidebar {
             flex: 1;
         }
-
-        /* Card de Resumo Principal (Hero) */
-        .hero-card {
-            background: linear-gradient(135deg,var(--azul_claro_correios) 0%, var(--azul_correios) 100%);
-            color: white;
-            padding: 5px;
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow);
-            
-        }
-        .hero-card h1 {
-            font-size: 2rem;
-            font-weight: 700;
-            margin: 0 0 10px 0;
-        }
-        
-        .hero-summary {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            background-color: rgba(255, 255, 255, 0.1);
-            padding: 20px;
-            border-radius: 12px;
-        }
-        .hero-summary .icon {
-            font-size: 2rem;
-        }
-        .hero-summary .text {
-            font-size: 1.1rem;
-            font-weight: 500;
-        }
-        .hero-summary .text strong {
-            font-size: 1.2rem;
-            font-weight: 700;
-            color: var(--secondary-color);
-        }
-
-        /* Lista de Comparação Gráfica */
-        .comparison-container {
-            background: var(--card-bg-color);
-            padding: 20px;
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow);
-        }
-        .comparison-container h2 {
-            font-size: 1.5rem;
-            font-weight: 600;
-            margin: 0 0 24px 0;
-        }
-        .comparison-item {
-            display: grid;
-            grid-template-columns: 2fr 3fr 1fr;
-            align-items: center;
-            gap: 10px;
-            padding: 10px 0;
-            border-bottom: 1px solid var(--border-color);
-        }
-        .comparison-item:last-child { border-bottom: none; }
-        .item-title { font-weight: 500; }
-        .item-bars .bar {
-            height: 12px;
-            border-radius: 6px;
-            background-color: var(--border-color);
-            transition: width 1.5s ease-in-out;
-        }
-        .item-bars .bar.maio { background-color: #a8dadc; }
-        .item-bars .bar.junho { background-color: #457b9d; }
-        .item-bars .label {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-            margin-bottom: 6px;
-        }
-        .item-change {
-            text-align: right;
-        }
-        .item-change .value {
-            font-size: 1.1rem;
-            font-weight: 600;
-            display: block;
-        }
-        .item-change .status { font-size: 0.85rem; }
-        .increase { color: var(--danger-color); }
-        .decrease { color: var(--success-color); }
 
         /* Responsividade */
         @media (max-width: 1200px) {
             .dashboard-layout {
                 flex-direction: column;
             }
-            .comparison-item {
-                grid-template-columns: 1fr;
-                gap: 16px;
-            }
-            .item-change { text-align: left; }
         }
     </style>
 </head>
@@ -192,81 +100,19 @@
 	<div class="wrapper">
         <cfinclude template="includes/aa_navBar.cfm">
         <cfinclude template="includes/aa_sidebar.cfm">
+        
         <div class="content-wrapper">
-             <section class="content">
+            <section class="content">
                 <div class="dashboard-layout">
-                    <div class="main-content">
-                        <div class="hero-card">
-                            <div class="hero-summary">
-                                <div class="icon"><i class="fas fa-chart-line increase"></i></div>
-                                <div class="text">
-                                    Em Junho, o total de eventos com deficiências do controle <strong>aumentou 32%</strong> em relação ao mês anterior.
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="comparison-container">
-                             <h2>Desempenho por Assunto</h2>
-                             <div class="comparison-item">
-                                <div class="item-title">Pendências no PROTER</div>
-                                <div class="item-bars">
-                                    <div class="label"><span>Maio</span> <span>26.879</span></div>
-                                    <div class="bar maio animated-bar" data-width="97.5%"></div>
-                                    <div class="label" style="margin-top:8px;"><span>Junho</span> <span>27.543</span></div>
-                                    <div class="bar junho animated-bar" data-width="100%"></div>
-                                </div>
-                                <div class="item-change increase">
-                                    <span class="value">↑ 664</span>
-                                    <span class="status">Aumentou 2%</span>
-                                </div>
-                             </div>
-                             <div class="comparison-item">
-                                <div class="item-title">Funcionamento do alarme</div>
-                                <div class="item-bars">
-                                    <div class="label"><span>Maio</span> <span>6.391</span></div>
-                                    <div class="bar maio animated-bar" data-width="95.9%"></div>
-                                    <div class="label" style="margin-top:8px;"><span>Junho</span> <span>6.663</span></div>
-                                    <div class="bar junho animated-bar" data-width="100%"></div>
-                                </div>
-                                <div class="item-change increase">
-                                    <span class="value">↑ 272</span>
-                                    <span class="status">Aumentou 4%</span>
-                                </div>
-                             </div>
-                             <div class="comparison-item">
-                                <div class="item-title">Embarque e desembarque da carga</div>
-                                <div class="item-bars">
-                                    <div class="label"><span>Maio</span> <span>2.255</span></div>
-                                    <div class="bar maio animated-bar" data-width="42.8%"></div>
-                                    <div class="label" style="margin-top:8px;"><span>Junho</span> <span>5.267</span></div>
-                                    <div class="bar junho animated-bar" data-width="100%"></div>
-                                </div>
-                                <div class="item-change increase">
-                                    <span class="value">↑ 3.012</span>
-                                    <span class="status">Aumentou 134%</span>
-                                </div>
-                             </div>
-                             <div class="comparison-item">
-                                <div class="item-title">CNH vencida há mais de 30 dias</div>
-                                <div class="item-bars">
-                                    <div class="label"><span>Maio</span> <span>6.017</span></div>
-                                    <div class="bar maio animated-bar" data-width="100%"></div>
-                                    <div class="label" style="margin-top:8px;"><span>Junho</span> <span>5.207</span></div>
-                                    <div class="bar junho animated-bar" data-width="86.5%"></div>
-                                </div>
-                                <div class="item-change decrease">
-                                    <span class="value">↓ 810</span>
-                                    <span class="status">Reduziu 13%</span>
-                                </div>
-                             </div>
-                        </div>
+                    <div class="main-content">                       
+                        <!--- Incluir componente de Desempenho por Assunto --->
+                        <cfinclude template="includes/componentes_deficiencias_controle/desempenho_assunto.cfm">
                     </div>
 
                     <div class="sidebar">
-                        <!--- Incluindo o componente de resumo geral --->
-                        <cfinclude  template="includes/componentes_deficiencias_controle/resumo_geral.cfm">
+                        <!--- Componente de Resumo Geral --->
+                        <cfinclude template="includes/componentes_deficiencias_controle/resumo_geral.cfm">
                     </div>
-
                 </div>
             </section>
         </div>
@@ -274,28 +120,10 @@
         <cfinclude template="includes/aa_footer.cfm">
    </div>
     
- 
     <script language="JavaScript">
         $(document).ready(function(){
             $.widget.bridge('uibutton', $.ui.button);
             $('#modalOverlay').modal('hide');
-
-            // Animação para as barras de progresso
-            $('.animated-bar').each(function(){
-                var $this = $(this);
-                var targetWidth = $this.data('width');
-                $this.css('width', '0%').animate({
-                    width: targetWidth
-                }, 1500, 'swing');
-            });
-
-            // Efeito de fade-in para os cards principais
-            $('.hero-card, .comparison-container').each(function(i){
-                $(this).css({opacity: 0, transform: 'translateY(20px)'}).delay(i * 100).animate({
-                    opacity: 1,
-                    transform: 'translateY(0)'
-                }, 600, 'swing');
-            });
         });
     </script>
 </body>
