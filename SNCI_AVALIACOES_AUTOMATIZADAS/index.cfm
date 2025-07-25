@@ -85,11 +85,11 @@
         
         <div class="content-wrapper">
             <section class="content">
-                <!-- HERO CARD NO TOPO -->
-                <div style="width: 100%; padding: 0 16px; margin-bottom: 16px;">
+    
+                <!--<div style="width: 100%; padding: 0 16px; margin-bottom: 16px;">
                     <cfinclude template="includes/componentes_deficiencias_controle/mensagem_card.cfm">
-                </div>
-                <!-- COMPONENTES HORIZONTAIS ABAIXO -->
+                </div>-->
+ 
                 <div class="deficiencias-geral-layout">
                     <div class="dashboard-main-content">
                         <cfinclude template="includes/componentes_deficiencias_controle/desempenho_assunto.cfm">

@@ -222,7 +222,7 @@
    
     <div class="desempenho-container">
         <div class="comparison-container">
-            <h2>Desempenho por Assunto</h2>
+            <h2>Desempenho por Assunto <span style="font-size: 0.85rem;">(<cfoutput>#nomeMesAtual# x #nomeMesAnterior#</cfoutput>)</span></h2>
             <cfloop collection="#dados#" item="chave">
                 <cfset item = dados[chave]>
                 <cfif item.anterior GT 0 OR item.atual GT 0>

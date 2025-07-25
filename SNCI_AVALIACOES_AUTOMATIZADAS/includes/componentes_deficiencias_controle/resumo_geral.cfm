@@ -1,7 +1,7 @@
 <cfprocessingdirective pageencoding="utf-8">
 
 <cfset anoAtual = dateFormat(now(), "yyyy")>
-<cfparam name="attributes.titulo" default="Resumo Geral de #anoAtual#">
+<cfparam name="attributes.tituloResumo" default="Resumo Geral de #anoAtual#">
 <cfparam name="attributes.cssClass" default="">
 <cfparam name="attributes.showAnimation" default="true">
 <cfparam name="attributes.dados" default="#structNew()#">
@@ -26,7 +26,6 @@
     </cfquery>
 
 
-<!--- Estrutura padrão dos dados caso não seja fornecida --->
 <cfif structIsEmpty(attributes.dados)>
     <cfset attributes.dados = {
         testesEnvolvidos = {
@@ -232,7 +231,7 @@
 <div class="snci-resumo-geral <cfoutput>#attributes.cssClass#</cfoutput>">
     <div class="desempenho-container">
         <div class="comparison-container">
-            <h2><cfoutput>#attributes.titulo#</cfoutput></h2>
+            <h2><cfoutput>#attributes.tituloResumo#</cfoutput></h2>
             <div class="kpi-row">
                 <!--- Criar array ordenado pela propriedade ordem --->
                 <cfset dadosOrdenados = arrayNew(1)>
