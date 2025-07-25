@@ -40,7 +40,7 @@ function valida_acao(a) {
 //return false;
 var grpacesso = '<cfoutput>#grpacesso#</cfoutput>';
 if (a=='S' && (grpacesso=='GESTORES' || grpacesso=='ANALISTAS' || grpacesso=='INSPETORES')){
-alert('Atenção!\n\nPrezado usuário, o plano de testes analático é pra utilização restrita do controle interno.\n\nNão deverá ser divulgado/disponibilizado aos demais órgãos dos correios');
+alert('Atenção!\n\nPrezado usuário, o plano de testes analítico é para utilização restrita do controle interno.\n\nNão deverá ser divulgado/disponibilizado aos demais órgãos dos correios');
 }
 var frm = document.forms[0];
 frm.frmacao.value=a;
