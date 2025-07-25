@@ -238,71 +238,71 @@
 <!--- Anexar arquivo --->
 
 <cfif Form.acao is 'Anexar'>
-<cftry>
-<!--- <cfoutput>
-  arquivo:#arquivo#<br>
-  direto: #diretorio_anexos#<br>
-  serverdir: #cffile.serverdirectory#<br>
-  serverfile: #cffile.serverfile#<br>
-  <cfset gil = gil>
-  </cfoutput> --->
-		<cfquery name="rsSeq" datasource="#dsn_inspecao#">
+	<cftry>
+	<!--- <cfoutput>
+	arquivo:#arquivo#<br>
+	direto: #diretorio_anexos#<br>
+	serverdir: #cffile.serverdirectory#<br>
+	serverfile: #cffile.serverfile#<br>
+	<cfset gil = gil>
+	</cfoutput> --->
+	<cfquery name="rsSeq" datasource="#dsn_inspecao#">
+		SELECT Ane_Codigo FROM Anexos
+		where Ane_NumInspecao='#Form.ninsp#' and 
+		Ane_Unidade='#Form.unid#' and 
+		Ane_NumGrupo=#Form.ngrup# and 
+		Ane_NumItem=#Form.nitem#
+	</cfquery>
+	<cfif rsSeq.recordcount lte 0>
+		<cfset seq = 1>
+	<cfelse>
+		<cfset seq = val(rsSeq.recordcount + 1)>			
+	</cfif>	
+	<cfset seq = '_Seq' & seq>
+
+	<cffile action="upload" filefield="arquivo" destination="#diretorio_anexos#" nameconflict="overwrite" accept="application/pdf">
+
+	<cfset data = DateFormat(now(),'DD-MM-YYYY') & '-' & TimeFormat(Now(),'HH') & 'h' & TimeFormat(Now(),'MM') & 'min' & TimeFormat(Now(),'SS') & 's'>
+
+	<cfset origem = cffile.serverdirectory & '\' & cffile.serverfile>
+	<!--- O arquivo anexo recebe nome indicando Numero da Inspecao, Numero da unidade, Numero do grupo e Numero do item ao qual estao vinculado --->
+
+	<cfset destino = cffile.serverdirectory & '\' & Form.ninsp & '_' & data & '_' & right(CGI.REMOTE_USER,8) & '_' & Form.ngrup & '_' & Form.nitem & seq & '.pdf'>
+
+
+	<cfif FileExists(origem)>
+
+		<cffile action="rename" source="#origem#" destination="#destino#">
+
+		<cfquery datasource="#dsn_inspecao#" name="qVerificaAnexo">
 			SELECT Ane_Codigo FROM Anexos
-			where Ane_NumInspecao='#Form.ninsp#' and 
-			Ane_Unidade='#Form.unid#' and 
-			Ane_NumGrupo=#Form.ngrup# and 
-			Ane_NumItem=#Form.nitem#
+			WHERE Ane_Caminho = <cfqueryparam cfsqltype="cf_sql_varchar" value="#destino#">
 		</cfquery>
-		<cfif rsSeq.recordcount lte 0>
-			<cfset seq = 1>
-		<cfelse>
-			<cfset seq = val(rsSeq.recordcount + 1)>			
-		</cfif>	
-		<cfset seq = '_Seq' & seq>
-
-		<cffile action="upload" filefield="arquivo" destination="#diretorio_anexos#" nameconflict="overwrite" accept="application/pdf">
-
-		<cfset data = DateFormat(now(),'DD-MM-YYYY') & '-' & TimeFormat(Now(),'HH') & 'h' & TimeFormat(Now(),'MM') & 'min' & TimeFormat(Now(),'SS') & 's'>
-
-		<cfset origem = cffile.serverdirectory & '\' & cffile.serverfile>
-		<!--- O arquivo anexo recebe nome indicando Numero da Inspecao, Numero da unidade, Numero do grupo e Numero do item ao qual estao vinculado --->
-
-		<cfset destino = cffile.serverdirectory & '\' & Form.ninsp & '_' & data & '_' & right(CGI.REMOTE_USER,8) & '_' & Form.ngrup & '_' & Form.nitem & seq & '.pdf'>
 
 
-		<cfif FileExists(origem)>
+		<cfif qVerificaAnexo.recordCount eq 0>
 
-			<cffile action="rename" source="#origem#" destination="#destino#">
-
-			<cfquery datasource="#dsn_inspecao#" name="qVerificaAnexo">
-				SELECT Ane_Codigo FROM Anexos
-				WHERE Ane_Caminho = <cfqueryparam cfsqltype="cf_sql_varchar" value="#destino#">
+			<cfquery datasource="#dsn_inspecao#" name="qVerifica">
+				INSERT Anexos(Ane_NumInspecao, Ane_Unidade, Ane_NumGrupo, Ane_NumItem, Ane_Caminho)
+				VALUES ('#Form.ninsp#','#Form.unid#',#Form.ngrup#,#Form.nitem#,'#destino#')
 			</cfquery>
 
+		</cfif>
+		</cfif>
 
-			<cfif qVerificaAnexo.recordCount eq 0>
-
-				<cfquery datasource="#dsn_inspecao#" name="qVerifica">
-				 INSERT Anexos(Ane_NumInspecao, Ane_Unidade, Ane_NumGrupo, Ane_NumItem, Ane_Caminho)
-				 VALUES ('#Form.ninsp#','#Form.unid#',#Form.ngrup#,#Form.nitem#,'#destino#')
-				</cfquery>
-
-		    </cfif>
-         </cfif>
-
-	   <cfcatch type="any">
-			<cfset mensagem = 'Ocorreu um erro ao efetuar esta operacao, o campo Arquivo estao vazio, Selecione um arquivo no formato PDF'>
-			<script>
-				alert('<cfoutput>#mensagem#</cfoutput>');
-				history.back();
-			</script>
-			<cfif isDefined("Session.E01")>
-			  <cfset StructClear(Session.E01)>
-			</cfif>
-			<!--- <cfdump var="#cfcatch#">
-			<cfabort> --->
-	   </cfcatch>
-	 </cftry>
+	<cfcatch type="any">
+		<cfset mensagem = 'Ocorreu um erro ao efetuar esta operacao, o campo Arquivo estao vazio, Selecione um arquivo no formato PDF'>
+		<script>
+			alert('<cfoutput>#mensagem#</cfoutput>');
+			history.back();
+		</script>
+		<cfif isDefined("Session.E01")>
+			<cfset StructClear(Session.E01)>
+		</cfif>
+		<!--- <cfdump var="#cfcatch#">
+		<cfabort> --->
+	</cfcatch>
+	</cftry>
   </cfif>
 
   <!--- Excluir anexo --->
@@ -607,7 +607,8 @@
 					</cfif>	
 				</cfloop>	
 			</cfoutput>
-		<cfelse>
+		<cfelse>	
+			<cfset dtnovoprazo = CreateDate(year(form.POSDTPREVSOLUCAOAGF),month(form.POSDTPREVSOLUCAOAGF),day(form.POSDTPREVSOLUCAOAGF))> 
 			<!---
 			<cfoutput>
 				<!--- contar 30 dias corridos para AGF e ACC --->			
@@ -2252,6 +2253,7 @@ window.open(page, "Popup", windowprops);
 		<input type="hidden" name="situacao" id="situacao" value="#url.situacao#">
 		<input type="hidden" name="posarea" id="posarea" value="#url.posarea#">
 		<input type="hidden" name="dias90decorridos" id="dias90decorridos" value="#dateformat(DateAdd( "d", 90, now()),"DD/MM/YYYY")#">
+		<input type="hidden" name="posdtprevsolucaoagf" id="posdtprevsolucaoagf" value="#qResposta.Pos_DtPrev_Solucao#">
 	</cfoutput>
 <cfset halbtgeral =''> 
 <cfif resp eq 3>
