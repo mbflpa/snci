@@ -10,53 +10,69 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>SNCI - Dashboard de Análise</title>
+    <title>SNCI - deficiencias-geral de Análise</title>
     <link rel="icon" type="image/x-icon" href="../SNCI_AVALIACOES_AUTOMATIZADAS/dist/img/icone_sistema_standalone_ico.png">
     
     <style>
-        :root {
-            --primary-color: #003366;
-            --secondary-color: #FFD200;
-            --danger-color: #e63946;
-            --success-color: #2a9d8f;
-            --bg-color: #f7f8fc;
-            --card-bg-color: #ffffff;
-            --text-primary: #1e293b;
-            --text-secondary: #64748b;
-            --border-color: #e2e8f0;
-            --border-radius: 16px;
-            --shadow: 0 10px 15px -3px rgb(0 0 0 / 0.05), 0 4px 6px -4px rgb(0 0 0 / 0.05);
-        }
+       
         
-        body {
-            font-family: 'Poppins', Arial, sans-serif;
-            background: var(--bg-color);
-            margin: 0;
-            color: var(--text-primary);
-        }
-        
-        .content-wrapper {
-            background-color: transparent !important;
-        }
-        
-        /* Layout principal do Dashboard */
-        .dashboard-layout {
+        .deficiencias-geral-layout {
             display: flex;
             gap: 32px;
             padding: 16px;
+            align-items: flex-start; /* Alinha os itens ao topo */
+            flex-wrap: nowrap; /* Garante que os itens não quebrem para a próxima linha */
         }
         
-        .main-content {
-            flex: 5;
+        /* Força alinhamento específico dos containers na página index */
+        .deficiencias-geral-layout .dashboard-main-content,
+        .deficiencias-geral-layout .dashboard-kpi-panel {
+            margin: 0 !important;
+            padding: 0 !important;
         }
         
-        .sidebar {
-            flex: 1;
+        /* Força os componentes dentro do layout a alinharem no topo */
+        .deficiencias-geral-layout .dashboard-main-content > .snci-desempenho-assunto,
+        .deficiencias-geral-layout .dashboard-kpi-panel > .snci-resumo-geral {
+            margin-top: 0 !important;
+            padding-top: 0 !important;
+        }
+        
+        /* Força containers internos dos componentes a alinharem */
+        .deficiencias-geral-layout .snci-desempenho-assunto .desempenho-container,
+        .deficiencias-geral-layout .snci-resumo-geral .desempenho-container {
+            margin-top: 0 !important;
+            padding-top: 0 !important;
+        }
+        
+        /* Força os comparison-container de ambos componentes */
+        .deficiencias-geral-layout .snci-desempenho-assunto .comparison-container,
+        .deficiencias-geral-layout .snci-resumo-geral .comparison-container {
+            margin-top: 0 !important;
+            padding-top: 12px !important;
+        }
+        
+        /* Força títulos h2 de ambos componentes para alinhamento perfeito */
+        .deficiencias-geral-layout .snci-desempenho-assunto .comparison-container h2,
+        .deficiencias-geral-layout .snci-resumo-geral .comparison-container h2 {
+            margin-top: 0 !important;
+            padding-top: 0 !important;
+            line-height: 1.25rem;
+        }
+
+        .dashboard-main-content {
+            width: 65%; /* Adjust as needed */
+            flex: none; /* Remove flex shorthand for testing */
+        }
+
+        .dashboard-kpi-panel {
+            width: 30%; /* Adjust as needed */
+            flex: none; /* Remove flex shorthand for testing */
         }
 
         /* Responsividade */
         @media (max-width: 1200px) {
-            .dashboard-layout {
+            .deficiencias-geral-layout {
                 flex-direction: column;
             }
         }
@@ -70,14 +86,16 @@
         
         <div class="content-wrapper">
             <section class="content">
-                <div class="dashboard-layout">
-                    <div class="main-content">                       
-                        <!--- Incluir componente de Desempenho por Assunto --->
-                        <cfinclude template="includes/componentes_deficiencias_controle/desempenho_assunto2.cfm">
+                <!-- HERO CARD NO TOPO -->
+                <div style="width: 100%; padding: 0 16px; margin-bottom: 16px;">
+                    <cfinclude template="includes/componentes_deficiencias_controle/mensagem_card.cfm">
+                </div>
+                <!-- COMPONENTES HORIZONTAIS ABAIXO -->
+                <div class="deficiencias-geral-layout">
+                    <div class="dashboard-main-content">
+                        <cfinclude template="includes/componentes_deficiencias_controle/desempenho_assunto.cfm">
                     </div>
-
-                    <div class="sidebar">
-                        <!--- Componente de Resumo Geral --->
+                    <div class="dashboard-kpi-panel">
                         <cfinclude template="includes/componentes_deficiencias_controle/resumo_geral.cfm">
                     </div>
                 </div>
