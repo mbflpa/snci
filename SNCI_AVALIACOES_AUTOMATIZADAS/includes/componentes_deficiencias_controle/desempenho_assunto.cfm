@@ -254,7 +254,7 @@
                             </span>
                             <span class="status">
                                 <cfif item.anterior GT 0>
-                                    <cfoutput>#item.percentual#%</cfoutput>
+                                    <cfoutput>#abs(item.percentual)#%</cfoutput>
                                 <cfelse>
                                     <cfoutput>#(item.atual GT 0 ? 100 : 0)#%</cfoutput>
                                 </cfif>
