@@ -1,6 +1,7 @@
 <cfprocessingdirective pageencoding="utf-8">
 
-<cfparam name="attributes.titulo" default="Resumo Geral">
+<cfset anoAtual = dateFormat(now(), "yyyy")>
+<cfparam name="attributes.titulo" default="Resumo Geral de #anoAtual#">
 <cfparam name="attributes.cssClass" default="">
 <cfparam name="attributes.showAnimation" default="true">
 <cfparam name="attributes.dados" default="#structNew()#">

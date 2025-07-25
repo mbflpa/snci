@@ -2,39 +2,6 @@
 <cfinclude template="../SNCI_AVALIACOES_AUTOMATIZADAS/includes/aa_modal_overlay.cfm ">
 <cfinclude template="../SNCI_AVALIACOES_AUTOMATIZADAS/includes/aa_modal_preloader.cfm">
 
-
-<!--- Configuração dos dados para o componente de desempenho --->
-<cfset dadosDesempenho = {
-    pendenciasProter = {
-        titulo = "Pendências no PROTER",
-        maio = { valor = 26879, percentual = 97.5 },
-        junho = { valor = 27543, percentual = 100 },
-        mudanca = { valor = 664, tipo = "increase", percentual = 2, texto = "Aumentou 2%" },
-        ordem = 1
-    },
-    funcionamentoAlarme = {
-        titulo = "Funcionamento do alarme",
-        maio = { valor = 6391, percentual = 95.9 },
-        junho = { valor = 6663, percentual = 100 },
-        mudanca = { valor = 272, tipo = "increase", percentual = 4, texto = "Aumentou 4%" },
-        ordem = 2
-    },
-    embarqueDesembarque = {
-        titulo = "Embarque e desembarque da carga",
-        maio = { valor = 2255, percentual = 42.8 },
-        junho = { valor = 5267, percentual = 100 },
-        mudanca = { valor = 3012, tipo = "increase", percentual = 134, texto = "Aumentou 134%" },
-        ordem = 3
-    },
-    cnhVencida = {
-        titulo = "CNH vencida há mais de 30 dias",
-        maio = { valor = 6017, percentual = 100 },
-        junho = { valor = 5207, percentual = 86.5 },
-        mudanca = { valor = 810, tipo = "decrease", percentual = 13, texto = "Reduziu 13%" },
-        ordem = 4
-    }
-}>
-
 <!DOCTYPE html>
 <html lang="pt-br">
 
@@ -106,7 +73,7 @@
                 <div class="dashboard-layout">
                     <div class="main-content">                       
                         <!--- Incluir componente de Desempenho por Assunto --->
-                        <cfinclude template="includes/componentes_deficiencias_controle/desempenho_assunto.cfm">
+                        <cfinclude template="includes/componentes_deficiencias_controle/desempenho_assunto2.cfm">
                     </div>
 
                     <div class="sidebar">

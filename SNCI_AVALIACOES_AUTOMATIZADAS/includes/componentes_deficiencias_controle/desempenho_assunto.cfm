@@ -1,5 +1,19 @@
 <cfprocessingdirective pageencoding="utf-8">
 
+<cfquery name="rsDadosHistoricosAssunto" datasource="#application.dsn_avaliacoes_automatizadas#">
+    SELECT 
+        p.MANCHETE
+        ,COUNT(p.sk_grupo_item) AS total_eventos
+        ,FORMAT(f.data_encerramento, 'yyyy-MM') AS mes_ano
+    FROM fato_verificacao f
+    INNER JOIN dim_teste_processos p ON f.sk_grupo_item = p.sk_grupo_item
+    WHERE f.sk_mcu = #application.rsUsuarioParametros.Und_MCU#
+      AND f.suspenso = 0
+      AND f.sk_grupo_item <> 12
+      AND f.data_encerramento >= DATEADD(MONTH, -2, GETDATE())
+    GROUP BY p.MANCHETE, FORMAT(f.data_encerramento, 'yyyy-MM')
+</cfquery>
+
 <cfparam name="titulo" default="Desempenho por Assunto">
 <cfparam name="cssClass" default="main-dashboard">
 <cfparam name="showAnimation" default="true">
@@ -7,39 +21,73 @@
 <cfparam name="heroMessage" default="">
 
 
+<cfset dados = {}>
 
-<!--- Verifica os dados comparativos caso não sejam fornecidos --->
-<cfif structIsEmpty(dados)>
-    <cfset dados = {
-        pendenciasProter = {
-            titulo = "Pendências no PROTER",
-            maio = { valor = 26879, percentual = 97.5 },
-            junho = { valor = 27543, percentual = 100 },
-            mudanca = { valor = 664, tipo = "increase", percentual = 2, texto = "Aumentou 2%" }
-        },
-        funcionamentoAlarme = {
-            titulo = "Funcionamento do alarme",
-            maio = { valor = 6391, percentual = 95.9 },
-            junho = { valor = 6663, percentual = 100 },
-            mudanca = { valor = 272, tipo = "increase", percentual = 4, texto = "Aumentou 4%" }
-        },
-        embarqueDesembarque = {
-            titulo = "Embarque e desembarque da carga",
-            maio = { valor = 2255, percentual = 42.8 },
-            junho = { valor = 5267, percentual = 100 },
-            mudanca = { valor = 3012, tipo = "increase", percentual = 134, texto = "Aumentou 134%" }
-        },
-        cnhVencida = {
-            titulo = "CNH vencida há mais de 30 dias",
-            maio = { valor = 6017, percentual = 100 },
-            junho = { valor = 5207, percentual = 86.5 },
-            mudanca = { valor = 810, tipo = "decrease", percentual = 13, texto = "Reduziu 13%" }
-        }
-    }>
-</cfif>
+<!--- Calcula os identificadores dos meses para comparação --->
+<cfset mesAnteriorDate = dateAdd("m", -1, now())>
+<cfset mesAnteriorFormatted = dateFormat(mesAnteriorDate, "mmmm")>
+<cfset mesAtualFormatted = dateFormat(now(), "mmmm")>
+<cfset nomeMesAnterior = ucase(left(mesAnteriorFormatted, 1)) & lcase(mid(mesAnteriorFormatted, 2, len(mesAnteriorFormatted)-1))>
+<cfset nomeMesAtual = ucase(left(mesAtualFormatted, 1)) & lcase(mid(mesAtualFormatted, 2, len(mesAtualFormatted)-1))>
+
+<!--- Identificadores dos meses no formato yyyy-mm --->
+<cfset mesAnteriorId = dateFormat(mesAnteriorDate, "yyyy-mm")>
+<cfset mesAtualId = dateFormat(now(), "yyyy-mm")>
+
+<!--- Organiza os dados por assunto e mês --->
+<cfloop query="rsDadosHistoricosAssunto">
+    <cfset chave = rereplace(MANCHETE, "[^A-Za-z0-9]", "", "all")>
+    <cfif NOT structKeyExists(dados, chave)>
+        <cfset dados[chave] = { titulo = MANCHETE }>
+    </cfif>
+    <cfif mes_ano EQ mesAnteriorId>
+        <cfset dados[chave]["maio"] = { valor = total_eventos, percentual = 0 }>
+    <cfelseif mes_ano EQ mesAtualId>
+        <cfset dados[chave]["junho"] = { valor = total_eventos, percentual = 0 }>
+    </cfif>
+</cfloop>
+
+<!--- Preenche meses ausentes para garantir exibição --->
+<cfloop collection="#dados#" item="chave">
+    <cfset registro = dados[chave]>
+    <cfif NOT structKeyExists(registro, "maio")>
+        <cfset registro.maio = { valor = 0, percentual = 0 }>
+    </cfif>
+    <cfif NOT structKeyExists(registro, "junho")>
+        <cfset registro.junho = { valor = 0, percentual = 0 }>
+    </cfif>
+</cfloop>
+
+<!--- Calcula percentual e mudança --->
+<cfloop collection="#dados#" item="chave">
+    <cfset registro = dados[chave]>
+    <cfif structKeyExists(registro, "maio") AND structKeyExists(registro, "junho")>
+        <cfset maioValor = registro.maio.valor>
+        <cfset junhoValor = registro.junho.valor>
+        <cfset maxValor = iif(maioValor GT junhoValor, maioValor, junhoValor)>
+        <!--- Evita divisão por zero --->
+        <cfif maxValor GT 0>
+            <cfset registro.maio.percentual = round(maioValor / maxValor * 100)>
+            <cfset registro.junho.percentual = round(junhoValor / maxValor * 100)>
+        <cfelse>
+            <cfset registro.maio.percentual = 0>
+            <cfset registro.junho.percentual = 0>
+        </cfif>
+        <cfset delta = junhoValor - maioValor>
+        <cfset percentual = iif(maioValor GT 0, round(abs(delta) / maioValor * 100), 0)>
+        <cfset tipo       = iif(delta GTE 0, 'increase', 'decrease')>
+        <cfset texto      = iif(delta GTE 0, 'Aumentou', 'Reduziu') & ' ' & percentual & '%'>
+        <cfset registro.mudanca = {
+            valor = abs(delta),
+            tipo = tipo,
+            percentual = percentual,
+            texto = texto
+        }>
+    </cfif>
+</cfloop>
 
 <cfif len(heroMessage) eq 0>
-    <cfset heroMessage = "Em Junho, o total de eventos com deficiências do controle <strong>aumentou 32%</strong> em relação ao mês anterior.">
+    <cfset heroMessage = "Em #nomeMesAtual#, o total de eventos com deficiências do controle <strong>aumentou 32%</strong> em relação ao mês anterior.">
 </cfif>
 
 <style>
@@ -257,6 +305,7 @@
 
 <div class="snci-desempenho-assunto">
     <div class="desempenho-container <cfoutput>#cssClass#</cfoutput>">
+
         <!-- Card Hero -->
         <div class="hero-card <cfif showAnimation eq 'true'>fade-in-up</cfif>" data-delay="100">
             <div class="hero-summary">
@@ -270,36 +319,40 @@
         <!-- Container de Comparação -->
         <div class="comparison-container <cfif showAnimation eq 'true'>fade-in-up</cfif>" data-delay="200">
             <h2><cfoutput>#titulo#</cfoutput></h2>
-            
-            <!--- Loop direto pelos dados (sem ordenação) --->
+
             <cfloop collection="#dados#" item="chave">
                 <cfset item = dados[chave]>
-                <div class="comparison-item <cfif showAnimation eq 'true'>fade-in-up</cfif>" data-delay="300">
-                    <div class="item-title"><cfoutput>#item.titulo#</cfoutput></div>
-                    <div class="item-bars">
-                        <div class="label">
-                            <span>Maio</span> 
-                            <span><cfoutput>#numberFormat(item.maio.valor, "999,999")#</cfoutput></span>
+                <!--- Exibe se houver evento em maio ou junho --->
+                <cfif item.maio.valor GT 0 OR item.junho.valor GT 0>
+                    <div class="comparison-item <cfif showAnimation eq 'true'>fade-in-up</cfif>" data-delay="300">
+                        <div class="item-title"><cfoutput>#item.titulo#</cfoutput></div>
+                        <div class="item-bars">
+                            <div class="label">
+                                <span><cfoutput>#nomeMesAnterior#</cfoutput></span> 
+                                <span><cfoutput>#numberFormat(item.maio.valor, "999,999")#</cfoutput></span>
+                            </div>
+                            <div class="bar maio animated-bar" style="width:0%;" data-width="<cfoutput>#item.maio.percentual#%</cfoutput>"></div>
+
+                            <div class="label" style="margin-top:8px;">
+                                <span><cfoutput>#nomeMesAtual#</cfoutput></span> 
+                                <span><cfoutput>#numberFormat(item.junho.valor, "999,999")#</cfoutput></span>
+                            </div>
+                            <div class="bar junho animated-bar" style="width:0%;" data-width="<cfoutput>#item.junho.percentual#%</cfoutput>"></div>
                         </div>
-                        <div class="bar maio animated-bar" style="width:0%;" data-width="<cfoutput>#item.maio.percentual#%</cfoutput>"></div>
-                        <div class="label" style="margin-top:8px;">
-                            <span>Junho</span> 
-                            <span><cfoutput>#numberFormat(item.junho.valor, "999,999")#</cfoutput></span>
+                        <div class="item-change <cfoutput>#item.mudanca.tipo#</cfoutput>">
+                            <span class="value">
+                                <cfif item.mudanca.tipo eq "increase">↑<cfelse>↓</cfif> 
+                                <cfoutput>#numberFormat(item.mudanca.valor, "999,999")#</cfoutput>
+                            </span>
+                            <span class="status"><cfoutput>#item.mudanca.texto#</cfoutput></span>
                         </div>
-                        <div class="bar junho animated-bar" style="width:0%;" data-width="<cfoutput>#item.junho.percentual#%</cfoutput>"></div>
                     </div>
-                    <div class="item-change <cfoutput>#item.mudanca.tipo#</cfoutput>">
-                        <span class="value">
-                            <cfif item.mudanca.tipo eq "increase">↑<cfelse>↓</cfif> 
-                            <cfoutput>#numberFormat(item.mudanca.valor, "999,999")#</cfoutput>
-                        </span>
-                        <span class="status"><cfoutput>#item.mudanca.texto#</cfoutput></span>
-                    </div>
-                </div>
+                </cfif>
             </cfloop>
         </div>
     </div>
 </div>
+
 
 <script language="JavaScript">
     $(document).ready(function() {
@@ -364,6 +417,7 @@
         $(window).on('scroll resize', checkVisibility);
         checkVisibility();
     });
+
 </script>
 
 
