@@ -120,12 +120,13 @@
 
 <cfset nInsp =''>
 <cfif isDefined("form.dataPrevista")>
-	
 	<cfparam name="URL.selModalidades" default="#form.selModalidades#">
 	<cfparam name="URL.selUnidades" default="#form.selUnidades#">
 	<cfparam name="URL.selCoordenador" default="#form.selCoordenador#">
 	<cfparam name="URL.dataPrevista" default="#form.dataPrevista#">
 	<cfparam name="URL.resp" default="#form.responsavel#">
+	<cfparam name="URL.inpvalorprevisto" default="#form.inpvalorprevisto#">
+	
     <cfset nInsp ='#left(trim("#form.selUnidades#"),2)#0001' & Year(Now())>
 
 	<cfquery datasource="#dsn_inspecao#" name="rsNumProximaInspecao">
@@ -140,13 +141,14 @@
 	</cfif>
 	
 	<cfif isdefined('url.acao')>
-
 		<cfif '#url.acao#' eq 'cadNumInsp'>
 			
 			<cfset dia_data=Left('#dataPrevista#',2)>
 			<cfset mes_data=Mid('#dataPrevista#',4,2)>
 			<cfset ano_data=Right('#dataPrevista#',2)>
 			<cfset dataPrevista=CreateDate(ano_data,mes_data,dia_data)>
+			<cfset inpvalorprevisto = Replace(inpvalorprevisto,'.','','All')>
+			<cfset inpvalorprevisto = Replace(inpvalorprevisto,',','.','All')>
 
 			<cfquery datasource="#dsn_inspecao#" name="rsUnidadeSelecionadaItens">
 				SELECT Und_Codigo, Und_Descricao, Und_TipoUnidade FROM Unidades WHERE Und_Status='A' and Und_Codigo ='#url.selUnidades#'
@@ -156,7 +158,6 @@
 				WHERE TUI_Modalidade ='#selModalidades#' and TUI_Ano=year(#dataPrevista#) and 
 				TUI_TipoUnid='#rsUnidadeSelecionadaItens.Und_TipoUnidade#' and TUI_Ativo=1
 	        </cfquery>
-
 			<cfif rsItens.recordcount neq 0> 
 							<cfquery datasource="#dsn_inspecao#">
 								INSERT INTO Numera_Inspecao
@@ -167,9 +168,9 @@
 
 							<cfquery datasource="#dsn_inspecao#">
 								INSERT INTO Inspecao
-								(INP_Unidade,INP_NumInspecao,INP_HrsPreInspecao,INP_DtInicDeslocamento,INP_DtFimDeslocamento,INP_HrsDeslocamento,INP_DtInicInspecao,INP_DtFimInspecao,INP_HrsInspecao,INP_Situacao,INP_DtEncerramento,INP_Coordenador,INP_Responsavel,INP_DtUltAtu,INP_UserName,INP_Motivo,INP_Modalidade)
+								(INP_Unidade,INP_NumInspecao,INP_HrsPreInspecao,INP_DtInicDeslocamento,INP_DtFimDeslocamento,INP_HrsDeslocamento,INP_DtInicInspecao,INP_DtFimInspecao,INP_HrsInspecao,INP_Situacao,INP_DtEncerramento,INP_Coordenador,INP_Responsavel,INP_DtUltAtu,INP_UserName,INP_Motivo,INP_Modalidade,INP_ValorPrevisto,INP_NaoAplicarValorPrevisto)
 								VALUES
-								('#selUnidades#','#nInsp#','0',<cfqueryparam value="#dataPrevista#" cfsqltype="CF_SQL_DATE">,<cfqueryparam value="#dataPrevista#" cfsqltype="CF_SQL_DATE">,'0',<cfqueryparam value="#dataPrevista#" cfsqltype="CF_SQL_DATE">,<cfqueryparam value="#dataPrevista#" cfsqltype="CF_SQL_DATE">,'0','NA',<cfqueryparam value="#dataPrevista#" cfsqltype="CF_SQL_DATE">,'#selCoordenador#','#resp#',convert(char,getdate(), 120),'#qAcesso.Usu_Login#','','#selModalidades#')
+								('#selUnidades#','#nInsp#','0',<cfqueryparam value="#dataPrevista#" cfsqltype="CF_SQL_DATE">,<cfqueryparam value="#dataPrevista#" cfsqltype="CF_SQL_DATE">,'0',<cfqueryparam value="#dataPrevista#" cfsqltype="CF_SQL_DATE">,<cfqueryparam value="#dataPrevista#" cfsqltype="CF_SQL_DATE">,'0','NA',<cfqueryparam value="#dataPrevista#" cfsqltype="CF_SQL_DATE">,'#selCoordenador#','#resp#',convert(char,getdate(), 120),'#qAcesso.Usu_Login#','','#selModalidades#',#inpvalorprevisto#,'#inpnaoaplicarvalorprevisto#')
 							</cfquery>
 							<cfquery datasource="#dsn_inspecao#">
 							   	UPDATE Unidades SET Und_NomeGerente = '#resp#' WHERE Und_Codigo ='#selUnidades#'
@@ -229,10 +230,7 @@
 
 
 <script type="text/javascript">
-						
-
-	
-    
+						    
     //após o onload recupera a posição do scroll armazenada no sessionStorage e reposiciona-o conforme última localização
      window.onload = function() {
 		var scrollposCadInsp = 0;
@@ -340,6 +338,12 @@ function gerarData(str) {
 	if (a == 'GERAR') {
 		var frm = document.forms[0];
 
+		if ((frm.inpvalorprevisto.value == '' || frm.inpvalorprevisto.value == '0,00') && $("#cbvlrprev").prop("checked") == false) {
+			alert('Informe o Valor previsto!');
+			frm.inpvalorprevisto.focus();
+			return false;
+		}
+
 		if (frm.selUnidades.value == '') {
 			alert('Informe a Unidade que será inspecionada!');
 			frm.selUnidades.focus();
@@ -409,7 +413,86 @@ function gerarData(str) {
     }
 	
 }
-
+function moedadig(a){
+		var valorinfo = $('#'+a).val()
+		//alert('a: '+a)
+		valorinfo = valorinfo.replace(",", "")
+		let n = 0
+		while (n == 0) {
+			valorinfo = valorinfo.replace(".", "")
+			if(valorinfo.indexOf('.') <= 0) {n = 1}
+		}
+		let tam = valorinfo.length
+		let inteiro = valorinfo.substring(0,tam-2)
+		let strinteiro = inteiro.toString()
+		inteiro=(eval(inteiro))
+		let decimal = valorinfo.substring(tam-2,tam)
+		//alert('tam: '+tam+' inteiro: '+inteiro+' decimal: '+decimal)
+		//if (decimal.length == 1) {decimal = decimal + '0'}
+		if(tam == 0){$('#'+a).val('0,00')}
+		if(tam == 1 && inteiro == undefined){$('#'+a).val('0,0'+valorinfo)}
+		if(tam == 2 && inteiro == undefined){$('#'+a).val('0,'+decimal)}
+		if(tam == 3 && inteiro == 0 && decimal == '00'){$('#'+a).val('0,00')}
+		if(tam == 3 && inteiro > 0){$('#'+a).val(inteiro+','+decimal)}
+		if(tam == 4 && inteiro == 0){$('#'+a).val(inteiro+','+decimal)}
+		if(tam == 4 && inteiro > 0){$('#'+a).val(inteiro+','+decimal)}
+		if(tam == 5){$('#'+a).val(inteiro+','+decimal)}
+		if(tam == 6){
+			let milhar = strinteiro.substring(0,1)
+			let centena = strinteiro.substring(1,strinteiro.length)
+			$('#'+a).val(milhar+'.'+centena+','+decimal)
+		}
+		if(tam == 7){
+			let milhar = strinteiro.substring(0,2)
+			let centena = strinteiro.substring(2,strinteiro.length)
+			$('#'+a).val(milhar+'.'+centena+','+decimal)
+		}
+		if(tam == 8){
+			let milhar = strinteiro.substring(0,3)
+			let centena = strinteiro.substring(3,strinteiro.length)
+			$('#'+a).val(milhar+'.'+centena+','+decimal)
+		}
+		if(tam == 9){
+			let milhao = strinteiro.substring(0,1)
+			let milhar = strinteiro.substring(1,4)
+			let centena = strinteiro.substring(4,strinteiro.length)
+			$('#'+a).val(milhao+'.'+milhar+'.'+centena+','+decimal)
+		}	
+		if(tam == 10){
+			let milhao = strinteiro.substring(0,2)
+			let milhar = strinteiro.substring(2,5)
+			let centena = strinteiro.substring(5,strinteiro.length)
+			$('#'+a).val(milhao+'.'+milhar+'.'+centena+','+decimal)
+		}	
+		if(tam == 11){
+			let milhao = strinteiro.substring(0,3)
+			let milhar = strinteiro.substring(3,6)
+			let centena = strinteiro.substring(6,strinteiro.length)
+			$('#'+a).val(milhao+'.'+milhar+'.'+centena+','+decimal)
+		}	
+		if(tam == 12){
+			let bilhao = strinteiro.substring(0,1)
+			let milhao = strinteiro.substring(1,4)
+			let milhar = strinteiro.substring(4,7)
+			let centena = strinteiro.substring(7,strinteiro.length)
+			$('#'+a).val(bilhao+'.'+milhao+'.'+milhar+'.'+centena+','+decimal)
+		}
+		if(tam == 13){
+			let bilhao = strinteiro.substring(0,2)
+			let milhao = strinteiro.substring(2,5)
+			let milhar = strinteiro.substring(5,8)
+			let centena = strinteiro.substring(8,strinteiro.length)
+			$('#'+a).val(bilhao+'.'+milhao+'.'+milhar+'.'+centena+','+decimal)
+		}	
+		if(tam == 14){
+			let bilhao = strinteiro.substring(0,3)
+			let milhao = strinteiro.substring(3,6)
+			let milhar = strinteiro.substring(6,9)
+			let centena = strinteiro.substring(9,strinteiro.length)
+			$('#'+a).val(bilhao+'.'+milhao+'.'+milhar+'.'+centena+','+decimal)
+		}				
+		//var f2 = valorinfo.toLocaleString('pt-br', {minimumFractionDigits: 2});
+	}
 //================
 function Mascara_Data(data)
 {
@@ -439,17 +522,13 @@ function Mascara_Data(data)
 }	
 //================
 function numericos() {
-var tecla = window.event.keyCode;
-//permite digitação das teclas numéricas (48 a 57, 96 a 105), Delete e Backspace (8 e 46), TAB (9) e ESC (27)
-//if ((tecla != 8) && (tecla != 9) && (tecla != 27) && (tecla != 46)) {
-	
-	if ((tecla != 46) && ((tecla < 48) || (tecla > 57))) {
+	var tecla = window.event.keyCode;
+	//alert(tecla)
+	//permite digitação das teclas numéricas (48 a 57, 96 a 105), Delete e Backspace (8 e 46), TAB (9) e ESC (27)	
+		if (((tecla < 48) || (tecla > 57))) {
 		//alert(tecla);
-	//  if () {
 		event.returnValue = false;
-	 // }
 	}
-//}
 }
 //================
 function abrirPopup(url,w,h) {
@@ -604,17 +683,16 @@ z-index:1000;visibility:hidden;position:absolute;" >
 		<form id="formCadNum" nome="formCadNum" class="appnitro" onSubmit="return valida_formCadNum('')" enctype="multipart/form-data" method="post"  action="cadastro_inspecao.cfm?acao=cadNumInsp">
 		
 		    <input type="hidden" name="NumInspecao" value="<cfoutput>#url.numInspecao#</cfoutput>">
+			<input type="hidden" id="inpnaoaplicarvalorprevisto" name="inpnaoaplicarvalorprevisto" value="0">
+			
 			<input type="hidden" name="sacao" id="sacao" value="">
 			<cfif '#url.acao#' neq 'cadastrado' >
 
 				<tr>
 					<input type="text"  id="myInput" onChange="filterFunction();"  onkeyup="filterFunction();"  style="color:blue;padding-left:20px;text-align: left;border:1px solid #3bd1f3;margin-left:104px;position:absolute;top:40px;left:20px;width:200px">
 					<img src="figuras/lupa.png" width="16"  border="0" style="position:absolute; left:126px;top:42px;z-index:1000"></img>
-					
 				</tr>
-				 
-				<br>
-				
+				<br>				
 				<tr>
 					<td>
 						<label  for="selUnidades" style="color:grey">Unidade: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
@@ -730,6 +808,14 @@ z-index:1000;visibility:hidden;position:absolute;" >
 						 type="text" value="<cfoutput>#resp#</cfoutput>" style="width:50%;text-align:left" size="30" maxlength="30" />
 					
 					</td>
+				</tr>
+				<br>
+				<tr>
+					<td>
+						<label for="inpvalorprevisto" style="color:grey">Valor previsto R$: &nbsp;</label>
+						<input name="inpvalorprevisto" id="inpvalorprevisto" type="text" value="0,00" style="text-align:left" size="18" maxlength="18" onKeyPress="numericos()" onKeyUp="moedadig(this.name)">					
+						<input type="checkbox" id="cbvlrprev" name="cbvlrprev" title="inativo"><label>Não se Aplica</label>
+					</td>					
 				</tr>
 				<br><br>
 
@@ -865,7 +951,7 @@ tbody {
 
 <!---Inspeções NA = não avaliadas, ER = em reavaliação, RA =reavaliado, CO = concluída--->
 <cfquery datasource="#dsn_inspecao#" name="rsEmRevisao">
-				SELECT distinct INP_DTConcluirAvaliacao, INP_NumInspecao, INP_DtFimInspecao, INP_Unidade,INP_Coordenador, INP_DtEncerramento,INP_DtUltAtu,INP_Modalidade,LTRIM(RTRIM(Und_Descricao)) AS Und_Descricao, Und_Codigo, Dir_sigla, Pro_Situacao, 'comNC' as tipo FROM  Inspecao
+				SELECT distinct INP_DTConcluir_Despesas, INP_DTConcluirAvaliacao, INP_NumInspecao, INP_DtFimInspecao, INP_Unidade,INP_Coordenador, INP_DtEncerramento,INP_DtUltAtu,INP_Modalidade,LTRIM(RTRIM(Und_Descricao)) AS Und_Descricao, Und_Codigo, Dir_sigla, Pro_Situacao, 'comNC' as tipo FROM  Inspecao
 				LEFT JOIN ParecerUnidade ON Pos_Inspecao = INP_NumInspecao
 				LEFT JOIN ProcessoParecerUnidade ON Pro_Inspecao = INP_NumInspecao
 				LEFT JOIN Unidades ON Und_Codigo = INP_Unidade
@@ -877,7 +963,7 @@ tbody {
 </cfquery>
 
 <cfquery datasource="#dsn_inspecao#" name="rsFinalizadasSemNC" >
-			SELECT INP_DTConcluirAvaliacao, INP_NumInspecao, INP_DtFimInspecao, INP_Unidade,INP_Coordenador, INP_DtEncerramento,INP_DtUltAtu,INP_Modalidade
+			SELECT INP_DTConcluir_Despesas, INP_DTConcluirAvaliacao, INP_NumInspecao, INP_DtFimInspecao, INP_Unidade,INP_Coordenador, INP_DtEncerramento,INP_DtUltAtu,INP_Modalidade
 				, LTRIM(RTRIM(Und_Descricao)) AS Und_Descricao, Und_Codigo, Dir_sigla, Pro_Situacao, 'semNC' as tipo FROM  Inspecao
 			LEFT JOIN ParecerUnidade ON Pos_Inspecao = INP_NumInspecao 
 			LEFT JOIN ProcessoParecerUnidade ON Pro_Inspecao = INP_NumInspecao
@@ -890,7 +976,7 @@ tbody {
 			ORDER BY INP_NumInspecao
 </cfquery>
 
-<cfquery datasource="#dsn_inspecao#" name="rsFinalizadasSemNCencerrado" >
+<cfquery datasource="#dsn_inspecao#" name="rsFinalizadasSemNCencerrado">
 			SELECT INP_DTConcluirAvaliacao, INP_NumInspecao, INP_DtFimInspecao, INP_Unidade,INP_Coordenador, INP_DtEncerramento,INP_DtUltAtu,INP_Modalidade,INP_RevisorLogin,LTRIM(RTRIM(Und_Descricao)) AS Und_Descricao, Und_Codigo, Dir_sigla, Pro_Situacao 
 			FROM  Inspecao
 			LEFT JOIN ParecerUnidade ON Pos_Inspecao = INP_NumInspecao 
@@ -907,6 +993,19 @@ tbody {
 
 <cfquery dbtype="query" name="rsEmRevisaoFinalizadasSemNC" >
   SELECT * FROM rsEmRevisao UNION SELECT * FROM rsFinalizadasSemNC WHERE Pro_Situacao = 'AB' and INP_DTConcluirAvaliacao IS NOT NULL
+</cfquery>
+
+<cfquery datasource="#dsn_inspecao#" name="rsvlralocado">
+	SELECT distinct INP_NumInspecao,INP_Unidade,LTRIM(RTRIM(Und_Descricao)) AS Und_Descricao,INP_Modalidade,INP_DTConcluirAvaliacao,Dir_sigla,INP_RevisorLogin,Usu_Apelido
+	FROM  Inspecao
+	INNER JOIN Unidades ON Und_Codigo = INP_Unidade
+	INNER JOIN Diretoria ON  Dir_Codigo = Und_CodDiretoria
+	LEFT JOIN Usuarios ON INP_RevisorLogin = Usu_Login
+	WHERE  Und_CodDiretoria in(#se#) 
+	and right(INP_NumInspecao,4) = CONVERT(VARCHAR(4),year(getdate())) 
+	and INP_DTConcluirAvaliacao is not null
+	and INP_DTConcluir_Despesas is null
+	ORDER BY Dir_sigla,INP_NumInspecao
 </cfquery>
 
 <cfset totalSemValidacao = 0>
@@ -928,13 +1027,14 @@ tbody {
 	WHERE  Und_CodDiretoria in(#se#) and NIP_Situacao = 'E' and right(NIP_NumInspecao,4) = CONVERT(VARCHAR(4),year(getdate())) 
 	ORDER BY NIP_NumInspecao  
 </cfquery>
-<h1 id="titulo" style="font-size:14px;width:720px;"><STRONG>AVALIAÇÕES</STRONG></h1>
+<h1 id="titulo" style="font-size:14px;width:100%;"><STRONG>AVALIAÇÕES</STRONG></h1>
 
 <div style="background:#6699CC;width=720px;">
 	<button class="tablink" onmouseOver="corHover(this);" onMouseOut="corOut(this);" onClick="openPage('NaoFinalizadas', this, '#6699CC')" id="naoFinaliz"><STRONG>INCLUIR INSPETORES</STRONG><br>( <cfoutput>#rsNumeraInspecao.recordcount#</cfoutput> )</button>
 	<button class="tablink" onmouseOver="corHover(this);" onMouseOut="corOut(this);" onClick="openPage('NaoIniciadas', this, '#6699CC')" id="naoAval"><STRONG>NÃO INICIADAS</STRONG><br>( <cfoutput>#rsNaoIniciadas.recordcount#</cfoutput> )</button>
-	<button class="tablink" onmouseOver="corHover(this);" onMouseOut="corOut(this);" onClick="openPage('EmANDAMENTO', this, '#6699CC')" id="naoAval"><STRONG>EM ANDAMENTO</STRONG><br>( <cfoutput>#rsInspecao.recordcount#</cfoutput> )</button>
+	<button class="tablink" onmouseOver="corHover(this);" onMouseOut="corOut(this);" onClick="openPage('EmANDAMENTO', this, '#6699CC')" id="emAndam"><STRONG>EM ANDAMENTO</STRONG><br>( <cfoutput>#rsInspecao.recordcount#</cfoutput> )</button>
 	<button class="tablink" onmouseOver="corHover(this);" onMouseOut="corOut(this);" onClick="openPage('EmRevisao', this, '#6699CC')" id="emRev"><STRONG>EM REVISÃO</STRONG><br>( <cfoutput>#rsEmRevisaoFinalizadasSemNC.recordcount#</cfoutput> )</button>
+	<button class="tablink" onmouseOver="corHover(this);" onMouseOut="corOut(this);" onClick="openPage('VlrAloc', this, '#6699CC')" id="vAloc"><STRONG>VALORES ALOCADOS</STRONG><br>( <cfoutput>#rsvlralocado.recordcount#</cfoutput> )</button>
 	<button class="tablink" onmouseOver="corHover(this);" onMouseOut="corOut(this);" onClick="openPage('SemNC', this, '#6699CC')" id="sNC"><STRONG>SEM ITEM NC</STRONG><br>( <cfoutput>#rsFinalizadasSemNCencerrado.recordcount#</cfoutput> )</button>
     <button class="tablink" onmouseOver="corHover(this);" onMouseOut="corOut(this);" onClick="openPage('Excluidas', this, '#6699CC')" id="excl"><STRONG>EXCLUÍDAS</STRONG><br>( <cfoutput>#rsExcluidas.recordcount#</cfoutput> )</button>
 
@@ -1560,7 +1660,6 @@ tbody {
 											<cfset semNC='Sem Itens "NÃO CONFORME"' >
 										</cfif>
 
-
 										<div align="left" style="margin-left:10px">
 											<div style="color:red;">#temNCI#</div>
 											<div style="color:red;">#emReanalise#</div>
@@ -1636,7 +1735,92 @@ tbody {
 					<label>NÃO EXISTEM AVALIAÇÕES FINALIZADAS (EM REVISÃO)</label>
 					</cfif>
 		</div>
+		<div id="VlrAloc" class="tabcontent" >
+				<!---INICIO TABELA DE valores alocados --->
+				<cfif rsvlralocado.recordCount neq 0>
+					
+					<div id="form_container" name="divEmVerificacao" style="width:1300px;height:expression(this.scrollHeight>299?'300px':'auto');overflow-y:auto;">
+					<table border="0" align="center"  id="tabEmVerificacao" style="width:expression(this.scrollHeight>299?'690px':'700px');">
+						<tr>
+							<td colspan="9" align="center" class="titulos"><h1 style="font-size:14px;background:#6699CC">Fazer Registro dos Valores Alocados</h1></td>
+						</tr>
+						
+						<tr bgcolor="#6699CC" class="exibir" align="center" style="color:#fff">
+							<td width="5%">
+								<div align="center">Número</div>
+							</td>
+							<td width="25%">
+								<div align="center">Unidade</div>
+							</td>
+							<td width="3%">
+								<div align="center">Mod.</div>
+							</td>
+							<td width="8%">
+								<div align="center">Conclusão Avaliação</div>
+							</td>
+							<td width="25%">
+								<div align="center">Revisor</div>
+							</td>							
+						</tr>
 
+					<cfset scor = 'white'>
+					<cfset avaliada = 0>
+					<cfoutput query="rsvlralocado">
+						<form action="" method="POST" >
+
+						<cfset fimaval = '#DateFormat(rsvlralocado.INP_DTConcluirAvaliacao,'dd/mm/yyyy')#' >  	
+					   
+							<tr id="#rsvlralocado.CurrentRow#" valign="middle" bgcolor="#scor#"  class="exibir" 
+								onMouseOver="mouseOver(this);" 
+                                onMouseOut="mouseOut(this);"
+                                onclick="gravaOrdLinha(this);"
+								style="cursor:pointer">							
+									<td width="5%">
+										<div align="left" onClick="capturaPosicaoScroll();window.open('cadastro_inspecao_despesas.cfm?numInspecao=#rsvlralocado.INP_NumInspecao#','_blank');">
+											#rsvlralocado.INP_NumInspecao#
+										</div>
+									</td>
+									<td width="25%" onClick="capturaPosicaoScroll();window.open('cadastro_inspecao_despesas.cfm?numInspecao=#rsvlralocado.INP_NumInspecao#','_blank');">
+										<div align="left" >#trim(Dir_Sigla)#-#rsvlralocado.Und_Descricao#								
+										</div>
+									</td>
+									
+									<td width="3%" onClick="capturaPosicaoScroll();window.open('cadastro_inspecao_despesas.cfm?numInspecao=#rsvlralocado.INP_NumInspecao#','_blank');">
+											<div align="center"><cfif #rsvlralocado.INP_Modalidade# eq 0>PRES.<CFELSE>A DIST.</CFIF></div>
+									</td>
+									
+									<td width="8%" onClick="capturaPosicaoScroll();window.open('cadastro_inspecao_despesas.cfm?numInspecao=#rsvlralocado.INP_NumInspecao#','_blank');">
+										<div align="center">#fimaval#</div>
+									</td>
+									<cfset revisor = 'SEM REVISOR(A)'>
+									<cfif trim(rsvlralocado.Usu_Apelido) neq ''>
+										<cfset revisor = trim(rsvlralocado.Usu_Apelido)>
+									</cfif>
+
+									<td width="25%" onClick="capturaPosicaoScroll();if('#revisor#' != 'SEM REVISOR(A)'){window.open('cadastro_inspecao_despesas.cfm?numInspecao=#INP_NumInspecao#','_blank')} else {if (confirm ('                       Atenção! \n\nConfirma Assumir a Revisão?')) {window.open('cadastro_inspecao.cfm?numInspecao=#rsInspCaInsp.INP_NumInspecao#&Unid=#rsInspCaInsp.INP_Unidade#&acao=assumirevisao','_self')}}">
+										<div align="left">
+												<div align="left">#revisor#</div>
+										</div>	
+									</td>
+							</tr>
+						
+					</form>
+
+					<cfif scor eq 'white'>
+						<cfset scor = 'f7f7f7'>
+					<cfelse>
+						<cfset scor = 'white'>
+					</cfif>
+					</cfoutput>
+
+
+					</table>
+					
+					</div>
+					<cfelse>
+					<label>NÃO EXISTEM AVALIAÇÕES FINALIZADAS (EM REVISÃO)</label>
+					</cfif>
+		</div>
 		<div id="SemNC" class="tabcontent" >
 			<!---INICIO TABELA DE AVALIAÇÕES SEM ITENS NC--->
 			<cfif rsFinalizadasSemNCencerrado.recordCount neq 0>
@@ -1848,8 +2032,6 @@ tbody {
 
 
 	<script type="text/javascript">
-
-
 	    //funções que controlam as tabs
 
 		function confExc(div,mens){
@@ -2070,4 +2252,22 @@ tbody {
 	</cfif>
 </cfif>
 </body>
+<script src="public/jquery-3.7.1.min.js"></script>
+<script type="text/javascript">
+	$('#cbvlrprev').click(function(){  
+		let title = $(this).attr('title')
+		if(title == 'inativo'){
+			$('#cbvlrprev').attr('title','ativo')
+			$('#inpvalorprevisto').val('0,00')
+			$("#inpvalorprevisto").prop('readonly', true)
+			$('#inpnaoaplicarvalorprevisto').val('1')
+		}else{
+			$('#cbvlrprev').attr('title','inativo')
+			$('#inpvalorprevisto').val('0,00')
+			$("#inpvalorprevisto").prop('readonly', false)
+			$('#inpnaoaplicarvalorprevisto').val('0')
+		}
+		//alert($("#cbvlrprev").prop("checked"))
+	})	
+</script>
 </html>

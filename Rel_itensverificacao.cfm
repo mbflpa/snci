@@ -12,7 +12,7 @@
     INNER JOIN Itens_Verificacao ON (TUI_Modalidade = Itn_Modalidade) and (TUI_TipoUnid = Itn_TipoUnidade) and Itn_NumItem = TUI_ItemVerif AND Itn_NumGrupo = TUI_GrupoItem AND Itn_Ano = TUI_Ano
     INNER JOIN Tipo_Unidades ON TUN_Codigo = TUI_TipoUnid
     WHERE TUI_Modalidade = '#url.frmmodal#' 
-    <cfif #grpacesso# eq 'INSPETORES' and #url.frmtpano# eq year(now())>
+    <cfif (#grpacesso# eq 'INSPETORES' or #grpacesso# eq 'GESTORES') and #url.frmtpano# eq year(now())>
       and Itn_Situacao = 'A'
     </cfif>
 	  and Itn_Ano = '#url.frmtpano#' and TUI_TipoUnid = #url.frmtipo#

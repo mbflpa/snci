@@ -52,8 +52,9 @@
 		</cfquery>
 	</cfif> 
 </cfif>
-
+	
 <cfif isdefined("url.numInspecao")>
+	
 	<!--- Verificar item Ativo e ou Desligado que não pertença a tabela resultainspecao --->
 	<!--- Verificar se é a primeira intervencao do gestor e ou inspetor --->
 	<cfquery name="rsVerificar" datasource="#dsn_inspecao#">
@@ -61,10 +62,12 @@
 			FROM Resultado_Inspecao 
 			where RIP_NumInspecao='#url.numInspecao#' AND RIP_Resposta <> 'A'	
 	</cfquery> 
-	<cfif rsVerificar.recordcount lte 0>	
+	
+	<cfif rsVerificar.recordcount lte 0>			
 		<cfquery name="rsID" datasource="#dsn_inspecao#">
 			SELECT RIP_NumInspecao,RIP_Unidade,RIP_NumGrupo,RIP_NumItem,INP_Modalidade,Und_TipoUnidade,RIP_Ano,Und_CodDiretoria,Und_CodReop
-			FROM Inspecao INNER JOIN (Resultado_Inspecao 
+			FROM Inspecao 
+			INNER JOIN (Resultado_Inspecao 
 			INNER JOIN Unidades ON RIP_Unidade = Und_Codigo) ON (INP_NumInspecao = RIP_NumInspecao) AND (INP_Unidade = RIP_Unidade)
 			where RIP_NumInspecao='#url.numInspecao#' 
 		</cfquery> 
@@ -135,6 +138,7 @@
 		<!--- Fim Verificar por item Ativado e ou Novo => Adicionar na Resultadoinspecao --->
 	</cfif>
 	<!--- ===================================== --->
+
 	<cfoutput>
 		<cfquery datasource="#dsn_inspecao#" name="rsVerificaFinalizacao">
 			SELECT RIP_MatricAvaliador FROM Resultado_Inspecao 
@@ -145,11 +149,13 @@
 			SELECT count(IPT_MatricInspetor) as quantInsp FROM Inspetor_Inspecao 
 			WHERE  IPT_NumInspecao=convert(varchar,'#url.numInspecao#')
 		</cfquery>
+		
 		<cfquery datasource="#dsn_inspecao#" name="rslistaInspSemAvaliacao">
 			SELECT IPT_MatricInspetor FROM Inspetor_Inspecao 
 			LEFT JOIN Resultado_Inspecao ON (IPT_NumInspecao = RIP_NumInspecao) AND (IPT_MatricInspetor = RIP_MatricAvaliador)
 			where RIP_MatricAvaliador Is Null AND IPT_NumInspecao=convert(varchar,'#url.numInspecao#')
 		</cfquery>
+		
 		<cfquery datasource="#dsn_inspecao#" name="rsInspecaoConcluida">
 			SELECT INP_NumInspecao, INP_Coordenador FROM Inspecao 
 			WHERE INP_NumInspecao = convert(varchar,'#url.numInspecao#') and INP_Situacao = 'CO'
@@ -158,11 +164,12 @@
 		<cfquery datasource="#dsn_inspecao#" name="rsMatricCoord">
 			SELECT INP_Coordenador, INP_Modalidade FROM Inspecao WHERE INP_NumInspecao = convert(varchar,'#url.numInspecao#') 
 		</cfquery>
+		
 	</cfoutput>		
 </cfif>
 <cfset CurrentPage=GetFileFromPath(GetTemplatePath())>
 
-<cfset total=0>
+	<cfset total=0>
 	<cfif isDefined("url.numInspecao")>
 		<cfset url.numInspecao = "#url.numInspecao#">
 	<cfelse>
@@ -175,7 +182,7 @@
 	   INNER JOIN Inspetor_Inspecao ON RIP_Unidade =IPT_CodUnidade AND RIP_NumInspecao =IPT_NumInspecao
 	   WHERE RIP_Recomendacao='S' AND RIP_NumInspecao='#url.numInspecao#'
 	</cfquery>
-	
+
 	<cfquery name="rsItem" datasource="#dsn_inspecao#">
         SELECT RIP_Unidade,
 		       Und_Descricao,
@@ -753,7 +760,7 @@ background:#6699CC;
 		<img id="imgAguarde" name="imgAguarde"src="figuras/aguarde.png" width="100px"  border="0" style="position:relative;top:20%"></img>
 	</div>
 
-<form id="frmopc" action="itens_inspetores_avaliacao.cfm" method="get"  enctype="multipart/form-data"  name="frmopc" >
+<form id="frmopc" action="itens_inspetores_avaliacao.cfm" method="get"  enctype="multipart/form-data"  name="frmopc">
 
 	<table width="100%" height="50%">
 
@@ -781,7 +788,7 @@ background:#6699CC;
 
 <cfif isdefined("url.acao")>
 <cfoutput>
-    <cfif "#url.acao#" eq "ConcluirAvaliacao">
+    <cfif "#url.acao#" eq "ConcluirAvaliacao">	
 		<!--- Rotina de finalização da avaliação--->
 		<cfquery name="rsInspecaoFinalizar" datasource="#dsn_inspecao#">
 			SELECT RIP_NumInspecao,INP_Situacao 
@@ -789,12 +796,13 @@ background:#6699CC;
 			INNER JOIN Inspecao ON INP_NumInspecao = RIP_NumInspecao
 			WHERE RIP_NumInspecao='#url.numInspecao#' and RIP_Resposta='A'
 		</cfquery>
+			
 		<!---Seleciona os itens não conformes da tabela Resultado_Inspecao--->
 		<cfquery name="rsInspecaoFinalizarNC" datasource="#dsn_inspecao#">
 			SELECT  RIP_NumInspecao FROM Resultado_Inspecao 
 			WHERE RIP_NumInspecao='#url.numInspecao#' and RIP_Resposta='N'
 		</cfquery>
-			
+		
 		<!---Se não existirem mais itens não avaliados para esta Avaliação, inicializa o cadastro nas tabelas ProcessoParecerUnidade, ParecerUnidade e Andamento e atualiza a tabela Inspecao de 'NA' para 'CO' --->
 		<!--- Se ocorrerem erros em uma das query a seguir, será feitoum rollback dos registros--->
 		<cftransaction>
@@ -807,6 +815,7 @@ background:#6699CC;
 				  IPT_MatricInspetor in(#listaInspSemAval#)
 				</cfquery>
 			</cfif>
+				
 			<cfquery datasource="#dsn_inspecao#" name="rsResumo">
 					SELECT min(IPT_DtInicDesloc)  as dtInicDeslocMin, 
 						   max(IPT_DtFimDesloc)   as dtFimDesloclMax,
@@ -817,6 +826,7 @@ background:#6699CC;
 						   SUM(IPT_NumHrsInsp)    as numHrsInspTotal
 					FROM Inspetor_Inspecao WHERE IPT_NumInspecao = '#url.numInspecao#'
 			</cfquery>
+			
 			<cfquery datasource="#dsn_inspecao#">
 				UPDATE inspecao SET INP_HrsPreInspecao =     '#rsResumo.numHrsPreInspTotal#', 
 									INP_DtInicDeslocamento = '#rsResumo.dtInicDeslocMin#',
@@ -828,32 +838,40 @@ background:#6699CC;
 			</cfquery> 
 
 			<cfif "#rsInspecaoFinalizar.recordcount#" eq 0 and "#rsInspecaoFinalizarNC.recordcount#" neq 0>		
+				
 				<!---Insert na tabela ProcessoParecerUnidade --->
 				<cfquery datasource="#dsn_inspecao#" name="rsExistePRPAUN">
 				   SELECT Pro_Unidade FROM ProcessoParecerUnidade 
 				   WHERE Pro_Inspecao = '#url.numInspecao#'
 				</cfquery>
+				
 				<cfif rsExistePRPAUN.recordcount lte 0>
 					<cfquery datasource="#dsn_inspecao#">
 						INSERT INTO ProcessoParecerUnidade (Pro_Unidade, Pro_Inspecao, Pro_Situacao, Pro_DtEncerr, Pro_username, Pro_dtultatu) 
 						VALUES ('#url.Unid#', '#url.numInspecao#', 'AB', NULL, '#qAcesso.Usu_Matricula#', GETDATE())
 					</cfquery> 
 				</cfif>
+			
 				<!---Seleciona os itens não conformes da tabela Resultado_Inspecao--->
 				<cfquery name="rsInspecaoFinal" datasource="#dsn_inspecao#">
-					SELECT * FROM Resultado_Inspecao 
+					SELECT RIP_NumInspecao,RIP_Unidade,RIP_Ano,RIP_NumGrupo,RIP_NumItem,Inp_Modalidade,RIP_NCISEI
+					FROM Resultado_Inspecao 
 					INNER JOIN Inspecao ON (RIP_NumInspecao = INP_NumInspecao) AND (RIP_Unidade =INP_Unidade) 
 					WHERE RIP_NumInspecao='#url.numInspecao#' and RIP_Resposta='N'
-				</cfquery>			
+					order by RIP_NumGrupo,RIP_NumItem
+				</cfquery>	
+					
 				<!---  --->
 				<!--- Realizar um loop cadastrando os itens não conformes nas tabelas ParecerUnidade e Andamento --->
                 <cfloop query="rsInspecaoFinal">
+
 					<!--- Dado default para registro no campo Pos_Area --->
 					<cfset posarea_cod = '#rsInspecaoFinal.RIP_Unidade#'>
 					<!--- Obter o tipo da Unidade e sua descrição para alimentar o Pos_AreaNome --->
 					<cfquery name="rsUnid" datasource="#dsn_inspecao#">
 						SELECT Und_Centraliza, Und_Descricao, Und_TipoUnidade FROM Unidades WHERE Und_Codigo = '#rsInspecaoFinal.RIP_Unidade#'
 					</cfquery>
+					
 					<!--- Dado default para registro no campo Pos_AreaNome --->
 					<cfset posarea_nome = rsUnid.Und_Descricao>
 					<!--- Buscar o tipo de TipoUnidade que pertence a resposta do item --->
@@ -876,6 +894,7 @@ background:#6699CC;
 						<cfset posarea_cod = #rsUnid.Und_Centraliza#>
 						<cfset posarea_nome = #rsCDD.Und_Descricao#>
 					</cfif>
+					
 					<!--- inicio classificacao do ponto --->
 					<cfset ItnPontuacao = rsItem2.Itn_Pontuacao>
 					<cfset ClasItem_Ponto = ucase(trim(rsitem2.Itn_Classificacao))>
@@ -886,7 +905,8 @@ background:#6699CC;
 						Pos_Inspecao='#rsInspecaoFinal.RIP_NumInspecao#' and 
 						Pos_NumGrupo=#rsInspecaoFinal.RIP_NumGrupo# and 
 						Pos_NumItem = #rsInspecaoFinal.RIP_NumItem#
-					</cfquery>			
+					</cfquery>	
+						
 					<cfif rsExistePaUn.recordcount lte 0>
 						    <cfquery datasource="#dsn_inspecao#">
 								INSERT INTO ParecerUnidade (Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem, Pos_DtPosic, Pos_NomeResp, Pos_Situacao, Pos_Parecer, Pos_co_ci, Pos_dtultatu, Pos_username, Pos_aval_dinsp, Pos_Situacao_Resp, Pos_Area, Pos_NomeArea, Pos_NCISEI, Pos_PontuacaoPonto, Pos_ClassificacaoPonto) 
@@ -897,7 +917,8 @@ background:#6699CC;
 								update ParecerUnidade set Pos_DtPosic=CONVERT(char, GETDATE(), 102), Pos_NomeResp='#CGI.REMOTE_USER#', Pos_Situacao='RE', Pos_Parecer='', Pos_co_ci='INTRANET', Pos_dtultatu=CONVERT(char, GETDATE(), 120), Pos_username='#CGI.REMOTE_USER#', Pos_aval_dinsp=NULL, Pos_Situacao_Resp=0, Pos_Area='#posarea_cod#', Pos_NomeArea='#posarea_nome#', Pos_NCISEI='#RIP_NCISEI#', Pos_PontuacaoPonto=#ItnPontuacao#, Pos_ClassificacaoPonto='#ClasItem_Ponto#'
 								where Pos_Unidade='#rsInspecaoFinal.RIP_Unidade#' and Pos_Inspecao='#rsInspecaoFinal.RIP_NumInspecao#' and Pos_NumGrupo=#rsInspecaoFinal.RIP_NumGrupo# and Pos_NumItem=#rsInspecaoFinal.RIP_NumItem#
 							</cfquery>					
-					</cfif>						
+					</cfif>	
+										
 					<!---Fim Insere ParecerUnidade --->
 					<!--- Inserindo dados dados na tabela Andamento --->
 					<cfset andparecer = "Ação: Concluir Avaliacao (INSPETORES)">
@@ -910,12 +931,15 @@ background:#6699CC;
 						And_HrPosic = '000000' and 
 						And_Situacao_Resp = 0
 					</cfquery>
+			
 					<cfif rsExisteSN.recordcount lte 0>	
 						<cfquery datasource="#dsn_inspecao#">
 							insert into Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_HrPosic, and_Parecer, And_Area, And_NomeArea) 
 							values ('#url.numInspecao#', '#rsInspecaoFinal.RIP_Unidade#', #rsInspecaoFinal.RIP_NumGrupo#, #rsInspecaoFinal.RIP_NumItem#, #createodbcdate(CreateDate(Year(Now()),Month(Now()),Day(Now())))#, '#CGI.REMOTE_USER#', 0, '000000', '#andparecer#', '#rsInspecaoFinal.RIP_Unidade#','#posarea_nome#')
 						</cfquery>
+									
 					<cfelse>
+
 						<cfquery datasource="#dsn_inspecao#">
 							update Andamento set And_DtPosic = #createodbcdate(CreateDate(Year(Now()),Month(Now()),Day(Now())))#
 							, And_username='#CGI.REMOTE_USER#'
@@ -928,7 +952,8 @@ background:#6699CC;
 							And_NumItem = #rsInspecaoFinal.RIP_NumItem# and
 							And_HrPosic = '000000' and 
 							And_Situacao_Resp = 0
-						</cfquery>					
+						</cfquery>	
+										
 					</cfif>	 
 					<!---Fim Insere Andamento --->					
 		
@@ -941,8 +966,9 @@ background:#6699CC;
 						INNER JOIN Itens_Verificacao ON Itn_Ano = convert(char(4),RIP_Ano) AND Itn_NumGrupo = RIP_NumGrupo AND Itn_NumItem = RIP_NumItem and inp_Modalidade = itn_modalidade
 						INNER JOIN Unidades ON Und_Codigo = RIP_Unidade and (Itn_TipoUnidade = Und_TipoUnidade)
 						WHERE ((RTRIM(RIP_Resposta)= 'E' AND Itn_ValidacaoObrigatoria=1) OR RTRIM(RIP_Resposta)= 'V') AND RTRIM(RIP_Recomendacao) IS NULL AND RIP_NumInspecao='#rsInspecaoFinal.RIP_NumInspecao#' and RIP_Unidade='#rsInspecaoFinal.RIP_Unidade#' 
-					</cfquery>
+					</cfquery>											
 				</cfloop>
+
 				<cfquery datasource="#dsn_inspecao#" >
 					UPDATE Inspecao SET INP_Situacao = 'CO'
 					, INP_DtEncerramento =  CONVERT(char, GETDATE(), 102)
@@ -950,10 +976,12 @@ background:#6699CC;
 					, INP_UserName = '#CGI.REMOTE_USER#'
 					, INP_DTConcluirAvaliacao = #createodbcdate(CreateDate(Year(Now()),Month(Now()),Day(Now())))#
 					WHERE INP_Unidade='#rsInspecaoFinal.RIP_Unidade#' AND INP_NumInspecao='#rsInspecaoFinal.RIP_NumInspecao#' 
-				</cfquery> 
+				</cfquery> 			
 				<!---Fim UPDATE em Inspecao --->
 			    <!---Fim do loop--->
+				
 			<cfelse>
+									
 				<!---SE NÃO EXISTIREM MAIS ITENS PARA AVALIAÇÃO E NÃO EXISTIREM ITENS NÃO CONFORME--->
 				<!---Insert na tabela ProcessoParecerUnidade --->				
 				<cfif "#rsInspecaoFinalizar.recordcount#" eq 0 and "#rsInspecaoFinalizarNC.recordcount#" eq 0>
@@ -993,10 +1021,10 @@ background:#6699CC;
 	</cfif>
 	</cfoutput>
 </cfif>
-
 <td valign="top" align="center">
 	<!--- Área de conteúdo   --->
 	<cfif '#grpacesso#' eq "INSPETORES">   
+	
 		<!---Inspeções NA = não avaliadas, ER = em reavaliação, RA =reavaliada--->
 		<cfquery datasource="#dsn_inspecao#" name="rsInspecoes">
 			SELECT * 
@@ -1008,6 +1036,7 @@ background:#6699CC;
 			ORDER BY INP_DtInicInspecao
 		</cfquery>
 	</cfif> 
+
 	<cfif '#grpacesso#' eq "GESTORES" OR '#grpacesso#' eq "DESENVOLVEDORES">  
 		<!---Inspeções NA = não avaliadas, ER = em reavaliação, RA =reavaliada--->  
 		<cfquery datasource="#dsn_inspecao#" name="rsInspecoes">
@@ -1073,7 +1102,7 @@ background:#6699CC;
 							SELECT * FROM Inspecao 
 							WHERE (INP_Situacao = 'NA' or INP_Situacao = 'ER')  and INP_NumInspecao='#rsInspecoes.INP_NumInspecao#'  
 						</cfquery>
-						<cfquery datasource="#dsn_inspecao#" name="rsCoordenador" >
+						<cfquery datasource="#dsn_inspecao#" name="rsCoordenador">
 							select Usu_Matricula, Usu_Apelido from usuarios where Usu_Matricula = Convert(varchar,#rsInspecao.INP_Coordenador#)
 						</cfquery>
 						<cfquery datasource="#dsn_inspecao#" name="rsUnidades">

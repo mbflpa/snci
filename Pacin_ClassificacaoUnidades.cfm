@@ -1,38 +1,36 @@
 <cfprocessingdirective pageEncoding ="utf-8"> 
-
-<cfset CurrentPage=GetFileFromPath(GetTemplatePath())>
  <cfif isDefined("url.Ninsp") and url.Ninsp neq ''>
     <cfset form.frmano = right(url.Ninsp,4)>
-   <!--- passagem de parametro num da avaliação e nome da página requisitante(url.pagretorno)--->
-	 <cfquery name="rsClas" datasource="#dsn_inspecao#">
-		SELECT distinct RIP_Unidade, RIP_NumInspecao
+   	<!--- passagem de parametro num da avaliação e nome da página requisitante(url.pagretorno)--->
+	<cfquery name="rsClas" datasource="#dsn_inspecao#">
+		SELECT INP_Unidade, INP_NumInspecao
 		FROM Inspecao 
-		INNER JOIN Resultado_Inspecao ON (INP_NumInspecao = RIP_NumInspecao) AND (INP_Unidade = RIP_Unidade)
-		INNER JOIN Unidades ON (INP_Unidade = Und_Codigo)
-		WHERE RIP_NumInspecao = '#url.Ninsp#' and INP_DTConcluirRevisao is not null
+		WHERE INP_NumInspecao = '#url.Ninsp#' and INP_DTConcluirRevisao is not null
 	</cfquery>
 <cfelse>
-
-<!--- Criar linha de metas --->
-<cfquery name="rsClas" datasource="#dsn_inspecao#">
-	SELECT distinct RIP_Unidade, RIP_NumInspecao
-	FROM Inspecao 
-	INNER JOIN Resultado_Inspecao ON (INP_NumInspecao = RIP_NumInspecao) AND (INP_Unidade = RIP_Unidade)
-	INNER JOIN Unidades ON (INP_Unidade = Und_Codigo)
-	WHERE Right(RIP_NumInspecao,4)= '#form.frmano#' and INP_DTConcluirRevisao is not null
-	<cfif form.se neq 'Todos'>
-		and Und_CodDiretoria = '#form.se#' 
-	</cfif>
-	<cfif form.frmtipounid neq 'Todas'>
-		and Und_TipoUnidade = '#form.frmtipounid#' 
-	</cfif>
-	order by RIP_NumInspecao
-</cfquery>   
+	<!--- Criar linha de metas --->
+	<cfquery name="rsClas" datasource="#dsn_inspecao#">
+		SELECT INP_Unidade, INP_NumInspecao
+		FROM Inspecao 
+		INNER JOIN Unidades ON (INP_Unidade = Und_Codigo)
+		WHERE Right(INP_NumInspecao,4)= '#form.frmano#' and INP_DTConcluirRevisao is not null
+		<cfif form.se neq 'Todos'>
+			and Und_CodDiretoria = '#form.se#' 
+		</cfif>
+		<cfif form.frmtipounid neq 'Todas'>
+			and Und_TipoUnidade = '#form.frmtipounid#' 
+		</cfif>
+		order by INP_NumInspecao
+	</cfquery>   
+	<cfset startTime = CreateTime(0,0,0)> 
+	<cfset endTime = CreateTime(0,0,59)> 
+	<cfloop from="#startTime#" to="#endTime#" index="i" step="#CreateTimeSpan(0,0,0,1)#"> 
+	</cfloop>
+</cfif>
 <cfset startTime = CreateTime(0,0,0)> 
-<cfset endTime = CreateTime(0,0,55)> 
+<cfset endTime = CreateTime(0,0,59)> 
 <cfloop from="#startTime#" to="#endTime#" index="i" step="#CreateTimeSpan(0,0,0,1)#"> 
 </cfloop>
-</cfif>
 <cfquery name="qUsuario" datasource="#dsn_inspecao#">
   SELECT Usu_DR, Usu_Matricula, Usu_Coordena FROM Usuarios WHERE Usu_Login = '#CGI.REMOTE_USER#'
 </cfquery>
@@ -64,7 +62,7 @@
 		INNER JOIN Resultado_Inspecao ON (INP_Unidade = RIP_Unidade) AND (INP_NumInspecao = RIP_NumInspecao)) 
 		INNER JOIN Itens_Verificacao ON (convert(char(4),RIP_Ano) = Itn_Ano) AND (RIP_NumGrupo = Itn_NumGrupo) AND (RIP_NumItem = Itn_NumItem) AND (Und_TipoUnidade = Itn_TipoUnidade)) 
 		LEFT JOIN ParecerUnidade ON (RIP_Unidade = Pos_Unidade) AND (RIP_NumInspecao = Pos_Inspecao) AND (RIP_NumGrupo = Pos_NumGrupo) AND (RIP_NumItem = Pos_NumItem)
-		WHERE Itn_Ano='#form.frmano#' AND INP_NumInspecao='#rsClas.RIP_NumInspecao#' and INP_DTConcluirRevisao is not null
+		WHERE Itn_Ano='#form.frmano#' AND INP_NumInspecao='#rsClas.INP_NumInspecao#' and INP_DTConcluirRevisao is not null
 	</cfquery> 
 	<cfset startTime = CreateTime(0,0,0)> 
 	<cfset endTime = CreateTime(0,0,55)> 
@@ -259,16 +257,16 @@
 	<cfquery name="rsNegar" datasource="#dsn_inspecao#">
 		SELECT Pos_Situacao_Resp
 		FROM ParecerUnidade
-		WHERE Pos_Inspecao='#rsClas.RIP_NumInspecao#' AND Pos_Situacao_Resp In (0,11)
+		WHERE Pos_Inspecao='#rsClas.INP_NumInspecao#' AND Pos_Situacao_Resp In (0,11)
 	</cfquery>
 <cfif rsNegar.recordcount lte 0> 	
     <cfquery datasource="#dsn_inspecao#" name="rsExiste">
 	 select TNC_Avaliacao from TNC_Classificacao
-	 where TNC_Ano = '#form.frmano#' and TNC_Unidade='#rsClas.RIP_Unidade#' and TNC_Avaliacao='#rsClas.RIP_NumInspecao#'
+	 where TNC_Ano = '#form.frmano#' and TNC_Unidade='#rsClas.INP_Unidade#' and TNC_Avaliacao='#rsClas.INP_NumInspecao#'
 	</cfquery>
 	<cfif rsExiste.recordcount lte 0>
 		<cfquery datasource="#dsn_inspecao#">
-		insert into	TNC_Classificacao (TNC_Ano,TNC_Unidade,TNC_Avaliacao,TNC_dtultatu,TNC_username,TNC_QTDC,TNC_QTDN,TNC_QTDV,TNC_QTDE,TNC_QTDCN,TNC_QTDSolucao,TNC_QTDRegularizado,TNC_QTDImprocedente,TNC_QTDCancelado,TNC_VLRFALTA,TNC_VLRSOBRA,TNC_VLREMRISCO,TNC_PTSMaxUnidade,TNC_PTSUnidInicio,TNC_TNCInicio,TNC_Classifinicio,TNC_PTSUnidAtual,TNC_TNCAtual,TNC_ClassifAtual,TNC_PTSSolucao,TNC_PTSRegularizado,TNC_PTSImprocedente,TNC_PTSCancelado) values ('#Right(rsClas.RIP_NumInspecao,4)#','#rsClas.RIP_Unidade#','#rsClas.RIP_NumInspecao#',CONVERT(char, GETDATE(), 120),'#CGI.REMOTE_USER#',#totC#,#totN#,#totV#,#totE#,#totCN#,#status3#,#status25#,#status12#,#status13#,#somafalta#,#somasobra#,#somaemrisco#,#somaptsmax#,#somapiini#,#TNCInicio#,'#TNCClassInicio#',#somapiatu#,#TNCAtual#,'#TNCClassAtual#',#TNCPTSSolucao#,#TNCPTSRegularizado#,#TNCPTSImprocedente#,#TNCPTSCancelado#)
+		insert into	TNC_Classificacao (TNC_Ano,TNC_Unidade,TNC_Avaliacao,TNC_dtultatu,TNC_username,TNC_QTDC,TNC_QTDN,TNC_QTDV,TNC_QTDE,TNC_QTDCN,TNC_QTDSolucao,TNC_QTDRegularizado,TNC_QTDImprocedente,TNC_QTDCancelado,TNC_VLRFALTA,TNC_VLRSOBRA,TNC_VLREMRISCO,TNC_PTSMaxUnidade,TNC_PTSUnidInicio,TNC_TNCInicio,TNC_Classifinicio,TNC_PTSUnidAtual,TNC_TNCAtual,TNC_ClassifAtual,TNC_PTSSolucao,TNC_PTSRegularizado,TNC_PTSImprocedente,TNC_PTSCancelado) values ('#Right(rsClas.INP_NumInspecao,4)#','#rsClas.INP_Unidade#','#rsClas.INP_NumInspecao#',CONVERT(char, GETDATE(), 120),'#CGI.REMOTE_USER#',#totC#,#totN#,#totV#,#totE#,#totCN#,#status3#,#status25#,#status12#,#status13#,#somafalta#,#somasobra#,#somaemrisco#,#somaptsmax#,#somapiini#,#TNCInicio#,'#TNCClassInicio#',#somapiatu#,#TNCAtual#,'#TNCClassAtual#',#TNCPTSSolucao#,#TNCPTSRegularizado#,#TNCPTSImprocedente#,#TNCPTSCancelado#)
 		</cfquery>
 	<cfelse>	
 	   <cfquery datasource="#dsn_inspecao#">
@@ -292,7 +290,7 @@
 			,TNC_PTSRegularizado=#TNCPTSRegularizado#
 			,TNC_PTSImprocedente=#TNCPTSImprocedente#
 			,TNC_PTSCancelado=#TNCPTSCancelado# 
-			where TNC_Ano = '#form.frmano#' and TNC_Unidade='#rsClas.RIP_Unidade#' and TNC_Avaliacao='#rsClas.RIP_NumInspecao#'
+			where TNC_Ano = '#form.frmano#' and TNC_Unidade='#rsClas.INP_Unidade#' and TNC_Avaliacao='#rsClas.INP_NumInspecao#'
 	   </cfquery>	
 	</cfif>
 </cfif>	
@@ -335,40 +333,29 @@
 		ORDER BY Und_CodDiretoria, TUN_Descricao, Und_Descricao, TNC_Avaliacao
 		</cfquery>
 	</cfoutput>	 
-	<cfquery name="rsXLS" datasource="#dsn_inspecao#">
-		SELECT TNC_Ano, TNC_Unidade, Und_Descricao, TUN_Descricao, TNC_Avaliacao, TNC_QTDC, TNC_QTDN, TNC_QTDV, TNC_QTDE, TNC_QTDCN, TNC_QTDSolucao, TNC_PTSSolucao, TNC_QTDRegularizado, TNC_PTSRegularizado, TNC_QTDImprocedente, TNC_PTSImprocedente, TNC_QTDCancelado, TNC_PTSCancelado, convert(money, TNC_VLRFALTA,1) as TNCVLRFALTA,  convert(money, TNC_VLRSOBRA,1) as TNCVLRSOBRA, convert(money, TNC_VLREMRISCO,1) as TNCVLREMRISCO, TNC_PTSUnidInicio, TNC_PTSMaxUnidade, TNC_TNCInicio, TNC_ClassifInicio, TNC_PTSUnidAtual, TNC_TNCAtual, TNC_ClassifAtual, convert(char,TNC_dtultatu,103) as TNCdtultatu
-		FROM TNC_Classificacao 
-		INNER JOIN Unidades ON TNC_Unidade = Und_Codigo
-		INNER JOIN Tipo_Unidades ON Und_TipoUnidade = TUN_Codigo
-		WHERE 
-		<cfif form.se neq 'Todos' or form.frmtipounid neq 'Todas' or trim(form.frmano) neq 'Todos'>
-			 <cfif form.se neq 'Todos'>
-				 Und_CodDiretoria = '#form.se#' and
-			 </cfif>
-			<cfif form.frmtipounid neq 'Todas'>
-				Und_TipoUnidade= #form.frmtipounid# and
-			 </cfif>			
-			<cfif trim(form.frmano) neq 'Todos'>
-				TNC_Ano = '#form.frmano#' and
-			</cfif>
-		</cfif>
-		TNC_Ano is not null
-		<cfif form.se eq 'Todos' and form.grupoacesso eq 'GESTORES'>
-			and Und_CodDiretoria in(#form.usucoordena#)
-		</cfif>
-		ORDER BY Und_CodDiretoria, TUN_Descricao, Und_Descricao, TNC_Avaliacao
-	</cfquery>
 	
-<cfoutput>
-<cfset sarquivo = #DateFormat(now(),"YYYYMMDDHH")# & '_' & #trim(qUsuario.Usu_Matricula)# & '.xls'>
-</cfoutput>
+	
+<!--- Criacao do arquivo CSV --->
+<cfset sdata = dateformat(now(),"YYYYMMDDHH")>
+<cfset diretorio =#GetDirectoryFromPath(GetTemplatePath())#>
+<cfset slocal = #diretorio# & 'Fechamento\'>
+<cfset sarquivo = #DateFormat(now(),"YYYYMMDDHH")# & '_' & #trim(qUsuario.Usu_Matricula)# & '.csv'>
 
-	<html>
-	<head>
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-	<title>Sistema Nacional de Controle Interno</title>
-	<link href="../../estilo.css" rel="stylesheet" type="text/css">
-	<link href="css.css" rel="stylesheet" type="text/css">
+<!--- Excluir arquivos anteriores ao dia atual --->
+<cfdirectory name="qList" filter="*.csv" sort="name desc" directory="#slocal#">
+<cfloop query="qList">
+	<cfif (left(name,8) lt left(sdata,8)) or (mid(name,12,8) eq trim(qUsuario.Usu_Matricula))>
+	  <cffile action="delete" file="#slocal##name#">
+	</cfif>
+</cfloop> 
+<cffile action="write" addnewline="no" file="#slocal##sarquivo#" output=''>
+
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>Sistema Nacional de Controle Interno</title>
+<link href="../../estilo.css" rel="stylesheet" type="text/css">
+<link href="css.css" rel="stylesheet" type="text/css">
 
 <script language="JavaScript" type="text/JavaScript">
 <cfinclude template="mm_menu.js">
@@ -395,8 +382,8 @@ function troca(a){
             <td colspan="6">&nbsp;</td>
           </tr>
  <cfoutput>	  
-	  
             <tr valign="baseline">
+			  <td><div align="left"><a href="Fechamento/<cfoutput>#sarquivo#</cfoutput>"><img src="icones/csv.png" width="50" height="35" border="0"></a></div></td>				
               <td width="14%"><div align="right"><span class="titulos">Superintendência:</span></div></td>
               <td width="17%"><div align="left">
                 <select name="dr" id="dr" class="form" disabled>
@@ -426,7 +413,11 @@ function troca(a){
               </div></td>
             </tr>
           </cfoutput>
-        </table>
+       </table>
+	   <cfoutput>
+<cfset auxcab = 'LISTAS DAS UNIDADES  CLASSIFICADAS NO EXERCÍCIO DE:  #form.frmano#'>
+<cffile action="Append" file="#slocal##sarquivo#" output=';;#auxcab#'>
+</cfoutput>
 <form action="Pacin_o.cfm" method="post" target="_parent" name="form1">  
 	  <table width="2200" border="0" align="center">
         <tr bgcolor="f7f7f7">
@@ -439,6 +430,9 @@ function troca(a){
 		<tr bgcolor="f7f7f7">
 			<td colspan="35" align="center" bgcolor="#B4B4B4" class="titulo1">LISTAS DAS UNIDADES  classificadas nO EXERCÍCIO DE: <cfoutput>#form.frmano#</cfoutput></td>
 		</tr>
+		<cffile action="Append" file="#slocal##sarquivo#" output='Qtd.: #rsBusca.recordcount#'>		
+        <cffile action="Append" file="#slocal##sarquivo#" output='Código;Descrição;Tipo;Avaliação;Qtd.C;Qtd.N;Qtd.V;Qtd.E;Qtd.(N+C);Qtd.(3-SO);Pts.(3-SO);Qtd.(25-RC);Pts.(25-RC);Qtd.(12-PI);Pts.(12-PI);Qtd.(13-OC);Pts.(13-OC);Estimado a Recuperar (R$);Estimado Não Planejado/Extrapolado/Sobra (R$);Estimado em Risco ou Envolvido (R$);Pts.Max Unidade;Pts.Item (Inicial);TNC (Inicial);Classif(Inicial);Pts.Item (Atual);TNC (Atual);Classif (Atual)'>		
+
         <tr class="titulosClaro">
           <td colspan="41" bgcolor="eeeeee" class="exibir"><cfoutput>Qtd. #rsBusca.recordcount#</cfoutput></td>
         </tr>
@@ -504,9 +498,9 @@ function troca(a){
 			<cfset pts12pi = TNC_PTSImprocedente>	
 			<cfset qtd13oc = TNC_QTDCancelado>	
 			<cfset pts13oc = TNC_PTSCancelado>	
-			<cfset falta = lscurrencyformat(TNC_VLRFALTA)>	
-			<cfset sobra = lscurrencyformat(TNC_VLRSOBRA)>
-			<cfset emrisco = lscurrencyformat(TNC_VLREMRISCO)>			
+			<cfset falta = lscurrencyformat(TNC_VLRFALTA,'none')>	
+			<cfset sobra = lscurrencyformat(TNC_VLRSOBRA,'none')>
+			<cfset emrisco = lscurrencyformat(TNC_VLREMRISCO,'none')>			
 
 			<cfset piini = TNC_PTSUnidInicio>	
 			<cfset pmini = TNC_PTSMaxUnidade>	
@@ -540,14 +534,14 @@ function troca(a){
             <td width="5%"><div align="center">#falta#</div></td>
             <td width="4%"><div align="center">#sobra#</div></td>
 			<td width="4%"><div align="center">#emrisco#</div></td>
-			<cfset auxcol = replace(pmini,'.',',')>
-            <td width="4%"><div align="center">#auxcol#</div></td>
-			<cfset auxcol = replace(piini,'.',',')>
-            <td width="4%"><div align="center">#auxcol#</div></td>
+			<cfset pmini = replace(pmini,'.',',')>
+            <td width="4%"><div align="center">#pmini#</div></td>
+			<cfset piini = replace(piini,'.',',')>
+            <td width="4%"><div align="center">#piini#</div></td>
             <td width="3%"><div align="center">#tncini#</div></td>
             <td width="7%"><div align="left">#classini#</div></td>
-			<cfset auxcol = replace(piatu,'.',',')>
-            <td><div align="center">#auxcol#</div></td>
+			<cfset piatu = replace(piatu,'.',',')>
+            <td><div align="center">#piatu#</div></td>
             <td width="3%"><div align="center">#tncatu#</div></td>
             <td width="12%"><div align="left">#classatu#</div></td>
           </tr>
@@ -557,6 +551,7 @@ function troca(a){
 		  <cfelse>
 		    <cfset scor = 'f7f7f7'>
 		  </cfif>
+		  <cffile action="Append" file="#slocal##sarquivo#" output='#UndCod#;#UndDesc#;#TUNDesc#;#Numaval#;#qtdc#;#qtdn#;#qtdv#;#qtde#;#qtdcn#;#qtd3so#;#pts3so#;#qtd25rc#;#pts25rc#;#qtd12pi#;#pts12pi#;#qtd13oc#;#pts13oc#;#falta#;#sobra#;#emrisco#;#pmini#;#piini#;#tncini#;#classini#;#piatu#;#tncatu#;#classatu#'>		  
       </cfoutput>
         <tr bgcolor="f7f7f7">
           <td colspan="35" align="center" class="titulos"><hr></td>
@@ -571,51 +566,6 @@ function troca(a){
         <tr>
           <td colspan="35" align="center" class="titulos"><hr></td>
         </tr>
-<!--- inicio exclusão --->
-<!--- Excluir arquivos anteriores ao dia atual --->
-<cfset sdata = dateformat(now(),"YYYYMMDDHH")>
-<cfset diretorio =#GetDirectoryFromPath(GetTemplatePath())#>
-<cfset slocal = #diretorio# & 'Fechamento\'>
-<cfdirectory name="qList" filter="*.*" sort="name desc" directory="#slocal#">
-  	<cfoutput query="qList">
-		   <cfif len(name) eq 23>
-				<cfif (left(name,8) lt left(sdata,8)) or (int(mid(sdata,9,2) - mid(name,9,2)) gte 2)>
-				    <cffile action="delete" file="#slocal##name#"> 
-				</cfif>
-		  </cfif>
-	</cfoutput>
-<!--- fim exclusão --->
-
-<cftry>
-
-<cfif Month(Now()) eq 1>
-  <cfset vANO = Year(Now()) - 1>
-<cfelse>
-  <cfset vANO = Year(Now())>
-</cfif>
-
-<cfset objPOI = CreateObject(
-    "component",
-    "Excel"
-    ).Init()
-    />
-
-<cfset data = now() - 1>
-	 <cfset objPOI.WriteSingleExcel(
-    FilePath = ExpandPath( "./Fechamento/" & sarquivo ),
-    Query = rsXLS,
-	ColumnList = 
-"TNC_Ano,TNC_Unidade,Und_Descricao,TUN_Descricao,TNC_Avaliacao,TNC_QTDC,TNC_QTDN,TNC_QTDV,TNC_QTDE,TNC_QTDCN,TNC_QTDSolucao,TNC_PTSSolucao,TNC_QTDRegularizado,TNC_PTSRegularizado,TNC_QTDImprocedente,TNC_PTSImprocedente,TNC_QTDCancelado,TNC_PTSCancelado,TNCVLRFALTA,TNCVLRSOBRA,TNCVLREMRISCO,TNC_PTSMaxUnidade,TNC_PTSUnidInicio,TNC_TNCInicio,TNC_ClassifInicio,TNC_PTSUnidAtual,TNC_TNCAtual,TNC_ClassifAtual,TNCdtultatu",
-	ColumnNames = "Ano,Código,Descrição,Tipo,Avaliação,Qtd.C,Qtd.N,Qtd.V,Qtd.E,Qtd.(C+N),Qtd.(3-SO),Pts.(3-SO),Qtd.(25-RC),Pts.(25-RC),Qtd.(12-PI),Pts.(12-PI),Qtd.(13-OC),Pts.(13-OC),Estimado a Recuperar (R$),Estimado Não Planejado/Extrapolado/Sobra (R$),Estimado em Risco ou Envolvido (R$),Pts.MaxUnidade,Pts.Item(Inicial),TNC(Inicial),Classif(Inicial),Pts.Item(Atual),TNC(Atual),Classif(Atual),DT.Atualiz",
-	SheetName = "CLASSIFICAÇÕES DAS UNIDADES"
-    ) />
-
-<cfcatch type="any">
-	<cfdump var="#cfcatch#">
-</cfcatch>
-</cftry>
-<!--- =========================================== --->
-<!--- Fim gerar planilha ---> 	
 	  <!--- FIM DA ÁREA DE CONTEÚDO --->
  </table>
 </form>	

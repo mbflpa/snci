@@ -69,11 +69,11 @@
 
 					<!---Se a lotação do usuario for um orgao origem de processos (status 'O' -> letra 'o' de Origem) e o perfil não for 11 - CI - MASTER ACOMPANHAMENTO (Gestor Nível 4) --->
 					<cfif '#application.rsUsuarioParametros.pc_org_status#' eq 'O' and #application.rsUsuarioParametros.pc_usu_perfil# neq 11>
-						and pc_num_orgao_origem = '#application.rsUsuarioParametros.pc_usu_lotacao#' OR (pc_aval_orientacao_status in (13) and pc_orgaos_2.pc_org_mcu = '#application.rsUsuarioParametros.pc_usu_lotacao#')
+						and pc_num_orgao_origem = '#application.rsUsuarioParametros.pc_usu_lotacao#' OR (pc_aval_orientacao_status in (13,14) and pc_orgaos_2.pc_org_mcu = '#application.rsUsuarioParametros.pc_usu_lotacao#')
 					</cfif>
 					<!---Se a lotação do usuario for um orgao origem de processos (status 'O' -> letra 'o' de Origem) e o perfil for 11 - CI - MASTER ACOMPANHAMENTO (Gestor Nível 4)--->
 					<cfif '#application.rsUsuarioParametros.pc_org_status#' eq 'O' and ListFind("11",#application.rsUsuarioParametros.pc_usu_perfil#) >
-							OR (pc_num_orgao_origem = '#application.rsUsuarioParametros.pc_usu_lotacao#' and pc_aval_orientacao_status in (1)) OR (pc_aval_orientacao_status in (17) and pc_orgaos_2.pc_org_mcu = '#application.rsUsuarioParametros.pc_usu_lotacao#')
+							OR (pc_num_orgao_origem = '#application.rsUsuarioParametros.pc_usu_lotacao#' and pc_aval_orientacao_status =1) OR (pc_aval_orientacao_status in (17) and pc_orgaos_2.pc_org_mcu = '#application.rsUsuarioParametros.pc_usu_lotacao#')
 					</cfif>
 					<!---Se a lotação do usuario não for um orgao origem de processos e não estiver desativado(status 'AD) e o perfil for 4 - 'AVALIADOR') --->
 					<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 4 and '#application.rsUsuarioParametros.pc_org_status#' neq 'D'>
@@ -2062,18 +2062,19 @@
 				<div class="row" style="margin-left:8px;margin-right:8px;margin-top:-30px;font-size:16px">
 					<div class="col-sm-12">
 						<div class="form-group">
-							<cfif rsProc.pc_num_status neq 6>
-								<div id="divTextoPosicSalvo"></div>
-								<textarea class="form-control" id="pcPosicAcomp" rows="3" required="" style=""  name="pcPosicAcomp" class="form-control" placeholder="Digite aqui a manifestação do Controle Interno..." ><cfoutput>#rsManifestacaoSalva.pc_aval_posic_texto#</cfoutput></textarea>
-							<cfelse>
-								<h6 style="color:red;">ORIENTAÇÃO BLOQUEADA. NÃO É PERMITIDO MANIFESTAÇÃO.</h6>
-							</cfif>
+							<div id="divTextoPosicSalvo"></div>
+							<textarea class="form-control" id="pcPosicAcomp" rows="3" required="" style=""  name="pcPosicAcomp" class="form-control" placeholder="Digite aqui a manifestação do Controle Interno..." ><cfoutput>#rsManifestacaoSalva.pc_aval_posic_texto#</cfoutput></textarea>
 						</div>										
 					</div>
 					<cfquery datasource="#application.dsn_processos#" name="rsOrientacaoStatus">
 						SELECT pc_orientacao_status.pc_orientacao_status_id,pc_orientacao_status.pc_orientacao_status_descricao  
 						FROM pc_orientacao_status 
-						WHERE (pc_orientacao_status_id in(5,16) OR pc_orientacao_status_finalizador = 'S' ) and pc_orientacao_status_status = 'A'
+						WHERE pc_orientacao_status_status = 'A'
+						<cfif rsProc.pc_aval_orientacao_status neq 14 >
+						 	AND (pc_orientacao_status_id in(5,16) OR pc_orientacao_status_finalizador = 'S' )
+						<cfelse>
+							AND pc_orientacao_status_finalizador = 'S'
+						</cfif>
 						order by pc_orientacao_status_id  asc
 					</cfquery>
 
@@ -2084,141 +2085,140 @@
 								AND pc_aval_posic_status in (2,4,5) and pc_aval_posic_num_orgaoResp = '#rsProc.mcuOrgaoRespOrientacao#'
 						order by pc_aval_posic_id desc
 					</cfquery>
-					<cfif rsProc.pc_num_status neq 6>
-						<div class="col-sm-3" >
-							<div class="form-group">
-								<label for="pcOrientacaoStatus">Status</label>
-								<select id="pcOrientacaoStatus" required="" name="pcOrientacaoStatus" class="form-control" style="height:35px">
-									<option selected=""  value="">Selecione o status...</option>
-									<!--<cfif #rsUltimaDataPrevistaResp.ultimaDataPrevistaResp# lt DATEFORMAT(Now(),"yyyy-mm-dd") and #rsUltimaDataPrevistaResp.pc_aval_posic_status# neq 4>
-										<option value="5" selected>PENDENTE</option>		
-									</cfif>-->
-									<cfoutput query="rsOrientacaoStatus">
-										<cfif rsManifestacaoSalva.recordcount eq 0>
-											<option value="#pc_orientacao_status_id#" <cfif pc_orientacao_status_id eq 5>selected</cfif>>#pc_orientacao_status_descricao#</option>
-										<cfelse>
-											<option value="#pc_orientacao_status_id#" <cfif pc_orientacao_status_id eq rsManifestacaoSalva.pc_aval_posic_status>selected</cfif>>#pc_orientacao_status_descricao#</option>
-										</cfif>
-									</cfoutput>
-								</select>
-							</div>
+					
+					<div class="col-sm-3" >
+						<div class="form-group">
+							<label for="pcOrientacaoStatus">Status</label>
+							<select id="pcOrientacaoStatus" required="" name="pcOrientacaoStatus" class="form-control" style="height:35px">
+								<option selected=""  value="">Selecione o status...</option>
+								<cfoutput query="rsOrientacaoStatus">
+									<cfif  rsProc.pc_aval_orientacao_status eq 14 >
+										<option value="#pc_orientacao_status_id#" <cfif pc_orientacao_status_id eq 10>selected</cfif>>#pc_orientacao_status_descricao#</option>
+									<cfelseif rsManifestacaoSalva.recordcount eq 0 >
+										<option value="#pc_orientacao_status_id#" <cfif pc_orientacao_status_id eq 5>selected</cfif>>#pc_orientacao_status_descricao#</option>
+									<cfelse>
+										<option value="#pc_orientacao_status_id#" <cfif pc_orientacao_status_id eq rsManifestacaoSalva.pc_aval_posic_status>selected</cfif>>#pc_orientacao_status_descricao#</option>
+									</cfif>
+								</cfoutput>
+							</select>
 						</div>
-						<!--Ultimo órgão responsálvel da tabela pc_avaliacao_posicionamentos-->
-						<cfquery datasource="#application.dsn_processos#" name="rsUltimoOrgaoResp">
-							Select TOP 1 pc_aval_posic_num_orgaoResp as ultimoOrgaoResp 
-							from pc_avaliacao_posicionamentos
-							INNER JOIN pc_orientacao_status ON pc_orientacao_status.pc_orientacao_status_id = pc_avaliacao_posicionamentos.pc_aval_posic_status
-							INNER JOIN pc_orgaos on pc_orgaos.pc_org_mcu = pc_avaliacao_posicionamentos.pc_aval_posic_num_orgaoResp
-						
-							WHERE pc_aval_posic_num_orientacao = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.pc_aval_orientacao_id#">
-									AND not pc_aval_posic_num_orgaoResp is null AND pc_org_controle_interno = 'N' 
-							
-							order by pc_aval_posic_id desc
-						</cfquery>
-
-						<div id ="pcOrgaoRespAcompDiv" class="col-sm-4" hidden>
-							<div class="form-group">
-								
-								<label for="pcOrgaoRespAcomp">Órgão:</label>
-								<select id="pcOrgaoRespAcomp" required="" name="pcOrgaoRespAcomp" class="form-control" style="height:35px">
-									<option selected=""  value="">Selecione o Órgão p/ envio...</option>
-									
-									<cfoutput query="rsAreasUnion">
-										<cfif rsManifestacaoSalva.recordcount eq 0>
-											<option <cfif '#pc_org_mcu#' eq '#rsproc.mcuOrgaoRespOrientacao#'>selected</cfif> value="#pc_org_mcu#">#pc_org_sigla# (#pc_org_mcu#)</option>
-										<cfelse>
-											<option <cfif '#pc_org_mcu#' eq rsManifestacaoSalva.pc_aval_posic_num_orgaoResp>selected</cfif> value="#pc_org_mcu#">#pc_org_sigla# (#pc_org_mcu#)</option>
-										</cfif>
-										<!-- Se o status da orientação for "EM ANÁLISE" ou se o status for finalizador, mostra o último órgão responsável pela última manifestação.-->
-										<cfif rsProc.pc_aval_orientacao_status eq 13 or rsProc.statusFinalizador eq 'S'>
-											<option <cfif '#pc_org_mcu#' eq '#rsUltimoOrgaoResp.ultimoOrgaoResp#'>selected</cfif> value="#pc_org_mcu#">#pc_org_sigla# (#pc_org_mcu#)</option>
-										</cfif>
-											
-									</cfoutput>
-
-
-								</select>
-							</div>
-						</div>
-						<div id ="pcDataPrevRespAcompDiv" class="col-md-2" hidden>
-							<div class="form-group">
-								<label for="pcDataPrevRespAcomp">Prazo Resposta:</label>
-								<div class="input-group date" id="reservationdate" data-target-input="nearest">
-									<input id="pcDataPrevRespAcomp"  name="pcDataPrevRespAcomp" required=""  type="date" class="form-control" placeholder="dd/mm/aaaa" style="height:35px"> 
-								</div>
-							</div>
-							<span id="dataPrevistaCalculada" style='font-size:11px;color:blue'></span>
-						</div>
-						<div id ="pcNumProcJudicialDiv" class="col-md-3" hidden>
-							<div class="form-group">
-								<label for="pcNumProcJudicial">N° Processo Judicial:</label>
-								<input id="pcNumProcJudicial"  name="pcNumProcJudicial" required="" class="form-control" style="height:35px">
-							</div>
-						</div>
-						
 					</div>
+					<!--Ultimo órgão responsálvel da tabela pc_avaliacao_posicionamentos-->
+					<cfquery datasource="#application.dsn_processos#" name="rsUltimoOrgaoResp">
+						Select TOP 1 pc_aval_posic_num_orgaoResp as ultimoOrgaoResp 
+						from pc_avaliacao_posicionamentos
+						INNER JOIN pc_orientacao_status ON pc_orientacao_status.pc_orientacao_status_id = pc_avaliacao_posicionamentos.pc_aval_posic_status
+						INNER JOIN pc_orgaos on pc_orgaos.pc_org_mcu = pc_avaliacao_posicionamentos.pc_aval_posic_num_orgaoResp
+					
+						WHERE pc_aval_posic_num_orientacao = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.pc_aval_orientacao_id#">
+								AND not pc_aval_posic_num_orgaoResp is null AND pc_org_controle_interno = 'N' 
+						
+						order by pc_aval_posic_id desc
+					</cfquery>
+
+					<div id ="pcOrgaoRespAcompDiv" class="col-sm-4" hidden>
+						<div class="form-group">
+							
+							<label for="pcOrgaoRespAcomp">Órgão:</label>
+							<select id="pcOrgaoRespAcomp" required="" name="pcOrgaoRespAcomp" class="form-control" style="height:35px">
+								<option selected=""  value="">Selecione o Órgão p/ envio...</option>
+								
+								<cfoutput query="rsAreasUnion">
+									<cfif rsManifestacaoSalva.recordcount eq 0>
+										<option <cfif '#pc_org_mcu#' eq '#rsproc.mcuOrgaoRespOrientacao#'>selected</cfif> value="#pc_org_mcu#">#pc_org_sigla# (#pc_org_mcu#)</option>
+									<cfelse>
+										<option <cfif '#pc_org_mcu#' eq rsManifestacaoSalva.pc_aval_posic_num_orgaoResp>selected</cfif> value="#pc_org_mcu#">#pc_org_sigla# (#pc_org_mcu#)</option>
+									</cfif>
+									<!-- Se o status da orientação for "EM ANÁLISE" ou se o status for finalizador, mostra o último órgão responsável pela última manifestação.-->
+									<cfif rsProc.pc_aval_orientacao_status eq 13 or rsProc.statusFinalizador eq 'S'>
+										<option <cfif '#pc_org_mcu#' eq '#rsUltimoOrgaoResp.ultimoOrgaoResp#'>selected</cfif> value="#pc_org_mcu#">#pc_org_sigla# (#pc_org_mcu#)</option>
+									</cfif>
+										
+								</cfoutput>
+
+
+							</select>
+						</div>
+					</div>
+					<div id ="pcDataPrevRespAcompDiv" class="col-md-2" hidden>
+						<div class="form-group">
+							<label for="pcDataPrevRespAcomp">Prazo Resposta:</label>
+							<div class="input-group date" id="reservationdate" data-target-input="nearest">
+								<input id="pcDataPrevRespAcomp"  name="pcDataPrevRespAcomp" required=""  type="date" class="form-control" placeholder="dd/mm/aaaa" style="height:35px"> 
+							</div>
+						</div>
+						<span id="dataPrevistaCalculada" style='font-size:11px;color:blue'></span>
+					</div>
+					<div id ="pcNumProcJudicialDiv" class="col-md-3" hidden>
+						<div class="form-group">
+							<label for="pcNumProcJudicial">N° Processo Judicial:</label>
+							<input id="pcNumProcJudicial"  name="pcNumProcJudicial" required="" class="form-control" style="height:35px">
+						</div>
+					</div>
+					
+				</div>
 				
-					<!--ANEXOS -->
-					<cfif rsProc.pc_num_status neq 6>
-						<div class="row">
-							<div class="col-md-12">
-	
-								<div class="card-body">
-									<div id="actions" class="row" >
-										<div class="col-lg-12" align="left">
-											<div class="btn-group w-30">
-													<cfif directoryExists(application.diretorio_anexos)>
-														<span id="anexosAcomp" class="btn btn-success col fileinput-button azul_claro_correios_backgroundColor" >
-															<i class="fas fa-upload"></i>
-															<span style="margin-left:5px">Clique aqui para anexar um documento (PDF, EXCEL ou ZIP)</span>
-														</span>
-													</cfif>
-												
-											</div>
-										</div>
-									</div>
-									
-									<div class="table table-striped files" id="previewsAcomp">
-									<div id="templateAcomp" class="row mt-2">
-										<div class="col-auto">
-											<span class="preview"><img src="data:," alt="" data-dz-thumbnail /></span>
-										</div>
-										<div class="col d-flex align-items-center">
-											<p class="mb-0">
-											<span class="lead" data-dz-name></span>
-											(<span data-dz-size></span>)
-											</p>
-											<strong class="error text-danger" data-dz-errormessage></strong>
-										</div>
-										<div class="col-4 d-flex align-items-center" >
-											<div class="progress progress-striped active w-100" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" >
-												<div class="progress-bar progress-bar-success" style="width:0%;" data-dz-uploadprogress ></div>
-											</div>
-										</div>
+				<!--ANEXOS -->
+				
+				<div class="row">
+					<div class="col-md-12">
+
+						<div class="card-body">
+							<div id="actions" class="row" >
+								<div class="col-lg-12" align="left">
+									<div class="btn-group w-30">
+											<cfif directoryExists(application.diretorio_anexos)>
+												<span id="anexosAcomp" class="btn btn-success col fileinput-button azul_claro_correios_backgroundColor" >
+													<i class="fas fa-upload"></i>
+													<span style="margin-left:5px">Clique aqui para anexar um documento (PDF, EXCEL ou ZIP)</span>
+												</span>
+											</cfif>
 										
 									</div>
 								</div>
-								
-								<div id="tabAnexosAcompDiv" style="margin-top:30px;margin-bottom:50px"></div>
-								
-								
 							</div>
 							
+							<div class="table table-striped files" id="previewsAcomp">
+							<div id="templateAcomp" class="row mt-2">
+								<div class="col-auto">
+									<span class="preview"><img src="data:," alt="" data-dz-thumbnail /></span>
+								</div>
+								<div class="col d-flex align-items-center">
+									<p class="mb-0">
+									<span class="lead" data-dz-name></span>
+									(<span data-dz-size></span>)
+									</p>
+									<strong class="error text-danger" data-dz-errormessage></strong>
+								</div>
+								<div class="col-4 d-flex align-items-center" >
+									<div class="progress progress-striped active w-100" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" >
+										<div class="progress-bar progress-bar-success" style="width:0%;" data-dz-uploadprogress ></div>
+									</div>
+								</div>
+								
+							</div>
 						</div>
-					</cfif>
-					<!--FIM ANEXOS-->
-				
-				
-					<div id = "divBtSalvarEnviar"style="justify-content:center; display: flex; width: 100%;padding:20px">
-						<div class="form-group" style="margin-right:150px;">
-							<button id="btSalvar" class="btn btn-block btn-primary " style="background-color: #28a745;"> <i class="fas fa-floppy-disk" style="margin-right:5px"></i>Salvar manifestação p/ envio posterior</button>
-						</div>
-						<div class="form-group">
-							<button id="btEnviar" class="btn btn-block btn-primary " > <i class="fas fa-share-from-square" style="margin-right:5px"></i>Enviar manifestação agora</button>
-						</div>
+						
+						<div id="tabAnexosAcompDiv" style="margin-top:30px;margin-bottom:50px"></div>
+						
+						
 					</div>
+					
+				</div>
+				
+				<!--FIM ANEXOS-->
+			
+			
+				<div id = "divBtSalvarEnviar"style="justify-content:center; display: flex; width: 100%;padding:20px">
+					<div class="form-group" style="margin-right:150px;">
+						<button id="btSalvar" class="btn btn-block btn-primary " style="background-color: #28a745;"> <i class="fas fa-floppy-disk" style="margin-right:5px"></i>Salvar manifestação p/ envio posterior</button>
+					</div>
+					<div class="form-group">
+						<button id="btEnviar" class="btn btn-block btn-primary " > <i class="fas fa-share-from-square" style="margin-right:5px"></i>Enviar manifestação agora</button>
+					</div>
+				</div>
 
-				</cfif>
+				
 			</div>
 		</div>
 			
@@ -2251,6 +2251,12 @@
 						dataPrevista = dataPrev.toISOString().split('T')[0];
 						dataPrevistaFormatada = '#obterDataPrevista.Data_Prevista_Formatada#';
 					</cfoutput>
+					$("#pcOrgaoRespAcompDiv").attr("hidden",false)	
+					$("#pcDataPrevRespAcompDiv").attr("hidden",false)
+					$("#pcNumProcJudicialDiv").attr("hidden",true)
+					$("#pcDataPrevRespAcomp").val(dataPrevista)
+					$("#pcNumProcJudicial").val(null)
+					$("#dataPrevistaCalculada").html("Prazo de 15 dias úteis: " + dataPrevistaFormatada + "</br>");
 				} 
 				
 				if($('#pcOrientacaoStatus').val() == 16){
@@ -2269,45 +2275,46 @@
                     var manifestacaoSalva = '#rsManifestacaoSalva.recordcount#';
 					var numProcJudicial = '#rsManifestacaoSalva.pc_aval_posic_numProcJudicial#';
 				</cfoutput>
-
-				if(manifestacaoSalva === '0'){
-					$('#pcOrientacaoStatus').val(5)
-					$("#pcOrgaoRespAcompDiv").attr("hidden",false)
-					$("#pcDataPrevRespAcompDiv").attr("hidden",false)	
-					$("#pcDataPrevRespAcomp").val(dataPrevista)
-					$("#dataPrevistaCalculada").html("Prazo de 15 dias úteis: " + dataPrevistaFormatada + "</br>");
-
-				}else{
-					if ($('#pcOrientacaoStatus').val() == 5){
-						$("#pcOrgaoRespAcompDiv").attr("hidden",false)	
-						$("#pcDataPrevRespAcompDiv").attr("hidden",false)
-						$("#pcNumProcJudicialDiv").attr("hidden",true)
+				if (!$('#pcOrientacaoStatus').val() == 14){
+					if(manifestacaoSalva === '0'){
+						$('#pcOrientacaoStatus').val(5)
+						$("#pcOrgaoRespAcompDiv").attr("hidden",false)
+						$("#pcDataPrevRespAcompDiv").attr("hidden",false)	
 						$("#pcDataPrevRespAcomp").val(dataPrevista)
-						$("#pcNumProcJudicial").val(null)
 						$("#dataPrevistaCalculada").html("Prazo de 15 dias úteis: " + dataPrevistaFormatada + "</br>");
-					}else if ($('#pcOrientacaoStatus').val() == 15){
-						$("#pcNumProcJudicialDiv").attr("hidden",false)
-						$("#pcDataPrevRespAcompDiv").attr("hidden",true)
-						$("#pcOrgaoRespAcompDiv").attr("hidden",true)
-						$("#pcDataPrevRespAcomp").val(null)	
-						$("#pcNumProcJudicial").val(numProcJudicial)
-						//$("#pcPosicAcomp").prop("disabled", true);
-					}else if ($('#pcOrientacaoStatus').val() == 16){
-						$("#pcOrgaoRespAcompDiv").attr("hidden",false)	
-						$("#pcDataPrevRespAcompDiv").attr("hidden",false)
-						$("#pcNumProcJudicialDiv").attr("hidden",true)
-						$("#pcDataPrevRespAcomp").val(dataPrevista)
-						$("#pcNumProcJudicial").val(null)
-						$("#dataPrevistaCalculada").html("Prazo de 90 dias corridos: " + dataPrevistaFormatada + "</br>");
-						$("#pcPosicAcomp").prop("disabled", true);
-					}else{
-						$("#pcDataPrevRespAcompDiv").attr("hidden",true)
-						$("#pcOrgaoRespAcompDiv").attr("hidden",true)
-						$("#pcNumProcJudicialDiv").attr("hidden",true)
-						$("#pcDataPrevRespAcomp").val(null)	
-						$("#pcNumProcJudicial").val(null)	
-					}
 
+					}else{
+						if ($('#pcOrientacaoStatus').val() == 5){
+							$("#pcOrgaoRespAcompDiv").attr("hidden",false)	
+							$("#pcDataPrevRespAcompDiv").attr("hidden",false)
+							$("#pcNumProcJudicialDiv").attr("hidden",true)
+							$("#pcDataPrevRespAcomp").val(dataPrevista)
+							$("#pcNumProcJudicial").val(null)
+							$("#dataPrevistaCalculada").html("Prazo de 15 dias úteis: " + dataPrevistaFormatada + "</br>");
+						}else if ($('#pcOrientacaoStatus').val() == 15){
+							$("#pcNumProcJudicialDiv").attr("hidden",false)
+							$("#pcDataPrevRespAcompDiv").attr("hidden",true)
+							$("#pcOrgaoRespAcompDiv").attr("hidden",true)
+							$("#pcDataPrevRespAcomp").val(null)	
+							$("#pcNumProcJudicial").val(numProcJudicial)
+							//$("#pcPosicAcomp").prop("disabled", true);
+						}else if ($('#pcOrientacaoStatus').val() == 16){
+							$("#pcOrgaoRespAcompDiv").attr("hidden",false)	
+							$("#pcDataPrevRespAcompDiv").attr("hidden",false)
+							$("#pcNumProcJudicialDiv").attr("hidden",true)
+							$("#pcDataPrevRespAcomp").val(dataPrevista)
+							$("#pcNumProcJudicial").val(null)
+							$("#dataPrevistaCalculada").html("Prazo de 90 dias corridos: " + dataPrevistaFormatada + "</br>");
+							$("#pcPosicAcomp").prop("disabled", true);
+						}else{
+							$("#pcDataPrevRespAcompDiv").attr("hidden",true)
+							$("#pcOrgaoRespAcompDiv").attr("hidden",true)
+							$("#pcNumProcJudicialDiv").attr("hidden",true)
+							$("#pcDataPrevRespAcomp").val(null)	
+							$("#pcNumProcJudicial").val(null)	
+						}
+
+					}
 				}
 					
 					
@@ -2383,7 +2390,7 @@
 				
 				// DropzoneJS Demo Code End
 
-		})
+			})
 
 
 			
@@ -2559,7 +2566,6 @@
 			});		
 
 			$('#btEnviar').on('click', function (event)  {
-				
 				//cancela e  não propaga o event click original no botão
 				event.preventDefault()
 				event.stopPropagation()
@@ -3506,7 +3512,13 @@
 				<cfquery datasource = "#application.dsn_processos#" name="rsOrgao">
 					SELECT 	pc_orgaos.* FROM pc_orgaos WHERE pc_org_mcu = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.pc_aval_orientacao_mcu_orgaoResp#">
 				</cfquery>
-				
+
+				<cfquery datasource = "#application.dsn_processos#" name="rsStatusAnteriorOrientacao">
+					SELECT pc_aval_orientacao_status FROM pc_avaliacao_orientacoes WHERE pc_aval_orientacao_id = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.pc_aval_orientacao_id#">
+				</cfquery>
+
+				<cfset statusAnteriorOrientacao = rsStatusAnteriorOrientacao.pc_aval_orientacao_status>
+
 				<cfif #arguments.pc_aval_orientacao_status# eq 5 OR #arguments.pc_aval_orientacao_status# eq 16>
 					<cfset data="#DateFormat(arguments.pc_aval_orientacao_dataPrevistaResp,'DD-MM-YYYY')#">
 					<cfset textoPosic = "#arguments.pc_aval_posic_texto#">
@@ -3544,13 +3556,13 @@
 
 
 				<cfelse>
-
+					<!--Não é mais utilizado pois gerava erro para posicionamentos de processos bloqueados
  					<cfquery datasource = "#application.dsn_processos#" name="rsOrgaoResp">
 						SELECT TOP 1 pc_aval_posic_num_orgaoResp as orgaoResp
 						FROM pc_avaliacao_posicionamentos
 						WHERE pc_aval_posic_num_orientacao=<cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.pc_aval_orientacao_id#">
 						ORDER BY pc_aval_posic_id DESC
-					</cfquery>
+					</cfquery>-->
 
 					
 					<cfset textoPosic = "#arguments.pc_aval_posic_texto#">
@@ -3562,7 +3574,7 @@
 							<cfqueryparam value="#textoPosic#" cfsqltype="cf_sql_varchar">,
 							<cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
 							<cfqueryparam value="#application.rsUsuarioParametros.pc_usu_matricula#" cfsqltype="cf_sql_varchar">,
-							<cfqueryparam value="#rsOrgaoResp.orgaoResp#" cfsqltype="cf_sql_varchar">,
+							<cfqueryparam value="#application.rsUsuarioParametros.pc_usu_lotacao#" cfsqltype="cf_sql_varchar">,
 							<cfqueryparam value="#arguments.pc_aval_orientacao_status#" cfsqltype="cf_sql_varchar">,
 							<cfqueryparam value="1" cfsqltype="cf_sql_integer">,
 							<cfqueryparam value="#arguments.pc_aval_orientacao_mcu_orgaoResp#" cfsqltype="cf_sql_varchar">,
@@ -3611,7 +3623,7 @@
 				</cfif>
 
 				<cfquery datasource = "#application.dsn_processos#" name="quantStatusNaoFinalizProcesso" >
-					SELECT pc_processos.pc_processo_id, pc_avaliacao_orientacoes.pc_aval_orientacao_id
+					SELECT pc_processos.pc_processo_id, pc_avaliacao_orientacoes.pc_aval_orientacao_status as statusOrientacao,  pc_avaliacao_orientacoes.pc_aval_orientacao_id
 					FROM    pc_processos LEFT JOIN
 							pc_avaliacoes ON pc_processos.pc_processo_id = pc_avaliacoes.pc_aval_processo LEFT JOIN
 							pc_avaliacao_orientacoes ON pc_avaliacoes.pc_aval_id = pc_avaliacao_orientacoes.pc_aval_orientacao_num_aval LEFT JOIN
@@ -3620,12 +3632,26 @@
 				</cfquery>
 
 				<cfif quantStatusNaoFinalizProcesso.recordcount eq 0>
+					<cfset status = 5>
+					<cfif statusAnteriorOrientacao eq '14'>
+						<cfset status = 8>
+						<!--Se o processo estiver bloqueado, muda os status de todas as PM para N - Não Informado-->
+						<cfquery datasource = "#application.dsn_processos#" >
+							UPDATE 	pc_avaliacao_melhorias
+							SET    	pc_aval_melhoria_status ='N'
+						    FROM    pc_avaliacao_melhorias
+							INNER JOIN pc_avaliacoes ON pc_avaliacoes.pc_aval_id = pc_avaliacao_melhorias.pc_aval_melhoria_num_aval
+							WHERE 	pc_aval_processo = '#rsProcesso.pc_aval_processo#'
+						</cfquery>	
+					</cfif>
+
 					<cfquery datasource = "#application.dsn_processos#" >
 						UPDATE 	pc_processos
-						SET    	pc_num_status = '5',
+						SET    	pc_num_status = <cfqueryparam value="#status#" cfsqltype="cf_sql_varchar">,
 								pc_data_finalizado = <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">
 						WHERE 	pc_processo_id = '#rsProcesso.pc_aval_processo#'
 					</cfquery>
+
 				</cfif>
 				
 				<!--Insere nos anexos o ID do posicionamento para exibir os anexos no respectivo posicionamento no timeline -->

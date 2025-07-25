@@ -86,6 +86,8 @@
                         ' -> N2: ', pc_avaliacao_tipos.pc_aval_tipo_processoN2,
                         ' -> N3: ', pc_avaliacao_tipos.pc_aval_tipo_processoN3, '.'
                         ) as tipoProcesso
+                        ,pc_status.pc_status_card_nome_ribbon
+                        ,pc_status.pc_status_card_style_ribbon
             FROM        pc_processos 
                         INNER JOIN pc_orgaos as pc_orgaos2 on pc_orgaos2.pc_org_mcu = pc_num_orgao_avaliado
                         INNER JOIN pc_orgaos as pc_orgaos3 on pc_orgaos3.pc_org_mcu = pc_num_orgao_origem
@@ -154,11 +156,16 @@
                         <!-- small card -->
                         <cfoutput>
                             <div class="small-box " style=" font-weight: bold;color:##696969!important;">
-                               
+                                <cfif rsInfoProcesso.pc_num_status eq 6 OR rsInfoProcesso.pc_num_status eq 8>
+                                    <div class="ribbon-wrapper ribbon-xl" >
+                                        <div class="ribbon " style="font-size:18px;left:8px;#rsInfoProcesso.pc_status_card_style_ribbon#" ><cfoutput>#rsInfoProcesso.pc_status_card_nome_ribbon#</cfoutput></div>
+                                    </div> 
+                                </cfif> 
+
                                 <div class="card-header" style="height:auto">
                                     <fieldset style="padding:0px!important;min-height: 90px;">
                                         <legend style="margin-left:20px">Informações Principais:</legend>
-
+                                        
                                         <p style="font-size: 1.5em!important;margin-left:20px;">Processo SNCI n°: <strong id="numSNCI" style="color:##0692c6;margin-right:30px">#rsInfoProcesso.pc_processo_id#
                                             
                                             </strong> Órgão Avaliado: <strong style="color:##0692c6">#rsInfoProcesso.siglaOrgAvaliado#</strong></p>

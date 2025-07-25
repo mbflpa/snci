@@ -102,6 +102,7 @@
                                     WHERE pc_pesquisas.pc_processo_id = pc_processos.pc_processo_id
                                     AND pc_pesquisas.pc_org_mcu = <cfqueryparam cfsqltype="cf_sql_varchar" value="#application.rsUsuarioParametros.pc_usu_lotacao#">
                                 )
+               AND pc_processos.pc_num_status in(4,5)
 
           UNION
 
@@ -117,18 +118,20 @@
                                 WHERE pc_pesquisas.pc_processo_id = pc_processos.pc_processo_id
                                 AND pc_pesquisas.pc_org_mcu = <cfqueryparam cfsqltype="cf_sql_varchar" value="#application.rsUsuarioParametros.pc_usu_lotacao#">
                             )
+              AND pc_processos.pc_num_status in(4,5)
           UNION
 
           SELECT DISTINCT pc_processos.pc_processo_id
           FROM pc_avaliacoes
           INNER JOIN pc_processos ON pc_avaliacoes.pc_aval_processo = pc_processos.pc_processo_id
           WHERE pc_num_orgao_avaliado = <cfqueryparam cfsqltype="cf_sql_varchar" value="#application.rsUsuarioParametros.pc_usu_lotacao#">
+                AND pc_processos.pc_num_status in(4,5)
           GROUP BY pc_processos.pc_processo_id
           HAVING COUNT(*) = (
               SELECT COUNT(*)
               FROM pc_avaliacoes a2
               WHERE a2.pc_aval_processo = pc_processos.pc_processo_id
-              AND a2.pc_aval_classificacao = 'L'
+              AND a2.pc_aval_classificacao = 'L' 
           )
       ) AS unificado
      

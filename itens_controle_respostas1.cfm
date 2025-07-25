@@ -608,8 +608,9 @@
 				</cfloop>	
 			</cfoutput>
 		<cfelse>
+			<!---
 			<cfoutput>
-				<!--- contar 30 dias úteis para AGF e ACC --->			
+				<!--- contar 30 dias corridos para AGF e ACC --->			
 				<cfset dtnovoprazo = CreateDate(year(form.INPDTConcluirRevisao),month(form.INPDTConcluirRevisao),day(form.INPDTConcluirRevisao))> 
 				<cfset dtnovoprazo = DateAdd( "d", 31, dtnovoprazo)>
 				<cfset nCont = 1>
@@ -633,7 +634,8 @@
 					</cfif>	
 					<cfset nCont = nCont + 1>	
 				</cfloop> 
-			</cfoutput>		
+			</cfoutput>	
+			--->	
 		</cfif>
  		<cfif form.frmResp eq 21 or form.frmResp eq 28>
 			<!---  --->
@@ -891,12 +893,13 @@
 				, Pos_Situacao = 'TF'
 				, Pos_Area = '#posarea#'
 				, Pos_NomeArea = '#posnomearea#'
-				, Pos_DtPrev_Solucao = #createodbcdate(createdate(year(dtnovoprazo),month(dtnovoprazo),day(dtnovoprazo)))# 
+				<!---, Pos_DtPrev_Solucao = #createodbcdate(createdate(year(dtnovoprazo),month(dtnovoprazo),day(dtnovoprazo)))# --->
 				<cfset Gestor = '#rsMod.Und_Descricao#'>
 				<cfset situacao = 'TRATAMENTO TERCEIRIZADA'>
 				<cfset IDArea = #posarea#>
 				<cfset sdestina = #rsMod.Und_Email#>
 				<cfset nomedestino = #rsMod.Und_Descricao#>
+				<cfset dtnovoprazo = CreateDate(right(form.cbdata,4),mid(form.cbdata,4,2),left(form.cbdata,2))> 
 				<cfset posdtprevsoltxt = 'Data Final da Solução: '>
 			</cfcase>
 			<cfcase value=19>
@@ -927,10 +930,11 @@
 				, Pos_Situacao = 'PF'
 				, Pos_Area = '#posarea#'
 				, Pos_NomeArea = '#posnomearea#'
-				, Pos_DtPrev_Solucao = #createodbcdate(createdate(year(dtnovoprazo),month(dtnovoprazo),day(dtnovoprazo)))# 
+				<!---, Pos_DtPrev_Solucao = #createodbcdate(createdate(year(dtnovoprazo),month(dtnovoprazo),day(dtnovoprazo)))#  --->
 				<cfset Gestor = '#rsMod.Und_Descricao#'>
 				<cfset situacao = 'PENDENTE DE TERCEIRIZADA'>
 				<cfset IDArea = #posarea#>
+				<cfset dtnovoprazo = CreateDate(right(form.cbdata,4),mid(form.cbdata,4,2),left(form.cbdata,2))> 
 				<cfset posdtprevsoltxt = 'Data Final da Solução: '>
 			</cfcase>
 			<cfcase value=21>

@@ -8,24 +8,24 @@
 	select Usu_DR, Usu_GrupoAcesso, Usu_Matricula, Usu_Email, Usu_Apelido,Usu_Coordena from usuarios 
 	where Usu_login = (<cfqueryparam cfsqltype="cf_sql_varchar" value="#cgi.REMOTE_USER#">)
 </cfquery>
-<cfset grpacesso = ucase(trim(qAcesso.Usu_GrupoAcesso))>
-<cfquery name="rsAno" datasource="#dsn_inspecao#">
-SELECT Grp_Ano
-FROM Grupos_Verificacao
-where Grp_Ano <= year(getdate())
-GROUP BY Grp_Ano
-ORDER BY Grp_Ano DESC
-</cfquery> 
+  <cfset grpacesso = ucase(trim(qAcesso.Usu_GrupoAcesso))>
+  <cfquery name="rsAno" datasource="#dsn_inspecao#">
+    SELECT Grp_Ano
+    FROM Grupos_Verificacao
+    where Grp_Ano <= year(getdate())
+    GROUP BY Grp_Ano
+    ORDER BY Grp_Ano DESC
+  </cfquery> 
 
-<cfquery name="rsTipo" datasource="#dsn_inspecao#">
-SELECT DISTINCT TUI_TipoUnid, TUN_Descricao
-FROM Tipo_Unidades INNER JOIN TipoUnidade_ItemVerificacao ON TUN_Codigo = TUI_TipoUnid
-where tui_Ano = year(getdate())
-<cfif grpacesso eq 'inspetores'>
-  and TUI_Ativo = 1
-</cfif>
-ORDER BY TUN_Descricao
-</cfquery> 
+  <cfquery name="rsTipo" datasource="#dsn_inspecao#">
+    SELECT DISTINCT TUI_TipoUnid, TUN_Descricao
+    FROM Tipo_Unidades INNER JOIN TipoUnidade_ItemVerificacao ON TUN_Codigo = TUI_TipoUnid
+    where tui_Ano = year(getdate())
+    <cfif grpacesso eq 'INSPETORES'>
+      and TUI_Ativo = 1
+    </cfif>
+    ORDER BY TUN_Descricao
+  </cfquery> 
 
 <cfinclude template="cabecalho.cfm">
 <html>
@@ -124,7 +124,7 @@ frm.frmacao.value=a;
                   SELECT distinct TUI_Modalidade  
                   FROM TipoUnidade_ItemVerificacao 
                   where tui_Ano = year(getdate())
-                  <cfif grpacesso eq 'inspetores'>
+                  <cfif grpacesso eq 'INSPETORES'>
                     and TUI_Ativo = 1
                   </cfif>                  
                 </cfquery>
@@ -139,7 +139,7 @@ frm.frmacao.value=a;
                 <cfoutput query="rsModal">
                   <cfif rsModal.TUI_Modalidade is 0>
                       <cfset auxnome = 'Presencial'>
-                  <cfelseif rsModal.TUI_Modalidade is 0>
+                  <cfelseif rsModal.TUI_Modalidade is 1>
                     <cfset auxnome = 'A Distância'>
                   <cfelse>
                     <cfset auxnome = 'Mista'>

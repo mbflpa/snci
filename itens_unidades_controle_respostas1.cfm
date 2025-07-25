@@ -3,8 +3,6 @@
  	   <cfinclude template="aviso_sessao_encerrada.htm">
 	  <cfabort>   
 </cfif>         
-
- 
 <cfset area = 'sins'>
 <cfset Encaminhamento = 'Ao SGCIN'>
 <cfset nID_Resp = 1>
@@ -118,7 +116,6 @@
 	<td>
 	   Não há itens pendentes para este Relatório/Unidade de Avaliação de Controle Interno.
 	<br><br>
-
 	<input name="" value="fechar" type="button" onClick="self.close(); ">
 	</td>
 	</tr>
@@ -425,7 +422,7 @@
 		</cfoutput>
 	<cfelse>
 		<cfoutput>
-			<!--- contar 30 dias úteis para AGF e ACC --->			
+			<!--- contar 30 dias corridos para AGF e ACC --->			
 			<cfset dtnovoprazo = CreateDate(year(rsItem.INP_DTConcluirRevisao),month(rsItem.INP_DTConcluirRevisao),day(rsItem.INP_DTConcluirRevisao))> 
 			<cfset dtnovoprazo = DateAdd( "d", 31, dtnovoprazo)>
 			<cfset nCont = 1>
@@ -452,6 +449,9 @@
 		</cfoutput>		
 	</cfif>	  
     <cfset posdtprevsoltxt = 'Data de Previsão da Solução: '>
+	<cfif dateformat(dtnovoprazo,"YYYYMMDD") lt form.posdtprevsolucao>
+		<cfset dtnovoprazo = CreateDate(left(form.posdtprevsolucao,4),mid(form.posdtprevsolucao,5,2),right(form.posdtprevsolucao,2))> 
+	</cfif>
 	 <cfquery datasource="#dsn_inspecao#">
 	   UPDATE ParecerUnidade SET Pos_Situacao_Resp = #FORM.frmResp#
    			  , Pos_Area = '#auxposarea#'
@@ -459,13 +459,13 @@
 		<cfswitch expression="#Form.frmResp#">
 			<cfcase value=1>
 			  , Pos_Situacao = 'RU'
-			  , Pos_DtPrev_Solucao = #createodbcdate(createdate(year(dtnovoprazo),month(dtnovoprazo),day(dtnovoprazo)))#
+			  , Pos_DtPrev_Solucao = #createodbcdate(createdate(year(dtnovoprazo),month(dtnovoprazo),day(dtnovoprazo)))# 
 			  <cfset Encaminhamento = 'Ao SGCIN'>
 			  <cfset situacao = 'RESPOSTA DA UNIDADE'>
 			</cfcase>
 			<cfcase value=15>
 			  , Pos_Situacao = 'TU'
-			  , Pos_DtPrev_Solucao = #createodbcdate(createdate(year(dtnovoprazo),month(dtnovoprazo),day(dtnovoprazo)))#
+			  , Pos_DtPrev_Solucao = #createodbcdate(createdate(year(dtnovoprazo),month(dtnovoprazo),day(dtnovoprazo)))# 
 			  <cfset Encaminhamento = 'A UNIDADE'>
 			  <cfset situacao = 'TRATAMENTO UNIDADE'>
 			</cfcase>
@@ -478,7 +478,7 @@
 			</cfcase>
 			<cfcase value=18>
 			  , Pos_Situacao = 'TF'
-			  , Pos_DtPrev_Solucao = #createodbcdate(createdate(year(dtnovoprazo),month(dtnovoprazo),day(dtnovoprazo)))# 
+ 		  	  , Pos_DtPrev_Solucao = #createodbcdate(createdate(year(dtnovoprazo),month(dtnovoprazo),day(dtnovoprazo)))# 
 			  <cfset Encaminhamento = 'A UNIDADE TERCEIRIZADA'>
 			  <cfset situacao = 'TRATAMENTO DE TERCEIRIZADA'>
 			  <cfset posdtprevsoltxt = 'Data Final da Solução: '>
@@ -569,13 +569,12 @@
  </cfif>
   </cfif>
  
-<!--- ============= --->
 <cfquery name="qSituacaoResp" datasource="#dsn_inspecao#">
   SELECT Pos_Situacao_Resp, Pos_NomeArea, Pos_Area
   FROM ParecerUnidade
   WHERE Pos_Unidade='#unid#' AND Pos_Inspecao='#ninsp#' AND Pos_NumGrupo=#ngrup# AND Pos_NumItem=#nitem#
 </cfquery>
-<!--- ============= --->
+
 <cfif left(ninsp,2) eq left(trim(qUsuario.Usu_Lotacao),2)>
 	<cfquery name="rsMod" datasource="#dsn_inspecao#">
 	  SELECT Und_Centraliza, Und_Descricao, Und_CodReop, Und_Codigo, Und_CodDiretoria, Und_TipoUnidade, Dir_Descricao, Dir_Codigo, Dir_Sigla
@@ -596,7 +595,6 @@
   WHERE  Ane_NumInspecao = '#ninsp#' AND Ane_Unidade = '#unid#' AND Ane_NumGrupo = #ngrup# AND Ane_NumItem = #nitem#
   order by Ane_Codigo 
 </cfquery>
-
 
 <html>
 <head>
@@ -1361,8 +1359,7 @@ function mensagem(){
     </cfloop>
 <!---  --->  	
 <cfoutput>
-    <cfset posdtprevsolucao = CreateDate(year(now()),month(now()),day(now()))>
-	<cfset posdtprevsolucao = dateformat(qResposta.Pos_DtPrev_Solucao,"YYYYMMDD")>
+	<cfset posdtprevsolucao = #dateformat(qResposta.Pos_DtPrev_Solucao,"YYYYMMDD")#>
 	<cfset dtbase = CreateDate(year(now()),month(now()),day(now()))>
 	<cfset dtrespos = CreateDate(year(now()),month(now()),day(now()))>
 	<cfset dttratam = CreateDate(year(now()),month(now()),day(now()))>
@@ -1526,6 +1523,7 @@ function mensagem(){
 	<input type="hidden" name="MM_UpdateRecord" value="form1">
 	<input type="hidden" name="rdCentraliz" id="rdCentraliz" value="#rdCentraliz#">	
 	<input type="hidden" name="PosClassificacaoPonto" id="PosClassificacaoPonto" value="#trim(qResposta.Pos_ClassificacaoPonto)#">
+	<input type="hidden" name="posdtprevsolucao" id="posdtprevsolucao" value="#dateformat(qResposta.Pos_DtPrev_Solucao,"YYYYMMDD")#">
 	<input type="hidden" name="undtipounidade" id="undtipounidade" value="#trim(rsItem.Und_TipoUnidade)#">
 	<input type="hidden" name="encerrarSN" id="encerrarSN" value="#encerrarSN#">
 	<!--- encerrarSN: #encerrarSN# somafalta: #somafalta# --->

@@ -201,6 +201,35 @@ label {
 	vertical-align: middle;
   	text-align: center;
 }
+.botaosalvar{
+	margin-top: 0.1em;
+	padding: 0.2em;
+	display: inline-block;
+	/*definimos a largura do box*/
+	width:680px;
+	/* definimos a altura do box */
+	height:40px;
+	/* definimos a cor de fundo do box */
+	background-color: #00a859;
+	/* definimos o quão arredondado irá ficar nosso box */
+	border-radius: 10px 20px;
+	text-align: center;
+	TextColor: #00a859;
+	cursor: pointer;
+	}	
+.mensg{
+	margin-top: 0.1em;
+	padding: 0.2em;
+	display: inline-block;
+	/*definimos a largura do box*/
+	width:1200px;
+	/* definimos a altura do box */
+	height:100px;
+	/* definimos a cor de fundo do box */
+	background-color: #e8e7e7;
+	/* definimos o quão arredondado irá ficar nosso box */
+	text-align: center;
+	}	
 
 </style>
 </head>
@@ -385,15 +414,15 @@ label {
 	</tr>
  </table>
  <div class="row"><br><br></div>
- <div id="aviso" class="noprint" align="center" style="margin-top:10px;float: left;margin-left:620px">
-	<a style="cursor:pointer;" onClick="if(confirm('Confirma conclusão da FACIN?')){concluir();}">
-	<div style="color:darkred;position:relative;font-size:25px">Confirmar conclusão da FACIN</div>
+ <div id="aviso" class="noprint botaosalvar" align="center">
+	<a onClick="if(confirm('Confirma conclusão da FACIN?')){concluir();}">
+	<div style="color:black;position:relative;font-size:25px">Confirmar conclusão da FACIN</div>
 	</a> 
  </div>
  <div class="row"><br><br><br></div>
- <div id="avisoinsp" class="noprint" align="center" style="margin-top:10px;float: left;margin-left:620px">
-	<a style="cursor:pointer;" onClick="if(confirm('Confirma conclusão das considerações (FACIN)?')){concluir();}">
-	<div style="color:darkred;position:relative;font-size:25px">Inspetor(a), confirmar conclusão das considerações (FACIN)</div>
+ <div id="avisoinsp" class="noprint botaosalvar" align="center">
+	<a onClick="if(confirm('Confirma conclusão das considerações (FACIN)?')){concluir();}">
+	<div style="color:black;position:relative;font-size:18px">Inspetor(a), confirmar conclusão das considerações (FACIN)</div>
 	</a> 
  </div>
  <div class="row"><br><br><br><br></div>
@@ -494,8 +523,6 @@ label {
 	function aviso() {
 		$('#aviso').hide()
 		$('#avisoinsp').hide()
-		//alert($('#msg').val())
-		//alert($('#acao').val())
 		if($('#msg').val() != '') {
 			$('#aviso').html('<h5>&nbsp;'+$('#msg').val()+'&nbsp;</h5>')
 			$('#aviso').show(500)
@@ -509,6 +536,7 @@ label {
 				$('#grpitem2').html(prots)
 				$('#aviso').html('<h5>&nbsp;Inspetor(a), FACIN não concluída pelo gestor&nbsp;&nbsp; <br> &nbsp;ou não houve item direcionado à você!&nbsp;</h5>')
 				$('#tab').hide()
+				$('#aviso').attr('class','noprint mensg')
 				$('#aviso').show(500)
 				$('#avisoinsp').hide()
 			}
@@ -519,6 +547,7 @@ label {
 				}else{
 					if ($('#acao').val()=='buscar'){
 						$('#aviso').html('<h5>&nbsp;FACIN está em fase de conclusão por '+$('#concfacingestor').val()+' Gestor(a): '+$('#concfacingestornome').val()+'&nbsp;</h5>')
+						$('#aviso').attr('class','noprint mensg')
 						$('#aviso').show(500)
 					}
 				}
@@ -532,6 +561,8 @@ label {
 						texto2 = '<h5>&nbsp;Conclusão das considerações (FACIN) realizada em '+$('#concfacininspetor').val()+' Inspetor(a): '+$('#concfacininspetornome').val()+'&nbsp;</h5>'
 					}
 					$('#aviso').html(texto1 + '<br>' + texto2)
+					$('#aviso').attr('class','noprint mensg')
+					//$('#aviso').attr('height','80px')
 					$('#aviso').show(500)
 				}
 				
@@ -550,15 +581,17 @@ label {
 					}
 					$('#aviso').html(texto1 + '<br>' + texto2)
 				}
+				$('#aviso').attr('class','noprint mensg')
 				$('#aviso').show(500)
 			}
-			if($('#grpacesso').val() == 'INSPETORES' && $('#faltaconcluirfacininspetorSN').val() == 'N' && $('#facininspetorconcluidaSN').val() == 'N') {		
+			if($('#grpacesso').val() == 'INSPETORES' && $('#faltaconcluirfacininspetorSN').val() == 'N' && $('#facininspetorconcluidaSN').val() == 'N') {	
 				$('#avisoinsp').show(500)
 			}
 			if($('#grpacesso').val() == 'INSPETORES' && $('#concfacingestor').val() == '') {$('#avisoinsp').hide()}
 		}		
 		if($('#grpitem').val() == '' && $('#grpitem2').val() == '') {
 			$('#aviso').html('<h5>&nbsp;Nº avaliação inexistente ou está na fase de Revisão!&nbsp;</h5>')
+			$('#aviso').attr('class','noprint mensg')
 			$('#aviso').show(500)
 		} 	
 		if($('#somenteavaliarmeta3').val() == 'S' && $('#grpitem2').val() != null) {
@@ -568,6 +601,7 @@ label {
 			$("#inc").attr('disabled', true);
 			if($('#concfacingestor').val() == ''){
 				$('#aviso').show(500)
+				
 			}
 		} 
    	}
@@ -599,7 +633,8 @@ label {
 			let dados = data.data.substring(vlr_ini,vlr_fin);
 			$('#avisoinsp').hide()
 			$("#aviso").html(dados);
-			$("#msgmacproc").show(500);
+			$('#aviso').attr('class','noprint mensg')
+			//$("#msgmacproc").show(500);
 			$("#alt").val('Consultar Grupo/Item');
         })
       }

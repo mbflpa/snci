@@ -100,13 +100,11 @@
         <cfargument name="modalgrupo" required="true">
         <cftransaction>
            <cfquery name="rsgrpverif" datasource="DBSNCI">
-                SELECT Grp_Codigo,trim(Grp_Descricao),Grp_Ano,Itn_Ano
-                FROM Grupos_Verificacao 
-                left JOIN Itens_Verificacao ON (Grp_Ano = Itn_Ano) AND (Grp_Codigo = Itn_NumGrupo)
-                WHERE Itn_Modalidade = <cfqueryparam value="#modalgrupo#" cfsqltype="cf_sql_char">
-                GROUP BY Grp_Ano,Grp_Codigo, Grp_Descricao,Itn_Ano
-                HAVING Grp_Ano=<cfqueryparam value="#anogrupo#" cfsqltype="cf_sql_char">
-                ORDER BY Grp_Codigo, Grp_Descricao
+                SELECT Grp_Codigo, Grp_Descricao
+                FROM (Grupos_Verificacao INNER JOIN Itens_Verificacao ON (Grp_Codigo = Itn_NumGrupo) AND (Grp_Ano = Itn_Ano)) INNER JOIN TipoUnidade_ItemVerificacao ON (Itn_NumItem = TipoUnidade_ItemVerificacao.TUI_ItemVerif) AND (Itn_NumGrupo = TipoUnidade_ItemVerificacao.TUI_GrupoItem) AND (Itn_TipoUnidade = TipoUnidade_ItemVerificacao.TUI_TipoUnid) AND (Itn_Ano = TipoUnidade_ItemVerificacao.TUI_Ano) AND (Itn_Modalidade = TipoUnidade_ItemVerificacao.TUI_Modalidade)
+                WHERE (Grp_Ano= <cfqueryparam value="#anogrupo#" cfsqltype="cf_sql_char">) AND (Itn_Modalidade = <cfqueryparam value="#modalgrupo#" cfsqltype="cf_sql_char">)
+                GROUP BY Grp_Codigo, Grp_Descricao
+                ORDER BY Grp_Codigo
           </cfquery>
           <cfreturn rsgrpverif>
         </cftransaction>

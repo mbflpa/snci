@@ -38,24 +38,24 @@
 			
 			
 			<cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'S'>
-				<!---Se o perfil for 16 - 'CI - CONSULTAS', mostra todas as orientações--->
-				<cfif ListFind("16",#application.rsUsuarioParametros.pc_usu_perfil#) >
-					AND pc_processo_id IS NOT NULL 
+			    <cfif ListFind("8,11,16",#application.rsUsuarioParametros.pc_usu_perfil#)>
+					AND pc_num_status in(4,5,6,8)
 				<cfelse>
+					AND pc_num_status in(4,5)
+				</cfif>
 										
-					<!---Se o perfil for 4 - 'CI - AVALIADOR (EXECUÇÃO)') --->
-					<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 4 >
-						AND pc_avaliador_matricula = #application.rsUsuarioParametros.pc_usu_matricula#	or pc_usu_matricula_coordenador = #application.rsUsuarioParametros.pc_usu_matricula# or pc_usu_matricula_coordenador_nacional = #application.rsUsuarioParametros.pc_usu_matricula#
-					</cfif>
-
-					<!---Se o perfil for 7 - 'CI - REGIONAL (Gestor Nível 1)'  ou 14 -'CI - REGIONAL - SCIA - Acompanhamento'--->
-					<cfif ListFind("7,14",#application.rsUsuarioParametros.pc_usu_perfil#) >
-						AND pc_orgaos.pc_org_se = '#application.rsUsuarioParametros.pc_org_se#' OR pc_orgaos.pc_org_se in(#application.seAbrangencia#)
-					</cfif>
+				<!---Se o perfil for 4 - 'CI - AVALIADOR (EXECUÇÃO)') --->
+				<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 4 >
+					AND (pc_avaliador_matricula = #application.rsUsuarioParametros.pc_usu_matricula#	or pc_usu_matricula_coordenador = #application.rsUsuarioParametros.pc_usu_matricula# or pc_usu_matricula_coordenador_nacional = #application.rsUsuarioParametros.pc_usu_matricula#)
 				</cfif>
 
+				<!---Se o perfil for 7 - 'CI - REGIONAL (Gestor Nível 1)'  ou 14 -'CI - REGIONAL - SCIA - Acompanhamento'--->
+				<cfif ListFind("7,14",#application.rsUsuarioParametros.pc_usu_perfil#) >
+					AND (pc_orgaos.pc_org_se = '#application.rsUsuarioParametros.pc_org_se#' OR pc_orgaos.pc_org_se in(#application.seAbrangencia#))
+				</cfif>
+				
 			<cfelse>
-				AND pc_aval_melhoria_status not in('B') AND  pc_num_status not in(6)
+				AND pc_aval_melhoria_status not in('B') AND  pc_num_status not in(6,8)
 				<!---Se o perfil do usuário não for 13 - GOVERNANÇA --->
 				<cfif #application.rsUsuarioParametros.pc_usu_perfil# neq 13 >
 					AND (

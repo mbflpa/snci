@@ -58,7 +58,7 @@
 
 <!--- <cfinclude template="cabecalho.cfm"> --->
 
-
+<cfset dtpart = year(now()) & '-01-01'>
 <!--- area de conteudo   --->
 <table width="50%" align="left">
   <tr>
@@ -87,12 +87,12 @@
           <tr>
             <th scope="row">Início</th>
             <td  colspan="1">
-              <input class="form-control" id="dtinic" name="dtinic" type="date" placeholder="DD/MM/AAAA">
+              <input class="form-control" id="dtinic" name="dtinic" type="date" placeholder="DD/MM/AAAA" value="<cfoutput>#dtpart#</cfoutput>">
             </td>
           </tr>
           <tr>
             <th scope="row">Final</th>
-            <td colspan="1"><input class="form-control" id="dtfinal" name="dtfinal" type="date" placeholder="DD/MM/AAAA"></td>
+            <td colspan="1"><input class="form-control" id="dtfinal" name="dtfinal" type="date" placeholder="DD/MM/AAAA" value="<cfoutput>#dateformat(now(),"yyyy-mm-dd")#</cfoutput>"></td>
 
           </tr>
           <tr>
@@ -161,7 +161,7 @@
       $('#frmse').change(function(e){ 
         let prots = '<option value="" selected>---</option>';
         let dtinic = $('#dtinic').val() 
-        dtinic += ' 23:59:59.000'
+        dtinic += ' 00:00:00.000'
         let dtfinal = $('#dtfinal').val()
         dtfinal += ' 23:59:59.000'
         if(dtinic == '' || dtfinal == ''){
@@ -200,7 +200,7 @@
         prots += '<option value="t">Todas</option>'
         if($(this).val() != ''){    
             let dtinic = $('#dtinic').val() 
-            dtinic += ' 23:59:59.000'
+            dtinic += ' 00:00:00.000'
             let dtfinal = $('#dtfinal').val()
             dtfinal += ' 23:59:59.999'
             let ano = $('#frmano').val(); 
@@ -236,7 +236,7 @@
         if($(this).val() != ''){   
             let ano = $('#frmano').val(); 
             let dtinic = $('#dtinic').val() 
-            dtinic += ' 23:59:59.000'
+            dtinic += ' 00:00:00.000'
             let dtfinal = $('#dtfinal').val()
             dtfinal += ' 23:59:59.999'
             let frmse = $('#frmse').val(); 

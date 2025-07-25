@@ -269,10 +269,16 @@
 	  </cfif>
 	   <cfif grpacesso eq "GESTORES">
 	   	<tr>		   
-		<td><img src="smallArrow.gif" width="16" height="5" /></td>
-		<td width="94%"><a href="index.cfm?opcao=permissao21">Solicitar Permuta Avaliação no PACIN</a></td>
+        <td><img src="smallArrow.gif" width="16" height="5" /></td>
+        <td width="94%"><a href="index.cfm?opcao=permissao21">Solicitar Permuta Avaliação no PACIN</a></td>
 	    </tr>
-	    </cfif>	
+	   </cfif>	
+    <cfif grpacesso eq "GESTORES" or grpacesso eq "GESTORMASTER">
+	   	<tr>		   
+        <td><img src="smallArrow.gif" width="16" height="5" /></td>
+        <td width="94%"><a href="index.cfm?opcao=permissao31">Gestão das Despesas Avaliação</a></td>
+	    </tr>
+	   </cfif>     
 	   <cfif grpacesso eq "GESTORMASTER">
       <tr>		   
          <td><img src="smallArrow.gif" width="16" height="5" /></td>

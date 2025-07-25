@@ -69,24 +69,28 @@
 								<cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'S'>
 									<!---Se  processoEmAcompanhamento igual a true só mostra orientações de processos em acompanhamento e bloqueados, caso contrário, mostra processos finalizados--->
 									<cfif '#arguments.processoEmAcompanhamento#' eq true>
+										<cfif ListFind("8,11,16",#application.rsUsuarioParametros.pc_usu_perfil#)>
 											AND pc_num_status in(4,6)
+										<cfelse>
+											AND pc_num_status in(4)
+										</cfif>
 									<cfelse>
+										<cfif ListFind("8,11,16",#application.rsUsuarioParametros.pc_usu_perfil#)>
+											AND pc_num_status in(5,8)
+										<cfelse>
 											AND pc_num_status in(5)
-									</cfif>
-									<!---Se o perfil for 16 - 'CI - CONSULTAS', mostra todas as orientações--->
-									<cfif ListFind("16",#application.rsUsuarioParametros.pc_usu_perfil#) >
-										AND pc_processo_id IS NOT NULL 
-									<cfelse>
-										
-										<!---Se a lotação do usuario não for um orgao origem de processos(status 'A') e o perfil for 4 - 'AVALIADOR') --->
-										<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 4 and '#application.rsUsuarioParametros.pc_org_status#' eq 'A'>
-											AND pc_avaliador_matricula = #application.rsUsuarioParametros.pc_usu_matricula#	or pc_usu_matricula_coordenador = #application.rsUsuarioParametros.pc_usu_matricula# or pc_usu_matricula_coordenador_nacional = #application.rsUsuarioParametros.pc_usu_matricula#
-										</cfif>
-										<!---Se o perfil for 7 - 'CI - REGIONAL (Gestor Nível 1)' - o órgão de origem será sempre GCOP--->
-										<cfif ListFind("7,14",#application.rsUsuarioParametros.pc_usu_perfil#) and '#application.rsUsuarioParametros.pc_org_status#' neq 'O'  and '#application.rsUsuarioParametros.pc_org_status#' eq 'A'>
-											AND pc_orgaos.pc_org_se = '#application.rsUsuarioParametros.pc_org_se#' OR pc_orgaos.pc_org_se in(#application.seAbrangencia#)
 										</cfif>
 									</cfif>
+																		
+									<!---Se a lotação do usuario não for um orgao origem de processos(status 'A') e o perfil for 4 - 'AVALIADOR') --->
+									<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 4 and '#application.rsUsuarioParametros.pc_org_status#' eq 'A'>
+										AND (pc_avaliador_matricula = #application.rsUsuarioParametros.pc_usu_matricula#	or pc_usu_matricula_coordenador = #application.rsUsuarioParametros.pc_usu_matricula# or pc_usu_matricula_coordenador_nacional = #application.rsUsuarioParametros.pc_usu_matricula#)
+									</cfif>
+									<!---Se o perfil for 7 - 'CI - REGIONAL (Gestor Nível 1)' - o órgão de origem será sempre GCOP--->
+									<cfif ListFind("7,14",#application.rsUsuarioParametros.pc_usu_perfil#) and '#application.rsUsuarioParametros.pc_org_status#' neq 'O'  and '#application.rsUsuarioParametros.pc_org_status#' eq 'A'>
+										AND (pc_orgaos.pc_org_se = '#application.rsUsuarioParametros.pc_org_se#' OR pc_orgaos.pc_org_se in(#application.seAbrangencia#))
+									</cfif>
+									
 								<cfelse>
 							        <!---Se  processoEmAcompanhamento igual a true só mostra orientações de processos em acompanhamento, caso contrário, mostra processos finalizados--->
 									<cfif '#arguments.processoEmAcompanhamento#' eq true>
@@ -232,19 +236,24 @@
 																WHERE pc_aval_processo = '#pc_processo_id#' AND pc_aval_melhoria_status not in('P')
 															</cfquery>
 
-															
-																<div style="position: relative;display: inline-block;">
-																	<div style="position: absolute;bottom:22px;left: 0;z-index: 1">
-																		<cfif #pc_num_status# eq 6 and #application.rsUsuarioParametros.pc_usu_perfil# neq 13>
-																			<i id="btDesbloquear" onclick="<cfoutput>javascript:desbloquearProcesso('#pc_processo_id#','#siglaOrgAvaliado#');</cfoutput>" class="fas fa-unlock grow-icon" style="color: #fff; cursor:pointer; margin-left: 2px;margin-bottom:14px" title="Desbloquear Processo" data-toggle="popover" data-trigger="hover" data-placement="bottom" data-content="Desbloquear o Processo Nº <cfoutput>#pc_processo_id#</cfoutput>."></i>
+															<cfif (application.rsUsuarioParametros.pc_org_mcu eq pc_num_orgao_origem AND application.rsUsuarioParametros.pc_usu_perfil eq 8) OR application.rsUsuarioParametros.pc_usu_perfil eq 11>
+																<div style="position: relative; display: inline-block;">
+																	<div style="position: absolute; bottom:37px; z-index: 1; width: 270px;">
+																		<cfif pc_num_status eq 6 >
+																			<div style="display: flex; justify-content: space-between; align-items: center; width: 100%;padding-left:5px;padding-right:5px;">
+																				<i id="btDesbloquear" onclick="<cfoutput>javascript:desbloquearProcesso('#pc_processo_id#','#siglaOrgAvaliado#');</cfoutput>" class="fas fa-unlock grow-icon" style="color: #fff; cursor:pointer;" title="Desbloquear Processo" data-toggle="popover" data-trigger="hover" data-placement="bottom" data-content="Desbloquear o Processo Nº <cfoutput>#pc_processo_id#</cfoutput>."></i>
+																				<i id="btFinalizaBloqueado" onclick="javascript:finalizaBloqueado(<cfoutput>'#rsProcCard.pc_processo_id#'</cfoutput>)" class="fas fa-shield-alt grow-icon" style="color: #fff; cursor:pointer;" title="Finalizar Processo mantendo o Bloqueio" data-toggle="popover" data-trigger="hover" data-placement="bottom" data-content="Finalizar c/ Bloqueio o Processo Nº <cfoutput>#pc_processo_id#</cfoutput>."></i>
+																			</div>
 																		<cfelse>
-																		<!--O botão bloquear só será visível para os processos com orientações, orientações sem posicionamento do órgão avaliado e propostas de melhoria sem o status Pendente-->
-																			<cfif pc_num_status eq 4 AND pc_modalidade eq "E" AND rsProcComOrientações.recordcount neq 0 AND rsProcComPosicOrgAvaliado.recordcount eq 0 AND rsProcComPropMelhoriaAvaliada.recordcount eq 0  and #application.rsUsuarioParametros.pc_org_controle_interno# eq 'S' and #application.rsUsuarioParametros.pc_usu_perfil# neq 13>
-																				<i id="btBloquear" onclick="<cfoutput>javascript:bloquearProcesso('#pc_processo_id#','#siglaOrgAvaliado#');</cfoutput>" class="fas fa-lock grow-icon" style="color: #cd0316; cursor:pointer; margin-left: 2px;margin-bottom:14px" title="Bloquear Processo" data-toggle="popover" data-trigger="hover" data-placement="bottom" data-content="Bloquear o Processo Nº <cfoutput>#pc_processo_id#</cfoutput>."></i>
+																			<cfif pc_num_status eq 4 AND pc_modalidade eq "E" AND rsProcComPosicOrgAvaliado.recordcount eq 0 AND rsProcComPropMelhoriaAvaliada.recordcount eq 0 >
+																				<div style="display: flex; justify-content: space-between; align-items: center; width: 100%;padding-left:5px;padding-right:5px;">
+																					<i id="btBloquear" onclick="<cfoutput>javascript:bloquearProcesso('#pc_processo_id#','#siglaOrgAvaliado#');</cfoutput>" class="fas fa-lock grow-icon" style="color: #cd0316; cursor:pointer;" title="Bloquear Processo" data-toggle="popover" data-trigger="hover" data-placement="bottom" data-content="Bloquear o Processo Nº <cfoutput>#pc_processo_id#</cfoutput>."></i>
+																				</div>
 																			</cfif>
 																		</cfif>
 																	</div>
 																</div>
+															</cfif>
 															
 														</section>
 													</td>
@@ -517,6 +526,73 @@
 						}
 					})
 					
+				}
+
+				function finalizaBloqueado(numProcesso){
+					var mensagem = "Deseja finalizar o processo N° <strong >" + numProcesso + "</strong> mantendo o bloqueio? <br><div style='background-color:#dc3545;color:#fff;text-align:justify;border-radius:0.8rem;padding:15px;'><span style='display: block;font-weight: bold;font-size: 20px;text-align: center;'>ATENÇÃO!</span>Este Processo receberá o status 'FINALIZADO C/ BLOQUEIO' e só poderá ser visualizado pelos órgãos do Controle Interno. Todas as Propostas de Melhoria, caso existam, receberão status 'NÃO INFORMADO'</div>"
+					swalWithBootstrapButtons.fire({//sweetalert2
+					html: logoSNCIsweetalert2(mensagem),
+					showCancelButton: true,
+					confirmButtonText: 'Sim!',
+					cancelButtonText: 'Cancelar!'
+					}).then((result) => {
+						if (result.isConfirmed) {
+							$('#modalOverlay').modal('show')	
+							setTimeout(function() {
+								$.ajax({
+									type: "post",
+									url: "cfc/pc_cfcConsultasPorProcesso.cfc",
+									data:{
+										method: "finalizaBloqueado",
+										numProcesso: numProcesso
+									},
+									async: false,
+									success: function(result) {
+										var anoMostra = $("input[name='opcaoAno']:checked").val();
+										ocultarTabela(anoMostra)
+										var valor = result;
+										// Se vier como WDDX, extraia o valor usando regex:
+										if(typeof valor === "string" && valor.indexOf("<wddxPacket") === 0){
+											var match = valor.match(/<string>(.*?)<\/string>/);
+											if(match && match[1]){
+												valor = match[1];
+											}
+										}
+
+										if(valor == 'true'){
+											Swal.fire({
+												html: logoSNCIsweetalert2('<strong>Operação não permitida!</strong><br><div style="background-color:#dc3545;color:#fff;text-align:justify;border-radius:0.8rem;padding:15px;">Este processo possui orientações bloqueadas. Para finalizá-lo, todas as orientações bloqueadas devem ser analisadas e baixadas na tela de "Acompanhamento" pelo Órgão de Origem. Após a última orientação ser baixada, este processo receberá automaticamente o status "Finalizado c/ Bloqueio" e suas Propostas de Melhoria, caso existam, receberão o status "NÃO INFORMADO".</div>'),});
+												$('#modalOverlay').delay(1000).hide(0, function() {
+												$('#modalOverlay').modal('hide');
+											});
+										} else {
+											$('#modalOverlay').delay(1000).hide(0, function() {
+												$('#modalOverlay').modal('hide');
+												toastr.success('Processo FINALIZADO com sucesso!');
+											});
+										}
+									},
+									error: function(xhr, ajaxOptions, thrownError) {
+										$('#modalOverlay').delay(1000).hide(0, function() {
+											$('#modalOverlay').modal('hide');
+										});
+										$('#modal-danger').modal('show')
+										$('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')
+										$('#modal-danger').find('.modal-body').text(thrownError)
+									}
+								});
+							}, 500);
+						} else {
+							// Lidar com o cancelamento: fechar o modal de carregamento, exibir mensagem, etc.
+							$('#modalOverlay').modal('hide');	
+							Swal.fire({
+								title: 'Finalização <span style="color:var(--amarelo_prisma_claro_correios)">cancelada</span> pelo usuário.',
+								html: logoSNCIsweetalert2(''),
+								icon: 'info'
+							});
+						}
+					})	
+
 				}
 
 				
@@ -2472,7 +2548,7 @@
 			</cfquery>
 			<!--fim COLOCA O PROCESSO EM STATUS 6 - BLOQUEADO-->
 
-			<!--COLOCA TODOS OS ITENS DO PROCESSO COM STATUS 8 - BLOQUEADO, EXCETO OS ITENS COM STATUS 7 - FINALIZADO (POIS A FINALIZAÇÃO DO ITEM JÁ FOI TRATADA NA FINALIZAÇÃO DO CADASTRO DO PROCESSO - 6° PASSO)-->
+			<!--COLOCA TODOS OS ITENS DO PROCESSO COM STATUS 8 - BLOQUEADO, EXCETO OS ITENS COM STATUS 7 - FINALIZADO (POIS A FINALIZAÇÃO DO ITEM JÝ FOI TRATADA NA FINALIZAÇÃO DO CADASTRO DO PROCESSO - 6° PASSO)-->
 			<cfquery datasource="#application.dsn_processos#" >
 				UPDATE 	pc_avaliacoes
 				SET 	pc_aval_status=8,
@@ -2480,7 +2556,7 @@
 						pc_aval_atualiz_login = '#application.rsUsuarioParametros.pc_usu_login#' 
 				WHERE 	pc_aval_processo = <cfqueryparam value="#arguments.numProcesso#" cfsqltype="cf_sql_varchar"> AND pc_aval_status not in (7)
 			</cfquery>
-			<!--fim COLOCA TODOS OS ITENS DO PROCESSO COM STATUS 8 - BLOQUEADO, EXCETO OS ITENS COM STATUS 7 - FINALIZADO (POIS A FINALIZAÇÃO DO ITEM JÁ FOI TRATADA NA FINALIZAÇÃO DO CADASTRO DO PROCESSO - 6° PASSO)-->
+			<!--fim COLOCA TODOS OS ITENS DO PROCESSO COM STATUS 8 - BLOQUEADO, EXCETO OS ITENS COM STATUS 7 - FINALIZADO (POIS A FINALIZAÇÃO DO ITEM JÝ FOI TRATADA NA FINALIZAÇÃO DO CADASTRO DO PROCESSO - 6° PASSO)-->
 
 			
 			<!--LISTA TODAS AS ORIENTAÇÕES DO PROCESSO-->
@@ -2492,25 +2568,27 @@
 
 			<!--COLOCA AS ORIENTAÇÕES COM STATUS 14 - BLOQUEADA-->
 			<!-- LOOP EM CADA ORIENTAÇÃO DO PROCESSO-->
-			<cfloop query="rsOrientacoes">
-				<cfquery datasource="#application.dsn_processos#" >
-					UPDATE	pc_avaliacao_orientacoes 
-					SET 	pc_aval_orientacao_status = 14,
-							pc_aval_orientacao_dataPrevistaResp = '',
-							pc_aval_orientacao_status_datahora =  <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
-							pc_aval_orientacao_atualiz_login = '#application.rsUsuarioParametros.pc_usu_login#'
-					WHERE 	pc_aval_orientacao_id = #pc_aval_orientacao_id#
-				</cfquery>
-				<!--fim COLOCA AS ORIENTAÇÕES COM STATUS 14 - BLOQUEADA-->
+			<cfif rsOrientacoes.recordcount neq 0>
+				<cfloop query="rsOrientacoes">
+					<cfquery datasource="#application.dsn_processos#" >
+						UPDATE	pc_avaliacao_orientacoes 
+						SET 	pc_aval_orientacao_status = 14,
+								pc_aval_orientacao_dataPrevistaResp = '',
+								pc_aval_orientacao_status_datahora =  <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
+								pc_aval_orientacao_atualiz_login = '#application.rsUsuarioParametros.pc_usu_login#'
+						WHERE 	pc_aval_orientacao_id = #pc_aval_orientacao_id#
+					</cfquery>
+					<!--fim COLOCA AS ORIENTAÇÕES COM STATUS 14 - BLOQUEADA-->
 
-				<!--Texto padrão manifestação-->
-				<cfset posicaoInicial = "Processo BLOQUEADO.<br>Este relatório aguarda a finalização de análises complementares do controle interno e/ou outros órgãos da empresa para liberação ao ÓRGÃO AVALIADO. Favor aguardar.">
-				<!--Insere a manifestação inicial do controle interno para a orientação bloqueada-->
-				<cfquery datasource="#application.dsn_processos#">
-					INSERT pc_avaliacao_posicionamentos(pc_aval_posic_num_orientacao, pc_aval_posic_texto, pc_aval_posic_datahora, pc_aval_posic_matricula, pc_aval_posic_num_orgao, pc_aval_posic_num_orgaoResp, pc_aval_posic_dataPrevistaResp, pc_aval_posic_status,  pc_aval_posic_enviado)
-					VALUES ('#pc_aval_orientacao_id#', '#posicaoInicial#',<cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,'#application.rsUsuarioParametros.pc_usu_matricula#','#application.rsUsuarioParametros.pc_usu_lotacao#', null,'',14, 1)
-				</cfquery>
-			</cfloop>
+					<!--Texto padrão manifestação-->
+					<cfset posicaoInicial = "Processo BLOQUEADO.<br>Este relatório aguarda a finalização de análises complementares do controle interno e/ou outros órgãos da empresa para liberação ao ÓRGÃO AVALIADO. Favor aguardar.">
+					<!--Insere a manifestação inicial do controle interno para a orientação bloqueada-->
+					<cfquery datasource="#application.dsn_processos#">
+						INSERT pc_avaliacao_posicionamentos(pc_aval_posic_num_orientacao, pc_aval_posic_texto, pc_aval_posic_datahora, pc_aval_posic_matricula, pc_aval_posic_num_orgao, pc_aval_posic_num_orgaoResp, pc_aval_posic_dataPrevistaResp, pc_aval_posic_status,  pc_aval_posic_enviado)
+						VALUES ('#pc_aval_orientacao_id#', '#posicaoInicial#',<cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,'#application.rsUsuarioParametros.pc_usu_matricula#','#application.rsUsuarioParametros.pc_usu_lotacao#', null,'',14, 1)
+					</cfquery>
+				</cfloop>
+			</cfif>
 			<!--fim LOOP EM CADA ORIENTAÇÃO DO PROCESSO-->
 
 
@@ -2547,7 +2625,7 @@
 			</cfquery>
 			<!--fim COLOCA O PROCESSO EM STATUS 4 - ACOMPANHAMENTO-->
 
-			<!--COLOCA TODOS OS ITENS DO PROCESSO COM STATUS 6 - ACOMPANHAMENTO, EXCETO OS ITENS COM STATUS 7 - FINALIZADO (POIS A FINALIZAÇÃO DO ITEM JÁ FOI TRATADA NA FINALIZAÇÃO DO CADASTRO DO PROCESSO - 6° PASSO)-->
+			<!--COLOCA TODOS OS ITENS DO PROCESSO COM STATUS 6 - ACOMPANHAMENTO, EXCETO OS ITENS COM STATUS 7 - FINALIZADO (POIS A FINALIZAÇÃO DO ITEM JÝ FOI TRATADA NA FINALIZAÇÃO DO CADASTRO DO PROCESSO - 6° PASSO)-->
 			<cfquery datasource="#application.dsn_processos#" >
 				UPDATE 	pc_avaliacoes
 				SET 	pc_aval_status=6,
@@ -2555,22 +2633,22 @@
 						pc_aval_atualiz_login = '#application.rsUsuarioParametros.pc_usu_login#' 
 				WHERE 	pc_aval_processo = <cfqueryparam value="#arguments.numProcesso#" cfsqltype="cf_sql_varchar"> AND pc_aval_status not in (7)
 			</cfquery>
-			<!--fim COLOCA TODOS OS ITENS DO PROCESSO COM STATUS 6 -  ACOMPANHAMENTO, EXCETO OS ITENS COM STATUS 7 - FINALIZADO (POIS A FINALIZAÇÃO DO ITEM JÁ FOI TRATADA NA FINALIZAÇÃO DO CADASTRO DO PROCESSO - 6° PASSO)-->
+			<!--fim COLOCA TODOS OS ITENS DO PROCESSO COM STATUS 6 -  ACOMPANHAMENTO, EXCETO OS ITENS COM STATUS 7 - FINALIZADO (POIS A FINALIZAÇÃO DO ITEM JÝ FOI TRATADA NA FINALIZAÇÃO DO CADASTRO DO PROCESSO - 6° PASSO)-->
 
 			
 		
 			<!-- Lista todas as medidas/orientações para regularização do processo -->
-					<cfquery datasource="#application.dsn_processos#" name="rsOrientacoes">
-						SELECT  pc_avaliacao_orientacoes.*,pc_avaliacoes.*, pc_processos.pc_modalidade, pc_processos.pc_iniciarBloqueado
-						,pc_orgaos.pc_org_sigla, pc_orgaos.pc_org_email, pc_orgao_avaliado.pc_org_email as pc_orgao_avaliado_email
-						,pc_orgao_avaliado.pc_org_sigla as pc_orgao_avaliado_sigla
-						FROM pc_avaliacao_orientacoes
-						LEFT JOIN  pc_avaliacoes on pc_aval_id = pc_aval_orientacao_num_aval
-						INNER JOIN pc_processos on pc_processo_id = pc_aval_processo
-						INNER JOIN pc_orgaos on pc_org_mcu = pc_aval_orientacao_mcu_orgaoResp
-						INNER JOIN pc_orgaos as pc_orgao_avaliado on pc_orgao_avaliado.pc_org_mcu = pc_processos.pc_num_orgao_avaliado
-						WHERE      pc_aval_processo = <cfqueryparam value="#arguments.numProcesso#" cfsqltype="cf_sql_varchar"> 
-					</cfquery>
+			<cfquery datasource="#application.dsn_processos#" name="rsOrientacoes">
+				SELECT  pc_avaliacao_orientacoes.*,pc_avaliacoes.*, pc_processos.pc_modalidade, pc_processos.pc_iniciarBloqueado
+				,pc_orgaos.pc_org_sigla, pc_orgaos.pc_org_email, pc_orgao_avaliado.pc_org_email as pc_orgao_avaliado_email
+				,pc_orgao_avaliado.pc_org_sigla as pc_orgao_avaliado_sigla
+				FROM pc_avaliacao_orientacoes
+				LEFT JOIN  pc_avaliacoes on pc_aval_id = pc_aval_orientacao_num_aval
+				INNER JOIN pc_processos on pc_processo_id = pc_aval_processo
+				INNER JOIN pc_orgaos on pc_org_mcu = pc_aval_orientacao_mcu_orgaoResp
+				INNER JOIN pc_orgaos as pc_orgao_avaliado on pc_orgao_avaliado.pc_org_mcu = pc_processos.pc_num_orgao_avaliado
+				WHERE      pc_aval_processo = <cfqueryparam value="#arguments.numProcesso#" cfsqltype="cf_sql_varchar"> 
+			</cfquery>
 			<!--fim LISTA TODAS AS ORIENTAÇÕES DO PROCESSO-->
 
 			<!--Insere em uma lista a relação de e-mails dos órgãos responsáveis pelas orientações do processo-->
@@ -2713,7 +2791,7 @@
 			/>
 
 			<cfset obj = new cfcSNCI.pc_cfcAvaliacoes()>
-			<cfset resultado = obj.teste_baixaPorValorEnvolvido('#arguments.numProcesso#')>
+			<cfset resultado = obj.baixaPorValorEnvolvido('#arguments.numProcesso#')>
 
 		</cftransaction>
 
@@ -2722,5 +2800,44 @@
 		
 	</cffunction>
 
+	<cffunction name="finalizaBloqueado" access="remote" returntype="string" hint="finaliza o processo mantendoi o bloqueio. Aplica o status 8 - Finalizado c/ Bloqueio no processo">
+		<cfargument name="numProcesso" type="string" required="true"/>
+		<cfquery name="rsExistemOrientacoes" datasource="#application.dsn_processos#">
+			SELECT pc_aval_orientacao_id FROM pc_avaliacao_orientacoes
+			INNER JOIN pc_avaliacoes on pc_aval_id = pc_aval_orientacao_num_aval
+			WHERE pc_aval_processo = <cfqueryparam value="#arguments.numProcesso#" cfsqltype="cf_sql_varchar">
+		</cfquery>
+		<cfif rsExistemOrientacoes.recordcount neq 0>
+			<cfreturn "true">
+		<cfelse>
+			<cftransaction>
+				<!-- Coloca o processo em status 8 - Finalizado com Bloqueio -->
+				<cfquery datasource="#application.dsn_processos#">
+					UPDATE pc_processos
+					SET pc_num_status = 8,
+					    pc_data_finalizado = <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
+						pc_alteracao_datahora = <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
+						pc_alteracao_login = '#application.rsUsuarioParametros.pc_usu_login#'
+					WHERE pc_processo_id = <cfqueryparam value="#arguments.numProcesso#" cfsqltype="cf_sql_varchar">
+				</cfquery>
+				<!-- fim Coloca o processo em status 8 - Finalizado com Bloqueio -->
+
+				<!-- Coloca todas as propostas de melhoria com status Não Informado -->
+				<cfquery datasource="#application.dsn_processos#">
+					UPDATE pc_avaliacao_melhorias
+					SET pc_aval_melhoria_status = 'N',
+						pc_aval_melhoria_datahora = <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
+						pc_aval_melhoria_login = '#application.rsUsuarioParametros.pc_usu_login#'
+					WHERE pc_aval_melhoria_num_aval IN (SELECT pc_aval_id FROM pc_avaliacoes WHERE pc_aval_processo = <cfqueryparam value="#arguments.numProcesso#" cfsqltype="cf_sql_varchar">)
+					
+				</cfquery>
+				<!-- fim Coloca todos os itens do processo com status 8 - Finalizado com Bloqueio -->
+				
+				<cfreturn "false">
+
+			</cftransaction>
+		</cfif>
+	
+	</cffunction>	
 
 </cfcomponent>
