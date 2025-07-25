@@ -6,12 +6,19 @@
 <cfparam name="attributes.dados" default="#structNew()#">
 <!-- Verifica os dados da unidade de lotação do usuário na tabela fato_verificacao -->
 <cfquery name="rsDadosHistoricos" datasource="#application.dsn_avaliacoes_automatizadas#">
-    SELECT   COUNT(DISTINCT CASE WHEN suspenso = 0 THEN sk_grupo_item END) AS testesEnvolvidos
+    SELECT   COUNT(DISTINCT CASE WHEN suspenso = 0 AND sk_grupo_item <> 12 THEN sk_grupo_item END) AS testesEnvolvidos
             ,SUM(NC_Eventos) AS totalEventos
             ,COUNT(CASE WHEN sigla_apontamento in('C','N') THEN sigla_apontamento END) AS testesAplicados
             ,COUNT(CASE WHEN sigla_apontamento = 'C' THEN sigla_apontamento END) AS conformes
             ,COUNT(CASE WHEN sigla_apontamento = 'N' THEN sigla_apontamento END) AS deficienciasControle
-            ,SUM(valor_falta + valor_Sobra + valor_risco) AS valorEnvolvido
+            ,SUM(
+                    COALESCE(valor_falta, 0) + 
+                    COALESCE(valor_sobra, 0) + 
+                    CASE 
+                        WHEN nm_teste <> '239-4' THEN COALESCE(valor_risco, 0)
+                        ELSE 0
+                    END
+                ) AS valorEnvolvido
             ,SUM(nr_reincidente) AS reincidencia
     FROM fato_verificacao f
     WHERE f.sk_mcu = <cfqueryparam cfsqltype="cf_sql_integer" value="#application.rsUsuarioParametros.Und_MCU#"> 
