@@ -122,7 +122,7 @@
     .snci-resumo-geral .kpi-row {
         display: flex;
         flex-direction: row;
-        gap: 16px;
+
         justify-content: center;
         align-items: stretch;
         flex-wrap: wrap;
@@ -141,7 +141,7 @@
         border: 1px solid #e2e8f0;
         min-width: 180px;
         flex: 1 1 180px;
-        max-width: 220px;
+        max-width: 250px;
     }
 
     .snci-resumo-geral .kpi-card:hover {

@@ -18,7 +18,6 @@
         
         .deficiencias-geral-layout {
             display: flex;
-            gap: 32px;
             padding: 16px;
             align-items: flex-start; /* Alinha os itens ao topo */
             flex-wrap: nowrap; /* Garante que os itens não quebrem para a próxima linha */
@@ -66,7 +65,7 @@
         }
 
         .dashboard-kpi-panel {
-            width: 30%; /* Adjust as needed */
+            width: 35%; /* Adjust as needed */
             flex: none; /* Remove flex shorthand for testing */
         }
 
