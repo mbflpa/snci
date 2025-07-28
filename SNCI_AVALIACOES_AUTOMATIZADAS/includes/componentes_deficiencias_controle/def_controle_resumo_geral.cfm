@@ -5,73 +5,58 @@
 <cfparam name="attributes.cssClass" default="">
 <cfparam name="attributes.showAnimation" default="true">
 <cfparam name="attributes.dados" default="#structNew()#">
-<!-- Verifica os dados da unidade de lotação do usuário na tabela fato_verificacao -->
-<cfquery name="rsDadosHistoricos" datasource="#application.dsn_avaliacoes_automatizadas#">
-    SELECT   COUNT(DISTINCT CASE WHEN suspenso = 0 AND sk_grupo_item <> 12 THEN sk_grupo_item END) AS testesEnvolvidos
-            ,SUM(NC_Eventos) AS totalEventos
-            ,COUNT(CASE WHEN sigla_apontamento in('C','N') THEN sigla_apontamento END) AS testesAplicados
-            ,COUNT(CASE WHEN sigla_apontamento = 'C' THEN sigla_apontamento END) AS conformes
-            ,COUNT(CASE WHEN sigla_apontamento = 'N' THEN sigla_apontamento END) AS deficienciasControle
-            ,SUM(
-                    COALESCE(valor_falta, 0) + 
-                    COALESCE(valor_sobra, 0) + 
-                    CASE 
-                        WHEN nm_teste <> '239-4' THEN COALESCE(valor_risco, 0)
-                        ELSE 0
-                    END
-                ) AS valorEnvolvido
-            ,SUM(nr_reincidente) AS reincidencia
-    FROM fato_verificacao f
-    WHERE f.sk_mcu = <cfqueryparam cfsqltype="cf_sql_integer" value="#application.rsUsuarioParametros.Und_MCU#"> 
-    </cfquery>
 
-
+<!--- Usar dados do CFC se não foram fornecidos dados personalizados --->
 <cfif structIsEmpty(attributes.dados)>
+    <cfset objDados = createObject("component", "cfc.DeficienciasControleDados")>
+    <cfset dadosResumo = objDados.obterDadosResumoGeral(application.rsUsuarioParametros.Und_MCU)>
+    <cfset dadosHistoricos = dadosResumo.dadosHistoricos>
+    
     <cfset attributes.dados = {
         testesEnvolvidos = {
-            valor = rsDadosHistoricos.testesEnvolvidos,
+            valor = dadosHistoricos.testesEnvolvidos,
             icone = "fas fa-list-ul",
             titulo = "Testes Envolvidos",
             cor = "",
             ordem= 1
         },
         testesAplicados = {
-            valor = rsDadosHistoricos.testesAplicados,
+            valor = dadosHistoricos.testesAplicados,
             icone = "fas fa-tasks",
             titulo = "Testes Aplicados",
             cor = "",
             ordem= 2
         },
         conformes = {
-            valor = rsDadosHistoricos.conformes,
+            valor = dadosHistoricos.conformes,
             icone = "fas fa-check-circle",
             titulo = "Conformes",
             cor = "decrease",
             ordem= 3
         },
         deficienciasControle = {
-            valor = rsDadosHistoricos.deficienciasControle,
+            valor = dadosHistoricos.deficienciasControle,
             icone = "fas fa-exclamation-triangle",
             titulo = "Deficiência do Controle",
             cor = "increase",
             ordem= 4
         },
         totalEventos = {
-            valor = rsDadosHistoricos.totalEventos,
+            valor = dadosHistoricos.totalEventos,
             icone = "fas fa-chart-bar",
             titulo = "Total de Eventos",
             cor = "",
             ordem= 5
         },
         reincidencia= {
-            valor = rsDadosHistoricos.reincidencia,
+            valor = dadosHistoricos.reincidencia,
             icone = "fas fa-redo",
             titulo = "Reincidência",
             cor = "",
             ordem= 6
         },
         valorEnvolvido = {
-            valor = rsDadosHistoricos.valorEnvolvido,
+            valor = dadosHistoricos.valorEnvolvido,
             icone = "fas fa-dollar-sign",
             titulo = "Valor Envolvido",
             cor = "",
@@ -346,5 +331,5 @@
         $(window).on('scroll resize', checkVisibility);
         checkVisibility();
     });
-</script>
+
 </script>

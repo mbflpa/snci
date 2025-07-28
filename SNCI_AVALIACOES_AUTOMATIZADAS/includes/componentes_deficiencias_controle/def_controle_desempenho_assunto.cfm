@@ -1,61 +1,19 @@
 <cfprocessingdirective pageencoding="utf-8">
 
-<!-- Inicializa nomes dos meses para evitar erro de variável indefinida -->
-<cfset nomeMesAtual = "Mês Atual">
-<cfset nomeMesAnterior = "Mês Anterior">
-<!--- Consulta para obter os dois últimos meses disponíveis na tabela --->
-<cfquery name="rsUltimosMeses" datasource="#application.dsn_avaliacoes_automatizadas#">
-    SELECT TOP 2 FORMAT(data_encerramento, 'yyyy-MM') AS mes_ano
-    FROM fato_verificacao
-    WHERE data_encerramento IS NOT NULL
-    GROUP BY FORMAT(data_encerramento, 'yyyy-MM')
-    ORDER BY mes_ano DESC
-</cfquery>
+<!--- Usar dados específicos do CFC --->
+<cfset objDados = createObject("component", "cfc.DeficienciasControleDados")>
+<cfset dadosDesempenho = objDados.obterDadosDesempenhoAssunto(application.rsUsuarioParametros.Und_MCU)>
 
-<cfif rsUltimosMeses.recordCount GTE 2>
-    <cfset mesAtualId = rsUltimosMeses.mes_ano[1]>
-    <cfset mesAnteriorId = rsUltimosMeses.mes_ano[2]>
-    <cfset nomeMesAtual = monthAsString(listLast(mesAtualId, "-")) & "/" & left(mesAtualId, 4)>
-    <cfset nomeMesAnterior = monthAsString(listLast(mesAnteriorId, "-")) & "/" & left(mesAnteriorId, 4)>
-<cfelse>
-    <cfset mesAtualId = "">
-    <cfset mesAnteriorId = "">
-</cfif>
+<cfset dadosMeses = dadosDesempenho.meses>
+<cfset nomeMesAtual = dadosMeses.nomeMesAtual>
+<cfset nomeMesAnterior = dadosMeses.nomeMesAnterior>
+<cfset mesAtualId = dadosMeses.mesAtualId>
+<cfset mesAnteriorId = dadosMeses.mesAnteriorId>
 
+<!--- Usar dados já processados do CFC --->
+<cfset dados = dadosDesempenho.dadosAssunto>
 
-<!--- Consulta agregada por MANCHETE e mês --->
-<cfquery name="rsDadosAssunto" datasource="#application.dsn_avaliacoes_automatizadas#">
-    SELECT DISTINCT
-        p.MANCHETE,
-        FORMAT(f.data_encerramento, 'yyyy-MM') AS mes_ano,
-        f.NC_Eventos AS total_eventos
-    FROM fato_verificacao f
-    INNER JOIN dim_teste_processos p ON f.sk_grupo_item = p.sk_grupo_item
-    WHERE f.sk_mcu = <cfqueryparam cfsqltype="cf_sql_integer" value="#application.rsUsuarioParametros.Und_MCU#">
-      AND f.suspenso = 0
-      AND f.sk_grupo_item <> 12
-      AND FORMAT(f.data_encerramento, 'yyyy-MM') IN (
-        <cfqueryparam value="#mesAtualId#,#mesAnteriorId#" list="true" cfsqltype="cf_sql_varchar">
-      )
-  
-</cfquery>
-
-<!--- Monta estrutura de dados por MANCHETE --->
-<cfset dados = {}>
-
-<cfloop query="rsDadosAssunto">
-    <cfset chave = rereplace(MANCHETE, "[^A-Za-z0-9]", "", "all")>
-    <cfif NOT structKeyExists(dados, chave)>
-        <cfset dados[chave] = { titulo = MANCHETE, anterior = 0, atual = 0 }>
-    </cfif>
-    <cfif mes_ano EQ mesAnteriorId>
-        <cfset dados[chave].anterior = total_eventos>
-    <cfelseif mes_ano EQ mesAtualId>
-        <cfset dados[chave].atual = total_eventos>
-    </cfif>
-</cfloop>
-
-<!--- Calcula evolução percentual e encontra o maior valor para escala das barras --->
+<!--- Calcular evolução percentual e encontrar o maior valor para escala das barras --->
 <cfset maxValor = 0>
 <cfloop collection="#dados#" item="chave">
     <cfset registro = dados[chave]>
@@ -271,13 +229,9 @@
 
 <script>
     $(document).ready(function() {
-        $(document).ready(function(){
-            $('.animated-bar').each(function(){
-                var width = $(this).data('width');
-                $(this).css('width', width);
-            });
+        $('.animated-bar').each(function(){
+            var width = $(this).data('width');
+            $(this).css('width', width);
         });
-
     });
-</script>
 </script>
