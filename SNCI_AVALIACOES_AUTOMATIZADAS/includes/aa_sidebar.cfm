@@ -39,219 +39,233 @@
     <link rel="stylesheet" href="../SNCI_AVALIACOES_AUTOMATIZADAS/dist/css/adminlte.min.css">
     <link rel="stylesheet" href="../SNCI_AVALIACOES_AUTOMATIZADAS/dist/css/stylesSNCI.css">
 
+   <cfset links = [
+  { href = "index.cfm", icon = "fas fa-home", text = "Principal" },
+  { href = "aa_deficiencias_controle.cfm", icon = "fas fa-bug", text = "Deficiências de Controle" },
+  { href = "teste.cfm", icon = "fas fa-shield-alt", text = "Vulnerabilidades" },
+  { href = "teste.cfm", icon = "fas fa-tasks", text = "Testes Aplicados" },
+  { href = "relatorios.cfm", icon = "fas fa-database", text = "Base de Eventos" },
+  { href = "orientacoes.cfm", icon = "fas fa-info-circle", text = "Orientações" },
+  { href = "historicoAnual.cfm", icon = "fas fa-history", text = "Histórico Anual" }
+] />
+
+
+    
+
 
     <style>
-          .select2-container--bootstrap4 .select2-dropdown .select2-results__option[aria-selected="true"] {
-            color: #fff!important;
-            background-color:var(--azul_correios)!important
-          }
-          .select2-results__option{
-            font-size:11px!important;
-          }
-          <cfif listLast(cgi.script_name, "/") eq "aa_Navegacao_por_abas.cfm">
-           
-          </cfif>
+      .select2-container--bootstrap4 .select2-dropdown .select2-results__option[aria-selected="true"] {
+        color: #fff!important;
+        background-color:var(--azul_correios)!important
+      }
+      .select2-results__option{
+        font-size:11px!important;
+      }
+      <cfif listLast(cgi.script_name, "/") eq "aa_Navegacao_por_abas.cfm">
+        
+      </cfif>
 
-          /* Estilos modernos para o sidebar */
-          .modern-sidebar {
-            background: linear-gradient(135deg,var(--azul_claro_correios) 0%, var(--azul_correios) 100%);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-            border-radius: 0 20px 20px 0;
-            backdrop-filter: blur(10px);
-          }
+      /* Estilos modernos para o sidebar */
+      .modern-sidebar {
+        background: linear-gradient(135deg,var(--azul_claro_correios) 0%, var(--azul_correios) 100%);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        border-radius: 0 20px 20px 0;
+        backdrop-filter: blur(10px);
+      }
 
-          .modern-nav-header {
-            background: none;
-            border-radius: 15px;
-            margin: 15px;
-            padding: 5px;
-            text-align: center;
-            backdrop-filter: blur(5px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-          }
+      .modern-nav-header {
+        background: none;
+        border-radius: 15px;
+        margin: 15px;
+        padding: 5px;
+        text-align: center;
+        backdrop-filter: blur(5px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
 
-          .modern-nav-header h3 {
-            color: rgba(255, 255, 255, 0.9) !important;
-            font-weight: 600;
-            margin: 0;
-            font-size: 1.2rem;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-          }
+      .modern-nav-header h3 {
+        color: rgba(255, 255, 255, 0.9) !important;
+        font-weight: 600;
+        margin: 0;
+        font-size: 1.2rem;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      }
 
-          .modern-nav-link {
-            margin: 8px 10px;
-            padding: 10px 10px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            backdrop-filter: blur(5px);
-            color: rgba(255, 255, 255, 0.9) !important;
-            display: flex;
-            align-items: center;
-            text-decoration: none;
-            position: relative;
-            overflow: hidden;
-          }
+      .modern-nav-link {
+        margin: 8px 10px;
+        padding: 10px 10px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        backdrop-filter: blur(5px);
+        color: rgba(255, 255, 255, 0.9) !important;
+        display: flex;
+        align-items: center;
+        text-decoration: none;
+        position: relative;
+        overflow: hidden;
+      }
 
-          .modern-nav-link::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: left 0.5s;
-          }
+      .modern-nav-link::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s;
+      }
 
-          .modern-nav-link:hover::before {
-            left: 100%;
-          }
+      .modern-nav-link:hover::before {
+        left: 100%;
+      }
 
-          .modern-nav-link:hover {
-            background: rgba(255, 255, 255, 0.2);
-            transform: translateX(5px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-            color: #fff !important;
-            border-color: rgba(255, 255, 255, 0.3);
-          }
+      .modern-nav-link:hover {
+        background: rgba(255, 255, 255, 0.2);
+        transform: translateX(5px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        color: #fff !important;
+        border-color: rgba(255, 255, 255, 0.3);
+      }
 
-          .modern-nav-link.active {
-            background: var(--amarelo_prisma_escuro_correios)!important;
-            border-color: rgba(255, 255, 255, 0.4);
-            transform: translateX(10px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
-            color: var(--azul_correios)!important;
-          }
+      .modern-nav-link.active {
+        background: var(--amarelo_prisma_escuro_correios)!important;
+        border-color: rgba(255, 255, 255, 0.4);
+        transform: translateX(10px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        color: var(--azul_correios)!important;
+      }
 
-          .modern-nav-link.active::after {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 4px;
-            height: 100%;
-            background: linear-gradient(180deg, #fff, rgba(255, 255, 255, 0.7));
-            border-radius: 0 4px 4px 0;
-          }
+      .modern-nav-link.active::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 4px;
+        height: 100%;
+        background: linear-gradient(180deg, #fff, rgba(255, 255, 255, 0.7));
+        border-radius: 0 4px 4px 0;
+      }
 
-          .modern-nav-icon {
-            width: 24px;
-            height: 24px;
-            margin-right: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 8px;
-            transition: all 0.3s ease;
-            flex-shrink: 0;
-          }
+      .modern-nav-icon {
+        width: 24px;
+        height: 24px;
+        margin-right: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        flex-shrink: 0;
+      }
 
-          .modern-nav-link:hover .modern-nav-icon {
-            background: rgba(255, 255, 255, 0.3);
-            transform: scale(1.1);
-          }
+      .modern-nav-link:hover .modern-nav-icon {
+        background: rgba(255, 255, 255, 0.3);
+        transform: scale(1.1);
+      }
 
-          .modern-nav-text {
-            font-weight: 500;
-            font-size: 0.8rem;
-            letter-spacing: 0.5px;
-          }
+      .modern-nav-text {
+        font-weight: 500;
+        font-size: 0.8rem;
+        letter-spacing: 0.5px;
+      }
 
-          .modern-profile-section {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            margin: 15px;
-            padding: 15px;
-            backdrop-filter: blur(5px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-          }
+      .modern-profile-section {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 15px;
+        margin: 15px;
+        padding: 15px;
+        backdrop-filter: blur(5px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
 
-          .modern-profile-section select {
-            background: rgba(255, 255, 255, 0.15);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 8px;
-            color: #fff;
-            margin-bottom: 10px;
-            transition: all 0.3s ease;
-          }
+      .modern-profile-section select {
+        background: rgba(255, 255, 255, 0.15);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 8px;
+        color: #fff;
+        margin-bottom: 10px;
+        transition: all 0.3s ease;
+      }
 
-          .modern-profile-section select:focus {
-            background: rgba(255, 255, 255, 0.2);
-            border-color: rgba(255, 255, 255, 0.4);
-            box-shadow: 0 0 0 0.2rem rgba(255, 255, 255, 0.25);
-          }
+      .modern-profile-section select:focus {
+        background: rgba(255, 255, 255, 0.2);
+        border-color: rgba(255, 255, 255, 0.4);
+        box-shadow: 0 0 0 0.2rem rgba(255, 255, 255, 0.25);
+      }
 
-          .modern-profile-section select option {
-            background: #333;
-            color: #fff;
-          }
+      .modern-profile-section select option {
+        background: #333;
+        color: #fff;
+      }
 
-          /* Scroll personalizado */
-          .modern-sidebar::-webkit-scrollbar {
-            width: 6px;
-          }
+      /* Scroll personalizado */
+      .modern-sidebar::-webkit-scrollbar {
+        width: 6px;
+      }
 
-          .modern-sidebar::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.1);
-          }
+      .modern-sidebar::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.1);
+      }
 
-          .modern-sidebar::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.3);
-            border-radius: 3px;
-          }
+      .modern-sidebar::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.3);
+        border-radius: 3px;
+      }
 
-          .modern-sidebar::-webkit-scrollbar-thumb:hover {
-            background: rgba(255, 255, 255, 0.5);
-          }
+      .modern-sidebar::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 255, 255, 0.5);
+      }
 
-          .nav-pills .nav-link {
-              border-radius: .7rem;
-          }
+      .nav-pills .nav-link {
+          border-radius: .7rem;
+      }
 
-          /* Animações */
-          @keyframes slideInLeft {
-            from {
-              transform: translateX(-100%);
-              opacity: 0;
-            }
-            to {
-              transform: translateX(0);
-              opacity: 1;
-            }
-          }
+      /* Animações */
+      @keyframes slideInLeft {
+        from {
+          transform: translateX(-100%);
+          opacity: 0;
+        }
+        to {
+          transform: translateX(0);
+          opacity: 1;
+        }
+      }
 
-          .modern-nav-link {
-            animation: slideInLeft 0.5s ease forwards;
-          }
+      .modern-nav-link {
+        animation: slideInLeft 0.5s ease forwards;
+      }
 
-          .modern-nav-link:nth-child(1) { animation-delay: 0.1s; }
-          .modern-nav-link:nth-child(2) { animation-delay: 0.2s; }
-          .modern-nav-link:nth-child(3) { animation-delay: 0.3s; }
-          .modern-nav-link:nth-child(4) { animation-delay: 0.4s; }
-          .modern-nav-link:nth-child(5) { animation-delay: 0.5s; }
+      .modern-nav-link:nth-child(1) { animation-delay: 0.1s; }
+      .modern-nav-link:nth-child(2) { animation-delay: 0.2s; }
+      .modern-nav-link:nth-child(3) { animation-delay: 0.3s; }
+      .modern-nav-link:nth-child(4) { animation-delay: 0.4s; }
+      .modern-nav-link:nth-child(5) { animation-delay: 0.5s; }
 
-          /* Responsive */
-          @media (max-width: 768px) {
-            .modern-sidebar {
-              border-radius: 0;
-            }
-            
-            .modern-nav-link {
-              margin: 5px 10px!important
-              padding: 10px 15px!important
-            }
-            
-            .modern-nav-header,
-            .modern-profile-section {
-              margin: 10px!important
-              padding: 15px!important
-            }
-          }
+      /* Responsive */
+      @media (max-width: 768px) {
+        .modern-sidebar {
+          border-radius: 0;
+        }
+        
+        .modern-nav-link {
+          margin: 5px 10px!important
+          padding: 10px 15px!important
+        }
+        
+        .modern-nav-header,
+        .modern-profile-section {
+          margin: 10px!important
+          padding: 15px!important
+        }
+      }
         
     </style>
+
 </head>
 <body>
 
@@ -286,54 +300,21 @@
 
           <nav class="mt-3">
             <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false" style="list-style: none; padding: 0;">
-              <li class="nav-item" style="margin-bottom: 0;">
-                <a href="index.cfm" class="nav-link modern-nav-link">
-                  <div class="modern-nav-icon">
-                    <i class="fas fa-tasks"></i>
-                  </div>
-                  <span class="modern-nav-text">Deficiências de Controle</span>
-                </a>
-              </li>
-              <li class="nav-item" style="margin-bottom: 0;">
-                <a href="teste.cfm" class="nav-link modern-nav-link">
-                  <div class="modern-nav-icon">
-                    <i class="fas fa-book"></i>
-                  </div>
-                  <span class="modern-nav-text">Vulnerabilidades</span>
-                </a>
-              </li>
-              <li class="nav-item" style="margin-bottom: 0;">
-                <a href="teste.cfm" class="nav-link modern-nav-link">
-                  <div class="modern-nav-icon">
-                    <i class="fas fa-vial"></i>
-                  </div>
-                  <span class="modern-nav-text">Testes Aplicados</span>
-                </a>
-              </li>
-              <li class="nav-item" style="margin-bottom: 0;">
-                <a href="relatorios.cfm" class="nav-link modern-nav-link">
-                  <div class="modern-nav-icon">
-                    <i class="fas fa-chart-bar"></i>
-                  </div>
-                  <span class="modern-nav-text">Base de Eventos</span>
-                </a>
-              </li>
-              <li class="nav-item" style="margin-bottom: 0;">
-                <a href="orientacoes.cfm" class="nav-link modern-nav-link">
-                  <div class="modern-nav-icon">
-                    <i class="fas fa-question-circle"></i>
-                  </div>
-                  <span class="modern-nav-text">Orientações</span>
-                </a>
-              </li>
-              <li class="nav-item" style="margin-bottom: 0;">
-                <a href="historicoAnual.cfm" class="nav-link modern-nav-link">
-                  <div class="modern-nav-icon">
-                    <i class="fas fa-history"></i>
-                  </div>
-                  <span class="modern-nav-text">Histórico Anual</span>
-                </a>
-              </li>
+              
+             <cfloop array="#links#" index="link">
+              <cfoutput>
+                <li class="nav-item" style="margin-bottom: 0;">
+                  <a href="#link.href#" class="nav-link modern-nav-link">
+                    <div class="modern-nav-icon">
+                      <i class="#link.icon#"></i>
+                    </div>
+                    <span class="modern-nav-text">#link.text#</span>
+                  </a>
+                </li>
+              </cfoutput>
+            </cfloop>
+
+
             </ul>
           </nav>
          

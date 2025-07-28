@@ -14,8 +14,6 @@
     <link rel="icon" type="image/x-icon" href="../SNCI_AVALIACOES_AUTOMATIZADAS/dist/img/icone_sistema_standalone_ico.png">
     
     <style>
-       
-        
         .deficiencias-geral-layout {
             display: flex;
             padding: 16px;
@@ -83,13 +81,18 @@
         <cfinclude template="includes/aa_navBar.cfm">
         <cfinclude template="includes/aa_sidebar.cfm">
         
-        <div class="content-wrapper" >
+        <div class="content-wrapper">
             <section class="content">
     
-                <div style="width: 100%; padding: 0 16px; margin-bottom: 16px;">
-                    <cfinclude template="includes/componentes_deficiencias_controle/def_controle_mensagem_card.cfm">
-                </div>
  
+                <div class="deficiencias-geral-layout">
+                    <div class="dashboard-main-content">
+                        <cfinclude template="includes/componentes_deficiencias_controle/def_controle_desempenho_assunto.cfm">
+                    </div>
+                    <div class="dashboard-kpi-panel">
+                        <cfinclude template="includes/componentes_deficiencias_controle/def_controle_resumo_geral.cfm">
+                    </div>
+                </div>
             </section>
         </div>
 
