@@ -608,35 +608,7 @@
 				</cfloop>	
 			</cfoutput>
 		<cfelse>	
-			<cfset dtnovoprazo = CreateDate(year(form.POSDTPREVSOLUCAOAGF),month(form.POSDTPREVSOLUCAOAGF),day(form.POSDTPREVSOLUCAOAGF))> 
-			<!---
-			<cfoutput>
-				<!--- contar 30 dias corridos para AGF e ACC --->			
-				<cfset dtnovoprazo = CreateDate(year(form.INPDTConcluirRevisao),month(form.INPDTConcluirRevisao),day(form.INPDTConcluirRevisao))> 
-				<cfset dtnovoprazo = DateAdd( "d", 31, dtnovoprazo)>
-				<cfset nCont = 1>
-				<cfloop condition="nCont lte 1">
-					<!---  --->
-					<cfset vDiaSem = DayOfWeek(dtnovoprazo)>
-					<cfif vDiaSem neq 1 and vDiaSem neq 7>
-						<!--- verificar se Feriado Nacional --->
-						<cfquery name="rsFeriado" datasource="#dsn_inspecao#">
-							SELECT Fer_Data FROM FeriadoNacional where Fer_Data = #dtnovoprazo#
-						</cfquery>
-						<cfif rsFeriado.recordcount gt 0>
-							<cfset nCont = nCont - 1>
-							<cfset dtnovoprazo = DateAdd( "d", 1, dtnovoprazo)>
-						</cfif>
-					</cfif>
-					<!--- Verifica se final de semana  --->
-					<cfif vDiaSem eq 1 or vDiaSem eq 7>
-						<cfset nCont = nCont - 1>
-						<cfset dtnovoprazo = DateAdd( "d", 1, dtnovoprazo)>
-					</cfif>	
-					<cfset nCont = nCont + 1>	
-				</cfloop> 
-			</cfoutput>	
-			--->	
+			<cfset dtnovoprazo = CreateDate(year(form.POSDTPREVSOLUCAOAGF),month(form.POSDTPREVSOLUCAOAGF),day(form.POSDTPREVSOLUCAOAGF))> 	
 		</cfif>
  		<cfif form.frmResp eq 21 or form.frmResp eq 28>
 			<!---  --->
@@ -894,7 +866,6 @@
 				, Pos_Situacao = 'TF'
 				, Pos_Area = '#posarea#'
 				, Pos_NomeArea = '#posnomearea#'
-				<!---, Pos_DtPrev_Solucao = #createodbcdate(createdate(year(dtnovoprazo),month(dtnovoprazo),day(dtnovoprazo)))# --->
 				<cfset Gestor = '#rsMod.Und_Descricao#'>
 				<cfset situacao = 'TRATAMENTO TERCEIRIZADA'>
 				<cfset IDArea = #posarea#>
@@ -931,7 +902,6 @@
 				, Pos_Situacao = 'PF'
 				, Pos_Area = '#posarea#'
 				, Pos_NomeArea = '#posnomearea#'
-				<!---, Pos_DtPrev_Solucao = #createodbcdate(createdate(year(dtnovoprazo),month(dtnovoprazo),day(dtnovoprazo)))#  --->
 				<cfset Gestor = '#rsMod.Und_Descricao#'>
 				<cfset situacao = 'PENDENTE DE TERCEIRIZADA'>
 				<cfset IDArea = #posarea#>

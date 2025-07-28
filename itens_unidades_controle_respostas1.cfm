@@ -422,36 +422,35 @@
 		</cfoutput>
 	<cfelse>
 		<cfoutput>
-			<!--- contar 30 dias corridos para AGF e ACC --->			
-			<cfset dtnovoprazo = CreateDate(year(rsItem.INP_DTConcluirRevisao),month(rsItem.INP_DTConcluirRevisao),day(rsItem.INP_DTConcluirRevisao))> 
-			<cfset dtnovoprazo = DateAdd( "d", 31, dtnovoprazo)>
-			<cfset nCont = 1>
-			<cfloop condition="nCont lte 1">
-				<!---  --->
-				<cfset vDiaSem = DayOfWeek(dtnovoprazo)>
+			<!--- contar 30 dias úteis para AGF e ACC --->			
+			<cfset agf30diasuteis = CreateDate(year(rsItem.INP_DTConcluirRevisao),month(rsItem.INP_DTConcluirRevisao),day(rsItem.INP_DTConcluirRevisao))> 
+			<cfset nCont = 0>
+			<cfloop condition="nCont lt 31">
+				<cfset agf30diasuteis = DateAdd( "d", 1, agf30diasuteis)>
+				<cfset vDiaSem = DayOfWeek(agf30diasuteis)>
 				<cfif vDiaSem neq 1 and vDiaSem neq 7>
 					<!--- verificar se Feriado Nacional --->
 					<cfquery name="rsFeriado" datasource="#dsn_inspecao#">
-						SELECT Fer_Data FROM FeriadoNacional where Fer_Data = #dtnovoprazo#
+						SELECT Fer_Data FROM FeriadoNacional where Fer_Data = #agf30diasuteis#
 					</cfquery>
 					<cfif rsFeriado.recordcount gt 0>
-						<cfset nCont = nCont - 1>
-						<cfset dtnovoprazo = DateAdd( "d", 1, dtnovoprazo)>
+					<cfset nCont = nCont - 1>
 					</cfif>
 				</cfif>
 				<!--- Verifica se final de semana  --->
 				<cfif vDiaSem eq 1 or vDiaSem eq 7>
 					<cfset nCont = nCont - 1>
-					<cfset dtnovoprazo = DateAdd( "d", 1, dtnovoprazo)>
 				</cfif>	
-				<cfset nCont = nCont + 1>	
-			</cfloop> 
+				<cfset nCont = nCont + 1>
+			</cfloop>	
 		</cfoutput>		
 	</cfif>	  
     <cfset posdtprevsoltxt = 'Data de Previsão da Solução: '>
-	<cfif dateformat(dtnovoprazo,"YYYYMMDD") lt form.posdtprevsolucao>
-		<cfset dtnovoprazo = CreateDate(left(form.posdtprevsolucao,4),mid(form.posdtprevsolucao,5,2),right(form.posdtprevsolucao,2))> 
+	<cfif rsMod.Und_TipoUnidade eq 12 or rsMod.Und_TipoUnidade eq 16>
+		<cfset posdtprevsoltxt = 'Data Final da Solução: '>
+		<cfset dtnovoprazo = createodbcdate(createdate(year(agf30diasuteis),month(agf30diasuteis),day(agf30diasuteis)))>
 	</cfif>
+
 	 <cfquery datasource="#dsn_inspecao#">
 	   UPDATE ParecerUnidade SET Pos_Situacao_Resp = #FORM.frmResp#
    			  , Pos_Area = '#auxposarea#'
@@ -474,14 +473,12 @@
 			  , Pos_DtPrev_Solucao = #createodbcdate(createdate(year(dtnovoprazo),month(dtnovoprazo),day(dtnovoprazo)))# 
   			  <cfset Encaminhamento = 'Ao SGCIN'>
 			  <cfset situacao = 'RESPOSTA DA TERCEIRIZADA'>
-			  <cfset posdtprevsoltxt = 'Data Final da Solução: '>
 			</cfcase>
 			<cfcase value=18>
 			  , Pos_Situacao = 'TF'
  		  	  , Pos_DtPrev_Solucao = #createodbcdate(createdate(year(dtnovoprazo),month(dtnovoprazo),day(dtnovoprazo)))# 
 			  <cfset Encaminhamento = 'A UNIDADE TERCEIRIZADA'>
 			  <cfset situacao = 'TRATAMENTO DE TERCEIRIZADA'>
-			  <cfset posdtprevsoltxt = 'Data Final da Solução: '>
 			</cfcase>
 	  </cfswitch>
 	  , Pos_DtPosic = #createodbcdate(CreateDate(Year(Now()),Month(Now()),Day(Now())))#
