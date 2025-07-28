@@ -80,7 +80,7 @@
         </cfif>
     <cfelseif eventosAnterior EQ 0 AND eventosAtual GT 0>
         <!--- Não havia eventos no mês anterior e agora há = PIOROU --->
-        <cfset mensagemCard = "Atenção! Em #monthAsString(listLast(mesAtualId, "-"))#, foram registrados #eventosAtual# evento(s) de deficiências de controle ( <span class='qEventos'>#eventosAtual# evento(s)</span> ), comparado a nenhum evento no mês anterior.">
+        <cfset mensagemCard = "Atenção! Em #monthAsString(listLast(mesAtualId, "-"))#, foram registrados #eventosAtual# evento(s) de deficiências de controle, e nenhum evento no mês anterior.">
         <cfset iconeCard = "fas fa-exclamation-triangle">
     <cfelseif eventosAnterior EQ 0 AND eventosAtual EQ 0>
         <!--- Não havia eventos e continua não havendo = EXCELENTE --->
