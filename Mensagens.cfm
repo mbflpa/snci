@@ -5,7 +5,8 @@
 <p>============== Previsão de retorno às 08h =================</p>
 <cfabort>
 </cfif>
-<cfset gil = gil> --->
+<cfset gil = gil> 
+--->
 
 <cfsetting requesttimeout="20000">
 <cfset auxdt = dateformat(now(),"YYYYMMDD")>
@@ -70,7 +71,7 @@
 <cfelse>
 	<!--- verificar se Feriado Nacional --->
 	<cfquery name="rsFeriado" datasource="#dsn_inspecao#">
-			 SELECT Fer_Data FROM FeriadoNacional where Fer_Data = #dtatual#
+		SELECT Fer_Data FROM FeriadoNacional where Fer_Data = #dtatual#
 	</cfquery>
 	<cfif rsFeriado.recordcount gt 0>
 	   <cfset rotinaSN = 'N'>
@@ -83,7 +84,7 @@
 <cfif rotinaSN is 'S'>
 	<!--- Obter a data util para 10(dez) dias --->
 	<cfset dt10dduteis = CreateDate(year(now()),month(now()),day(now()))>
-	<cfset nCont = 1>
+	<cfset nCont = 0>
 	<cfloop condition="nCont lt 11">
 		<cfset dt10dduteis = DateAdd( "d", 1, dt10dduteis)>
 		<cfset vDiaSem = DayOfWeek(dt10dduteis)>
@@ -102,28 +103,6 @@
 		</cfif>	
 		<cfset nCont = nCont + 1>
 	</cfloop>
-
-	<!--- Obter o a data util para 30(trinta) dias --->
-	<cfset dt30dduteis = CreateDate(year(now()),month(now()),day(now()))>
-	<cfset nCont = 1>
-	<cfloop condition="nCont lt 31">
-		<cfset dt30dduteis = DateAdd( "d", 1, dt30dduteis)>
-		<cfset vDiaSem = DayOfWeek(dt30dduteis)>
-		<cfif vDiaSem neq 1 and vDiaSem neq 7>
-			<!--- verificar se Feriado Nacional --->
-			<cfquery name="rsFeriado" datasource="#dsn_inspecao#">
-				 SELECT Fer_Data FROM FeriadoNacional where Fer_Data = #dt30dduteis#
-			</cfquery>
-			<cfif rsFeriado.recordcount gt 0>
-			   <cfset nCont = nCont - 1>
-			</cfif>
-		</cfif>
-		<!--- Verifica se final de semana  --->
-		<cfif vDiaSem eq 1 or vDiaSem eq 7>
-			<cfset nCont = nCont - 1>
-		</cfif>	
-		<cfset nCont = nCont + 1>
-	</cfloop>	
 </cfif>
 
 <cfloop condition="rotina lte 33">   
@@ -1260,7 +1239,6 @@
 		<!--- Opiniao da CCOP --->
 		<cfset Encaminhamento = "Opinião do Controle Interno">
 		<cfoutput query="rs2PU_16TS">
-		    	
 		    <!--- Pesquisa pelos 30 dias --->
 			<!--- 	<cfobject component = "CFC/Dao" name = "dao"> --->
 			<cfinvoke component="#dao#" method="VencidoPrazo_Andamento" returnVariable="PrazoVencidoDias"
@@ -1304,45 +1282,40 @@
 	<cfif rotina eq 6 and rotinaSN is 'S'>
 		<cfoutput>Modulo de nº : #rotina# em execucao</cfoutput><br>
 	   <cfquery name="rs14NR_20PF" datasource="#dsn_inspecao#">
-		SELECT INP_DTConcluirRevisao,Pos_Area, Pos_NomeArea, Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem, Pos_DtPosic, Pos_DtPrev_Solucao, Pos_Situacao_Resp, Pos_Parecer, Und_Email, 
-		Und_TipoUnidade, Und_Descricao, Und_Centraliza, Rep_Email
-		FROM Unidades 
-		INNER JOIN ParecerUnidade ON Und_Codigo = Pos_Unidade 
-		INNER JOIN inspecao on INP_Unidade = Pos_Unidade and INP_NumInspecao = Pos_Inspecao
-		INNER JOIN Reops ON Und_CodReop = Rep_Codigo
-		WHERE Pos_Situacao_Resp in (14) and 
-		Und_TipoUnidade in (12,16) and 
-		(Pos_DtPrev_Solucao < convert(datetime,convert(char(10),GETDATE(),102) + ' 00:00'))
-		ORDER BY Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem
+			SELECT INP_DTConcluirRevisao,Pos_Area, Pos_NomeArea, Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem, Pos_DtPosic, Pos_DtPrev_Solucao, Pos_Situacao_Resp, Pos_Parecer, Und_Email, 
+			Und_TipoUnidade, Und_Descricao, Und_Centraliza, Rep_Email
+			FROM Unidades 
+			INNER JOIN ParecerUnidade ON Und_Codigo = Pos_Unidade 
+			INNER JOIN inspecao on INP_Unidade = Pos_Unidade and INP_NumInspecao = Pos_Inspecao
+			INNER JOIN Reops ON Und_CodReop = Rep_Codigo
+			WHERE Pos_Situacao_Resp in (14) and 
+			Und_TipoUnidade in (12,16) and 
+			(Pos_DtPrev_Solucao < convert(datetime,convert(char(10),GETDATE(),102) + ' 00:00'))
+			ORDER BY Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem
 	   </cfquery>
 	    <!--- Opiniao da CCOP --->
 		<cfset Encaminhamento = "Opinião do Controle Interno">
 		<cfoutput query="rs14NR_20PF">
-			<cfset dt30terc = CreateDate(year(rs14NR_20PF.INP_DTConcluirRevisao),month(rs14NR_20PF.INP_DTConcluirRevisao),day(rs14NR_20PF.INP_DTConcluirRevisao))>
-			<!--- complementar os 20 dias úteis da data de liberação para compor os 30  dias úteis--->
-			<cfset dt30terc = CreateDate(year(dt30terc),month(dt30terc),day(dt30terc))>
-			<cfset nCont = 1>
-			<cfset dt30terc = DateAdd( "d", 31, dt30terc)>
-			<cfloop condition="nCont lte 1">
-				<cfset vDiaSem = DayOfWeek(dt30terc)>
+			<cfset dt30dduteis = CreateDate(year(rs14NR_20PF.INP_DTConcluirRevisao),month(rs14NR_20PF.INP_DTConcluirRevisao),day(rs14NR_20PF.INP_DTConcluirRevisao))>
+			<cfset nCont = 0>
+			<cfloop condition="nCont lt 31">
+				<cfset dt30dduteis = DateAdd( "d", 1, dt30dduteis)>
+				<cfset vDiaSem = DayOfWeek(dt30dduteis)>
 				<cfif vDiaSem neq 1 and vDiaSem neq 7>
-				<!--- verificar se Feriado Nacional --->
-				<cfquery name="rsFeriado" datasource="#dsn_inspecao#">
-					SELECT Fer_Data FROM FeriadoNacional where Fer_Data = #dt30terc#
-				</cfquery>
-				<cfif rsFeriado.recordcount gt 0>
+					<!--- verificar se Feriado Nacional --->
+					<cfquery name="rsFeriado" datasource="#dsn_inspecao#">
+						SELECT Fer_Data FROM FeriadoNacional where Fer_Data = #dt30dduteis#
+					</cfquery>
+					<cfif rsFeriado.recordcount gt 0>
 					<cfset nCont = nCont - 1>
-					<cfset dt30terc = DateAdd( "d", 1, dt30terc)>
-				</cfif>
+					</cfif>
 				</cfif>
 				<!--- Verifica se final de semana  --->
 				<cfif vDiaSem eq 1 or vDiaSem eq 7>
 					<cfset nCont = nCont - 1>
-					<cfset dt30terc = DateAdd( "d", 1, dt30terc)>
-				</cfif>
+				</cfif>	
 				<cfset nCont = nCont + 1>
-			</cfloop> 	
-
+			</cfloop>			
 			<cfset rot6_IDStatus = 20>
 			<cfset rot6_SglStatus = 'PF'>
 			<cfset rot6_DescStatus = 'PENDENTE DE TERCEIRIZADA'>
@@ -1353,12 +1326,12 @@
 
 			<!--- Opiniao da CCOP --->
 			<cfset Encaminhamento = "Opinião do Controle Interno">
-			<cfset aux_obs = #rs14NR_20PF.Pos_Parecer# & CHR(13) & CHR(13) & DateFormat(Now(),"DD/MM/YYYY") & '-' & TimeFormat(Now(),'HH:MM') & '>' & #Trim(Encaminhamento)# & CHR(13) & CHR(13) & 'À(O) ' & #trim(aux_posnomearea)# & CHR(13) & CHR(13) & #sinformes# & CHR(13) & CHR(13) & 'Data Final da Solução: ' & #DateFormat(dt30terc,"DD/MM/YYYY")# & CHR(13) & CHR(13) & 'Situação: ' & #rot6_DescStatus# & CHR(13) & CHR(13) & 'Responsável: SUBG CONTR INT OPER/GCOP' & CHR(13) & CHR(13) & '--------------------------------------------------------------------------------------------------------------'>
+			<cfset aux_obs = #rs14NR_20PF.Pos_Parecer# & CHR(13) & CHR(13) & DateFormat(Now(),"DD/MM/YYYY") & '-' & TimeFormat(Now(),'HH:MM') & '>' & #Trim(Encaminhamento)# & CHR(13) & CHR(13) & 'À(O) ' & #trim(aux_posnomearea)# & CHR(13) & CHR(13) & #sinformes# & CHR(13) & CHR(13) & 'Data Final da Solução: ' & #DateFormat(dt30dduteis,"DD/MM/YYYY")# & CHR(13) & CHR(13) & 'Situação: ' & #rot6_DescStatus# & CHR(13) & CHR(13) & 'Responsável: SUBG CONTR INT OPER/GCOP' & CHR(13) & CHR(13) & '--------------------------------------------------------------------------------------------------------------'>
 			<cfquery datasource="#dsn_inspecao#">
-				UPDATE ParecerUnidade SET Pos_Area = '#aux_posarea#', Pos_NomeArea = '#aux_posnomearea#', Pos_Situacao_Resp = #rot6_IDStatus#, Pos_Situacao = '#rot6_SglStatus#', Pos_DtUltAtu = CONVERT(char, GETDATE(), 120), Pos_DtPosic = #dtatual#, Pos_DtPrev_Solucao = #dt30terc#, Pos_Parecer = '#aux_obs#', Pos_Sit_Resp_Antes = 14 WHERE Pos_Unidade='#rs14NR_20PF.Pos_Unidade#' AND Pos_Inspecao='#rs14NR_20PF.Pos_Inspecao#' AND Pos_NumGrupo=#rs14NR_20PF.Pos_NumGrupo# AND Pos_NumItem=#rs14NR_20PF.Pos_NumItem#
+				UPDATE ParecerUnidade SET Pos_Area = '#aux_posarea#', Pos_NomeArea = '#aux_posnomearea#', Pos_Situacao_Resp = #rot6_IDStatus#, Pos_Situacao = '#rot6_SglStatus#', Pos_DtUltAtu = CONVERT(char, GETDATE(), 120), Pos_DtPosic = #dtatual#, Pos_DtPrev_Solucao = #dt30dduteis#, Pos_Parecer = '#aux_obs#', Pos_Sit_Resp_Antes = 14 WHERE Pos_Unidade='#rs14NR_20PF.Pos_Unidade#' AND Pos_Inspecao='#rs14NR_20PF.Pos_Inspecao#' AND Pos_NumGrupo=#rs14NR_20PF.Pos_NumGrupo# AND Pos_NumItem=#rs14NR_20PF.Pos_NumItem#
 			</cfquery>
 	
-			<cfset and_obs = DateFormat(Now(),"DD/MM/YYYY") & '-' & TimeFormat(Now(),'HH:MM') & '>' & #Trim(Encaminhamento)# & CHR(13) & CHR(13) & 'À(O) ' & #trim(aux_posnomearea)# & CHR(13) & CHR(13) & #sinformes# & CHR(13) & CHR(13) & 'Data Final da Solução: ' & #DateFormat(dt30terc,"DD/MM/YYYY")# & CHR(13) & CHR(13) & 'Situação: ' & #rot6_DescStatus# & CHR(13) & CHR(13) & 'Responsável: SUBG CONTR INT OPER/GCOP' & CHR(13) & CHR(13) & '--------------------------------------------------------------------------------------------------------------'>
+			<cfset and_obs = DateFormat(Now(),"DD/MM/YYYY") & '-' & TimeFormat(Now(),'HH:MM') & '>' & #Trim(Encaminhamento)# & CHR(13) & CHR(13) & 'À(O) ' & #trim(aux_posnomearea)# & CHR(13) & CHR(13) & #sinformes# & CHR(13) & CHR(13) & 'Data Final da Solução: ' & #DateFormat(dt30dduteis,"DD/MM/YYYY")# & CHR(13) & CHR(13) & 'Situação: ' & #rot6_DescStatus# & CHR(13) & CHR(13) & 'Responsável: SUBG CONTR INT OPER/GCOP' & CHR(13) & CHR(13) & '--------------------------------------------------------------------------------------------------------------'>
 			<cfset hhmmssdc = timeFormat(now(), "HH:MM:ssl")>
 			<cfset hhmmssdc = Replace(hhmmssdc,':','',"All")>
 			<cfset hhmmssdc = Replace(hhmmssdc,'.','',"All")>	 
@@ -3607,6 +3580,7 @@
 		<!--- fim ajustes de campos para exibição --->
 	</cfif>		
 	--->
+	<!---
 	<cfif rotina eq 31>	
 	<cfoutput>
 		<!--- envio por e-mail das conclusões de revisão no dia anterior --->
@@ -3827,6 +3801,7 @@
 		</cfloop>		
 	</cfoutput>		
 	</cfif>
+	--->	
 	<cfif rotina eq 32>
 		 <cfquery datasource="#dsn_inspecao#">
 		  UPDATE AvisosGrupos SET AVGR_status = 'D', AVGR_DT_DES = convert(char, getdate(), 102) WHERE AVGR_status = 'A' and AVGR_DT_FINAL < convert(datetime,convert(char(10),GETDATE(),102) + ' 00:00')

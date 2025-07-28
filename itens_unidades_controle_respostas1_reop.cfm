@@ -101,8 +101,6 @@ WHERE     (IPT_NumInspecao = '#URL.Ninsp#')
     <cfset aux_obs = Replace(aux_obs,"'","","All")>
 	<cfset aux_obs = Replace(aux_obs,'*','','All')>
     <cfset aux_obs = Replace(aux_obs,'>','','All')>		
-	<!---	 <cfset aux_obs = Replace(aux_obs,'&','','All')>
-		     <cfset aux_obs = Replace(aux_obs,'%','','All')> --->
     <cfset pos_obs = Form.H_obs & CHR(13) & CHR(13) & DateFormat(Now(),"DD/MM/YYYY") & '-' & TimeFormat(Now(),'HH:MM') & '> ' & Trim(Encaminhamento) & '  ' & '-' & '  ' & #aux_obs# & CHR(13) & CHR(13) & 'Responsável: ' & #maskcgiusu# & '\' & Trim(qUsuario.Usu_Apelido) & '\' & Trim(qUsuario.Usu_Lotacao) & CHR(13) & CHR(13) & '--------------------------------------------------------------------------------------------------------------'>
   '#pos_obs#'
   </cfif> 

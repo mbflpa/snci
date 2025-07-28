@@ -14,7 +14,6 @@
     where Usu_login = (<cfqueryparam cfsqltype="cf_sql_varchar" value="#qryPapelTrabalho.INP_RevisorLogin#">)
   </cfquery>
 
-
 <cfquery name="qAcesso" datasource="#dsn_inspecao#">
 	select Usu_DR, Usu_GrupoAcesso, Usu_Matricula, Usu_Email, Usu_Apelido, Usu_Coordena 
 	from usuarios 
@@ -119,7 +118,7 @@
 <cfquery name="rsInspecaoNaoFinalizada" datasource="#dsn_inspecao#">
     SELECT INP_DTConcluirRevisao, INP_Situacao, INP_DtUltAtu, Pos_Situacao_Resp  FROM Inspecao
     LEFT JOIN  ParecerUnidade ON INP_NumInspecao = Pos_Inspecao
-    WHERE LTRIM(INP_Situacao)<>'CO' 
+    WHERE LTRIM(INP_Situacao) <> 'CO' 
       and INP_Unidade ='#qryPapelTrabalho.RIP_Unidade#' and INP_NumInspecao='#qryPapelTrabalho.INP_NumInspecao#'
 </cfquery>
 
@@ -187,6 +186,80 @@
             UPDATE ProcessoParecerUnidade SET Pro_Situacao = 'EN', Pro_DtEncerr = convert(varchar, getdate(), 102), Pro_userName = '#CGI.REMOTE_USER#', Pro_dtultatu = CONVERT(DATETIME, getdate(), 103)
             WHERE Pro_Unidade = '#qryPapelTrabalho.RIP_Unidade#'	and Pro_Inspecao ='#qryPapelTrabalho.INP_NumInspecao#'
         </cfquery>
+        <!--- Início - e-mail automático por unidade com NC --->
+        <cfquery name="rsEnvio" datasource="#dsn_inspecao#">
+          SELECT Usu_Email, Und_Email, Fun_Email, Rep_Email, INP_NumInspecao, INP_Unidade, INP_DTConcluirRevisao, Und_TipoUnidade, Und_Descricao, Und_CodReop, INP_DtInicInspecao, INP_Coordenador
+          FROM (Inspecao INNER JOIN Unidades ON INP_Unidade = Und_Codigo) 
+          INNER JOIN Reops ON Und_CodReop = Rep_Codigo 
+          INNER JOIN Usuarios ON INP_UserName = Usu_Login
+          INNER JOIN Funcionarios ON INP_Coordenador = Fun_Matric 
+          WHERE INP_NumInspecao = '#qryPapelTrabalho.INP_NumInspecao#'
+        </cfquery>
+        <cfset startTime = CreateTime(0,0,0)> 
+        <cfset endTime = CreateTime(0,0,45)> 
+        <cfloop from="#startTime#" to="#endTime#" index="i" step="#CreateTimeSpan(0,0,0,1)#"> 
+        </cfloop> 
+        <cfset sdestina =''>
+            
+        <cfset emailrevisor = #rsEnvio.Usu_Email#>
+        <cfset emailunid = #rsEnvio.Und_Email#>
+        <cfset emailreopunid = #rsEnvio.Rep_Email#>
+        <cfset emailcoord = #rsEnvio.Fun_Email#>
+        <cfset emailscoi="">
+
+        <!--- adquirir o email do SCOI da SE --->
+        <cfset scoi_se = left(rsEnvio.INP_Unidade,2)>
+        <cfif scoi_se eq '03' or scoi_se eq '05' or scoi_se eq '65'>
+          <cfset scoi_se = '10'>
+        <cfelseif scoi_se eq '70'>
+          <cfset scoi_se = '04'>						 					 				 
+        </cfif>
+
+        <cfquery name="rsSCOIEmail" datasource="#dsn_inspecao#">
+          SELECT Ars_Email
+          FROM Areas
+          WHERE left(Ars_Codigo,2) = '#scoi_se#'  and (Ars_Descricao Like '%SEC AVAL CONT INTERNO/SGCIN%')
+        </cfquery>
+        <cfset startTime = CreateTime(0,0,0)> 
+        <cfset endTime = CreateTime(0,0,15)> 
+        <cfloop from="#startTime#" to="#endTime#" index="i" step="#CreateTimeSpan(0,0,0,1)#"> 
+        </cfloop>
+        <cfset emailscoi = #rsSCOIEmail.Ars_Email#>
+          
+        <cfif emailunid neq "">
+          <cfset sdestina = #sdestina# & ';' & #emailunid#>
+        </cfif>
+
+        <cfif emailreopunid neq "">
+          <cfset sdestina = #sdestina# & ';' & #emailreopunid#>
+        </cfif>
+
+        <cfif emailcoord neq "">
+          <cfset sdestina = #sdestina# & ';' & #emailcoord#>
+        </cfif>
+
+        <cfif emailrevisor neq "">
+          <cfset sdestina = #sdestina# & ';' & #emailrevisor#>
+        </cfif>
+        
+        <cfset sdestina = #sdestina# & ';' & #emailscoi#>
+
+        <cfif findoneof("@", trim(sdestina)) eq 0>
+          <cfset sdestina = "gilvanm@correios.com.br">
+        </cfif>
+
+        <cfset assunto = 'Relatório de Controle Interno - ' & #trim(rsEnvio.Und_Descricao)# & ' - Avaliação de Controle Interno ' & #rsEnvio.INP_NumInspecao#>
+        <!--- SEM NC --->
+        <cfmail from="SNCI@correios.com.br" to="#sdestina#" subject="#assunto#" type="HTML">
+          Mensagem automática. Não precisa responder!<br><br>
+          <strong>
+          Prezado(a) Gerente do(a) #trim(Ucase(rsEnvio.Und_Descricao))#<br><br>
+          &nbsp;&nbsp;&nbsp;informamos que não houve Não Conformidades no Relatório de Controle Interno: Nº #rsEnvio.INP_NumInspecao#, realizada nessa Unidade na Data: #dateformat(rsEnvio.INP_DtInicInspecao,"dd/mm/yyyy")#. <br><br>
+          &nbsp;&nbsp;&nbsp;Em caso de dúvidas, entrar em contato com a Equipe de Controle Interno localizada na SE, por meio do endereço eletrônico: #emailscoi#.<br><br>
+          <br>
+          &nbsp;&nbsp;&nbsp;Desde já agradecemos a sua atenção.
+          </strong>
+        </cfmail>        
         <cflocation url="../../../Pacin_ClassificacaoUnidades.cfm?&pagretorno=GeraRelatorio/gerador/dsp/papeltrabalho.cfm&Unid=#qryPapelTrabalho.RIP_Unidade#&Ninsp=#qryPapelTrabalho.INP_NumInspecao#">    
     </cfoutput>      
   </cfif>
@@ -214,13 +287,7 @@
   WHERE 
     ((RTRIM(RIP_Resposta)= 'E' AND Itn_ValidacaoObrigatoria=1) OR RTRIM(RIP_Resposta)= 'V') AND 
     RTRIM(RIP_Recomendacao) IS NULL AND RIP_NumInspecao='#qryPapelTrabalho.INP_NumInspecao#' and RIP_Unidade='#qryPapelTrabalho.RIP_Unidade#' 
-</cfquery>
-
-<!--- inicio re-envio de email conclusão de revisão --->
-<cfoutput>
-  <cfif isDefined("form.acao") and '#form.acao#' is 'reenvioemailconclusaorevisao'>
-  </cfif> 
-</cfoutput>  
+</cfquery> 
 <!--- final re-envio de email conclusão de revisão --->
 <cfoutput>
   <cfif isDefined("form.acao") and '#form.acao#' is 'ConcluirRevisaoComNC'>
@@ -358,7 +425,196 @@
               And_HrPosic='000014'
             </cfquery>            
           </cfif>
-      </cfloop>    
+      </cfloop>  
+      ==============================
+      <!--- Início - e-mail automático por unidade com NC --->
+      <cfquery name="rsEnvio" datasource="#dsn_inspecao#">
+        SELECT Usu_Email, Und_Email, Fun_Email, Rep_Email, INP_NumInspecao, INP_Unidade, INP_DTConcluirRevisao, Und_TipoUnidade, Und_Descricao, Und_CodReop, INP_DtInicInspecao, INP_Coordenador
+        FROM (Inspecao INNER JOIN Unidades ON INP_Unidade = Und_Codigo) 
+        INNER JOIN Reops ON Und_CodReop = Rep_Codigo 
+        INNER JOIN Usuarios ON INP_UserName = Usu_Login
+        INNER JOIN Funcionarios ON INP_Coordenador = Fun_Matric 
+        WHERE INP_NumInspecao = '#qryPapelTrabalho.INP_NumInspecao#'
+      </cfquery>
+      <cfset startTime = CreateTime(0,0,0)> 
+      <cfset endTime = CreateTime(0,0,45)> 
+      <cfloop from="#startTime#" to="#endTime#" index="i" step="#CreateTimeSpan(0,0,0,1)#"> 
+      </cfloop> 
+      <cfset sdestina =''>
+				
+      <cfset emailrevisor = #rsEnvio.Usu_Email#>
+      <cfset emailunid = #rsEnvio.Und_Email#>
+      <cfset emailreopunid = #rsEnvio.Rep_Email#>
+      <cfset emailcoord = #rsEnvio.Fun_Email#>
+      <cfset emailscoi="">
+
+      <!--- adquirir o email do SCOI da SE --->
+      <cfset scoi_se = left(rsEnvio.INP_Unidade,2)>
+      <cfif scoi_se eq '03' or scoi_se eq '05' or scoi_se eq '65'>
+        <cfset scoi_se = '10'>
+      <cfelseif scoi_se eq '70'>
+        <cfset scoi_se = '04'>						 					 				 
+      </cfif>
+
+      <cfquery name="rsSCOIEmail" datasource="#dsn_inspecao#">
+        SELECT Ars_Email
+        FROM Areas
+        WHERE left(Ars_Codigo,2) = '#scoi_se#'  and (Ars_Descricao Like '%SEC AVAL CONT INTERNO/SGCIN%')
+      </cfquery>
+      <cfset startTime = CreateTime(0,0,0)> 
+      <cfset endTime = CreateTime(0,0,15)> 
+      <cfloop from="#startTime#" to="#endTime#" index="i" step="#CreateTimeSpan(0,0,0,1)#"> 
+      </cfloop>
+      <cfset emailscoi = #rsSCOIEmail.Ars_Email#>
+			
+      <cfif emailunid neq "">
+        <cfset sdestina = #sdestina# & ';' & #emailunid#>
+      </cfif>
+
+      <cfif emailreopunid neq "">
+        <cfset sdestina = #sdestina# & ';' & #emailreopunid#>
+      </cfif>
+
+      <cfif emailcoord neq "">
+        <cfset sdestina = #sdestina# & ';' & #emailcoord#>
+      </cfif>
+
+      <cfif emailrevisor neq "">
+        <cfset sdestina = #sdestina# & ';' & #emailrevisor#>
+      </cfif>
+		
+      <cfset sdestina = #sdestina# & ';' & #emailscoi#>
+
+      <cfif findoneof("@", trim(sdestina)) eq 0>
+        <cfset sdestina = "gilvanm@correios.com.br">
+      </cfif>
+
+		  <cfset assunto = 'Relatório de Controle Interno - ' & #trim(rsEnvio.Und_Descricao)# & ' - Avaliação de Controle Interno ' & #rsEnvio.INP_NumInspecao#>
+      <cfif rsEnvio.Und_TipoUnidade neq 12 and rsEnvio.Und_TipoUnidade neq 16>  	
+          <cfmail from="SNCI@correios.com.br" to="#sdestina#" subject="#assunto#" type="HTML">
+              Mensagem automática. Não precisa responder!<br><br>
+              <strong>
+              Prezado(a) Gerente do(a) #trim(Ucase(rsEnvio.Und_Descricao))#, informamos que está disponível na intranet o Relatório de Controle Interno: Nº #rsEnvio.INP_NumInspecao#, realizada nessa Unidade na Data: #dateformat(rsEnvio.INP_DtInicInspecao,"dd/mm/yyyy")#. <br><br>
+
+              &nbsp;&nbsp;&nbsp;Solicitamos acessá-lo para registro de sua resposta, conforme orientações a seguir:<br><br>
+
+              &nbsp;&nbsp;&nbsp;a) Informar a Justificativa para ocorrência da falha: o que ocasionou o Problema (CAUSA); <br>
+
+              &nbsp;&nbsp;&nbsp;b) Informar o Plano de Ações adotado para regularização da falha detectada, com prazo de implementação;<br>
+
+              &nbsp;&nbsp;&nbsp;c) Anexar no sistema os Comprovantes de regularização da situação encontrada e/ou das Ações implementadas (em PDF).<br><br>
+
+              &nbsp;&nbsp;&nbsp;Registrar a resposta no Sistema Nacional de Controle Interno - SNCI  num prazo de dez (10) dias úteis, contados a partir da data de entrega do Relatório. <br>
+              &nbsp;&nbsp;&nbsp;O não cumprimento ensejará em perda de prazo.<br><br>
+
+              &nbsp;&nbsp;&nbsp;Ao Usuário(a), O Sistema Nacional de Controle Interno - SNCI   deve ser utilizado com o Navegador: Microsoft EDGE <br>
+              &nbsp;&nbsp;&nbsp;em outro navegador algum recurso de página poderá ter o seu funcionamento inadequado!<br><br>
+              
+              &nbsp;&nbsp;&nbsp;Acesse o SNCI endereço: (http://intranetsistemaspe/snci/rotinas_inspecao.cfm) ou clique no link: <a href="http://intranetsistemaspe/snci/rotinas_inspecao.cfm">Relatório de Controle Interno.</a><br><br>
+
+              &nbsp;&nbsp;&nbsp;Atentar para as orientações deste e-mail para registro de sua manifestação no SNCI. Respostas incompletas serão devolvidas para complementação. <br><br>
+
+              &nbsp;&nbsp;&nbsp;Em caso de dúvidas, entrar em contato com a Equipe de Controle Interno localizada na SE, por meio do endereço eletrônico:  #emailscoi#.<br><br>
+              <table>
+                  <tr>
+                      <td><strong>Unidade : #rsEnvio.INP_Unidade# - #rsEnvio.Und_Descricao#</strong></td>
+                  </tr>
+                  <tr>
+                      <td><strong>Relatório: #rsEnvio.INP_NumInspecao#</strong></td>
+                  </tr>
+                  <tr>
+                      <td><strong>------------------------------------------</strong></td>
+                  </tr>
+              </table>
+              <br>
+              &nbsp;&nbsp;&nbsp;Desde já agradecemos a sua atenção.
+              </strong>
+          </cfmail>
+          <cfset posparecer = DateFormat(rsEnvio.INP_DTConcluirRevisao,"DD/MM/YYYY") & '>Conclusão da Revisão e Liberação da Avaliação' & CHR(13) & CHR(13)
+          & 'Prezado(a) Gerente do(a)' & #trim(Ucase(rsEnvio.Und_Descricao))# & ', informamos que está disponível na intranet o Relatório de Controle Interno: Nº' & #rsEnvio.INP_NumInspecao# & ', realizada nessa Unidade na Data: ' & #dateformat(rsEnvio.INP_DtInicInspecao,"dd/mm/yyyy")# & CHR(13) & CHR(13) 
+          & 'Solicitamos acessá-lo para registro de sua resposta, conforme orientações a seguir:' & CHR(13) & CHR(13) 
+          & 'a) Informar a Justificativa para ocorrência da falha: o que ocasionou o Problema (CAUSA);' & CHR(13) 
+          & 'b) Informar o Plano de Ações adotado para regularização da falha detectada, com prazo de implementação;' & CHR(13) 
+          & 'c) Anexar no sistema os Comprovantes de regularização da situação encontrada e/ou das Ações implementadas (em PDF).' & CHR(13) & CHR(13) 
+          & 'Registrar a resposta no Sistema Nacional de Controle Interno - SNCI num prazo de dez (10) dias úteis, contados a partir da data de entrega do Relatório.' & CHR(13) 
+          & 'O não cumprimento ensejará em perda de prazo.' & CHR(13) & CHR(13) 
+          & 'Acesse o SNCI endereço: (http://intranetsistemaspe/snci/rotinas_inspecao.cfm) ou clique no link: Relatório de Controle Interno.' & CHR(13) & CHR(13) 
+          & 'Atentar para as orientações deste e-mail para registro de sua manifestação no SNCI. Respostas incompletas serão devolvidas para complementação.' & CHR(13) & CHR(13) 
+          & 'Em caso de dúvidas, entrar em contato com a Equipe de Controle Interno localizada na SE, por meio do endereço eletrônico:' & CHR(13) & CHR(13) 
+          & 'Unidade : ' & #rsEnvio.INP_Unidade# & '-' & #rsEnvio.Und_Descricao# & CHR(13) 
+          & 'Relatório:' &  #rsEnvio.INP_NumInspecao# 
+          & CHR(13) & CHR(13) & 'Desde já agradecemos a sua atenção.' 
+          & CHR(13)
+          & '-----------------------------------------------------------------------------------------------------------------------'>
+      <cfelse>
+          <cfmail from="SNCI@correios.com.br" to="#sdestina#" subject="#assunto#" type="HTML">
+              Mensagem automática. Não precisa responder!<br><br>
+              <strong>
+              Prezado(a) Gerente do(a) #trim(Ucase(rsEnvio.Und_Descricao))#, informamos que está disponível na intranet o Relatório de Controle Interno: Nº #rsEnvio.INP_NumInspecao#, realizada nessa Unidade na Data: #dateformat(rsEnvio.INP_DtInicInspecao,"dd/mm/yyyy")#. <br><br>
+
+              &nbsp;&nbsp;&nbsp;Solicitamos acessá-lo para registro de sua resposta, conforme orientações a seguir:<br><br>
+
+              &nbsp;&nbsp;&nbsp;a) Informar a Justificativa para ocorrência da falha: o que ocasionou o Problema (CAUSA); <br>
+
+              &nbsp;&nbsp;&nbsp;b) Informar o Plano de Ações adotado para regularização da falha detectada, com prazo de implementação;<br>
+
+              &nbsp;&nbsp;&nbsp;c) Anexar no sistema os Comprovantes de regularização da situação encontrada e/ou das Ações implementadas (em PDF).<br><br>
+
+              &nbsp;&nbsp;&nbsp;Registrar a resposta no Sistema Nacional de Controle Interno - SNCI  num prazo de dez (10) dias úteis, contados a partir da data de entrega do Relatório. <br>
+              &nbsp;&nbsp;&nbsp;O não cumprimento ensejará em perda de prazo.<br><br>
+
+              &nbsp;&nbsp;&nbsp;Ao Usuário(a), O Sistema Nacional de Controle Interno - SNCI   deve ser utilizado com o Navegador: Microsoft EDGE <br>
+              &nbsp;&nbsp;&nbsp;em outro navegador algum recurso de página poderá ter o seu funcionamento inadequado!<br><br>
+
+              &nbsp;&nbsp;&nbsp;Acesse o SNCI endereço: (http://intranetsistemaspe/snci/rotinas_inspecao.cfm) ou clique no link: <a href="http://intranetsistemaspe/snci/rotinas_inspecao.cfm">Relatório de Controle Interno.</a><br><br>
+
+              &nbsp;&nbsp;&nbsp;Atentar para as orientações deste e-mail para registro de sua manifestação no SNCI. Respostas incompletas serão devolvidas para complementação, <br>
+              &nbsp;&nbsp;&nbsp;Desde que esteja dentro do prazo de 30 (trinta) dias úteis a contar da entrega do Relatório. <br><br>   
+
+              &nbsp;&nbsp;&nbsp;Após esse prazo, a situação será direcionada diretamente para área gestora do Contrato de Terceirizadas para adoção das ações previstas em contrato. <br><br>                      
+
+              &nbsp;&nbsp;&nbsp;Em caso de dúvidas, entrar em contato com a Equipe de Controle Interno localizada na SE, por meio do endereço eletrônico:  #emailscoi#.<br><br>
+
+              <table>
+                <tr>
+                  <td><strong>Unidade : #rsEnvio.INP_Unidade# - #rsEnvio.Und_Descricao#</strong></td>
+                </tr>
+                <tr>
+                  <td><strong>Relatório: #rsEnvio.INP_NumInspecao#</strong></td>
+                </tr>
+                <tr>
+                  <td><strong>------------------------------------------</strong></td>
+                </tr>
+              </table>
+              <br>
+              &nbsp;&nbsp;&nbsp;Desde já agradecemos a sua atenção.
+              </strong>
+          </cfmail>
+  
+          <cfset posparecer = DateFormat(rsEnvio.INP_DTConcluirRevisao,"DD/MM/YYYY") & '>Conclusão da Revisão e Liberação da Avaliação' & CHR(13) & CHR(13)
+          & 'Prezado(a) Gerente do(a)' & #trim(Ucase(rsEnvio.Und_Descricao))# & ', informamos que está disponível na intranet o Relatório de Controle Interno: Nº' & #rsEnvio.INP_NumInspecao# & ', realizada nessa Unidade na Data: ' & #dateformat(rsEnvio.INP_DtInicInspecao,"dd/mm/yyyy")# & CHR(13) & CHR(13) 
+          & 'Solicitamos acessá-lo para registro de sua resposta, conforme orientações a seguir:' & CHR(13) & CHR(13) 
+          & 'a) Informar a Justificativa para ocorrência da falha: o que ocasionou o Problema (CAUSA);' & CHR(13) 
+          & 'b) Informar o Plano de Ações adotado para regularização da falha detectada, com prazo de implementação;' & CHR(13) 
+          & 'c) Anexar no sistema os Comprovantes de regularização da situação encontrada e/ou das Ações implementadas (em PDF).' & CHR(13) & CHR(13) 
+          & 'Registrar a resposta no Sistema Nacional de Controle Interno - SNCI num prazo de dez (10) dias úteis, contados a partir da data de entrega do Relatório.' & CHR(13) 
+          & 'O não cumprimento ensejará em perda de prazo.' & CHR(13) & CHR(13) 
+          & 'Acesse o SNCI endereço: (http://intranetsistemaspe/snci/rotinas_inspecao.cfm) ou clique no link: Relatório de Controle Interno.' & CHR(13) & CHR(13) 
+          & 'Atentar para as orientações deste e-mail para registro de sua manifestação no SNCI. Respostas incompletas serão devolvidas para complementação.' & CHR(13) 
+          & 'Desde que esteja dentro do prazo de 30 (trinta) dias úteis a contar da entrega do Relatório.' & CHR(13) & CHR(13) 
+          & 'Após esse prazo, a situação será direcionada diretamente para área gestora do Contrato de Terceirizadas para adoção das ações previstas em contrato.' & CHR(13) & CHR(13) 
+          & 'Em caso de dúvidas, entrar em contato com a Equipe de Controle Interno localizada na SE, por meio do endereço eletrônico:' & CHR(13) & CHR(13) 
+          & 'Unidade : ' & #rsEnvio.INP_Unidade# & '-' & #rsEnvio.Und_Descricao# & CHR(13) 
+          & 'Relatório:' &  #rsEnvio.INP_NumInspecao# 
+          & CHR(13) & CHR(13) & 'Desde já agradecemos a sua atenção.' 
+          & CHR(13)
+          & '-----------------------------------------------------------------------------------------------------------------------'>      
+      </cfif>          
+      <!--- Update na tabela parecer unidade --->
+      <cfquery datasource="#dsn_inspecao#">
+          UPDATE ParecerUnidade SET Pos_Parecer = '#posparecer#'
+          WHERE Pos_Inspecao='#rsEnvio.INP_NumInspecao#' and Pos_Situacao_Resp = 14
+      </cfquery>      
       <cflocation url="../../../Pacin_ClassificacaoUnidades.cfm?&pagretorno=GeraRelatorio/gerador/dsp/papeltrabalho.cfm&Unid=#qryPapelTrabalho.RIP_Unidade#&Ninsp=#qryPapelTrabalho.INP_NumInspecao#">             
 	    <!--- </cfif>  --->
       <!---Fim do prcesso de liberação da avaliação--->
@@ -434,15 +690,12 @@
     window.onbeforeunload = function () {
       window.opener.location.reload();
     }
-
     function aguarde(t) {
-
       if (t !== undefined) {
         topo = 30 + document.getElementById(t).offsetTop;
       } else {
         topo = '200';
       }
-
       if (document.getElementById("aguarde").style.visibility == "visible") {
         document.getElementById("aguarde").style.visibility = "hidden";
         document.getElementById("main_body").style.cursor = 'auto';
@@ -452,10 +705,8 @@
         piscando();
 
       }
-
       document.getElementById("imgAguarde").style.top = topo + 'px';
     }
-
 
     function abrirPopup(url, w, h) {
       var newW = w + 100;
@@ -526,9 +777,7 @@
         } else {
           window.scrollTo(0, scrollTargetY);
         }
-
       }
-
       // call it once to get started
       tick();
     }
@@ -555,7 +804,6 @@
 		}  
 
   </script>
-
 
 </head>
 <cfset qtdrevisar = 0>
@@ -692,10 +940,6 @@ z-index:1000;visibility:hidden;position:absolute;" >
           <cfset muitoGrav = 0>
           <cfset CP = 0>
           <cfoutput>	
-           <!--- 
-            <cfdump  var="#qryPapelTrabalho#">
-            <cfabort>
-            --->
           
 						<cfquery dbtype="query" name="rsLink">
 							SELECT GRP_CODIGO, ITN_NUMITEM FROM qryPapelTrabalho order by GRP_CODIGO, ITN_NUMITEM
@@ -721,7 +965,7 @@ z-index:1000;visibility:hidden;position:absolute;" >
               </tr>
               <tr>
                 <td valign="top" bordercolor="999999" bgcolor="" scope="row">&nbsp;</td>
-                <!---   ID para �ncora     --->
+                <!---   ID para ancora     --->
                 <cfset grp = Grp_Codigo>
                 <cfset Ite = Itn_NumItem>
                 <th valign="top" bordercolor="999999" bgcolor="" scope="row"><div id="#Grp_Codigo#.#Itn_NumItem#" align="left">Item: #grp#.#ite#</div></th>
@@ -735,7 +979,7 @@ z-index:1000;visibility:hidden;position:absolute;" >
               <cfset auxclassif = qryPapelTrabalho.Pos_ClassificacaoPonto>
             </cfif>
                 <td valign="top" bordercolor="999999" bgcolor="" scope="row">&nbsp;</td>
-                <!---   ID para �ncora     --->
+                <!---   ID para ancora     --->
                 <th valign="top" bordercolor="999999" bgcolor="" scope="row"><div id="#Grp_Codigo#.#Itn_NumItem#" align="left">Relevância Ponto: </div></th>
                 <td colspan="7" valign="top" bordercolor="999999" bgcolor="" scope="row"><div align="left">Pontuação<strong>:&nbsp; #auxpontua# &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</strong>Classificação<strong>: &nbsp;#auxclassif#</strong></div></td>
               </tr> 
@@ -800,7 +1044,7 @@ z-index:1000;visibility:hidden;position:absolute;" >
                   <cfset avaliacao = 'Não Verificado'>
                 </cfif>
                 <cfquery name="qSituacao" datasource="#dsn_inspecao#">
-        SELECT Pos_Situacao_Resp, Pos_NCISEI, Pos_NCISEI, STO_Codigo, STO_Descricao, STO_Cor FROM ParecerUnidade INNER JOIN Situacao_Ponto ON STO_Codigo = Pos_Situacao_Resp WHERE Pos_Unidade ='#qryPapelTrabalho.RIP_Unidade#' and Pos_NumGrupo ='#qryPapelTrabalho.Grp_Codigo#' and Pos_NumItem='#qryPapelTrabalho.Itn_NumItem#' and Pos_Inspecao='#qryPapelTrabalho.INP_NumInspecao#'
+                  SELECT Pos_Situacao_Resp, Pos_NCISEI, Pos_NCISEI, STO_Codigo, STO_Descricao, STO_Cor FROM ParecerUnidade INNER JOIN Situacao_Ponto ON STO_Codigo = Pos_Situacao_Resp WHERE Pos_Unidade ='#qryPapelTrabalho.RIP_Unidade#' and Pos_NumGrupo ='#qryPapelTrabalho.Grp_Codigo#' and Pos_NumItem='#qryPapelTrabalho.Itn_NumItem#' and Pos_Inspecao='#qryPapelTrabalho.INP_NumInspecao#'
                 </cfquery>
                 <td valign="top" bordercolor="999999" bgcolor="" scope="row"><div align="left" class="labelcell"></div></td>
                 <th valign="top" bordercolor="999999" bgcolor="" scope="row"><div align="left">Avaliação:</div></th>
@@ -812,11 +1056,11 @@ z-index:1000;visibility:hidden;position:absolute;" >
                       </cfif>
                   </strong>
                     <cfquery name="qAvaliador" datasource="#dsn_inspecao#">
-          SELECT Fun_Matric, Fun_Nome FROM Funcionarios WHERE Fun_Matric = '#RIP_MatricAvaliador#'
+                      SELECT Fun_Matric, Fun_Nome FROM Funcionarios WHERE Fun_Matric = '#RIP_MatricAvaliador#'
                     </cfquery>
                     <cfif #trim(RIP_MatricAvaliador)# neq ''>
-						<cfset maskmatrusu = trim(qAvaliador.Fun_Matric)>
-						<cfset maskmatrusu = left(maskmatrusu,1) & '.' &  mid(maskmatrusu,2,3) & '.***-' & right(maskmatrusu,1)> 
+                        <cfset maskmatrusu = trim(qAvaliador.Fun_Matric)>
+                        <cfset maskmatrusu = left(maskmatrusu,1) & '.' &  mid(maskmatrusu,2,3) & '.***-' & right(maskmatrusu,1)> 
                         <span  style="margin-left:10px;color:black;font-size:12px">(Avaliado por: #maskmatrusu#-#trim(qAvaliador.Fun_Nome)#)</span>
                     </cfif>                </td>
               </tr>
@@ -917,16 +1161,15 @@ z-index:1000;visibility:hidden;position:absolute;" >
                             <!---                                       <cfset M = M> --->
                             <a style="cursor:pointer;"  onclick="capturaPosicaoScroll();if(window.confirm('Atenção! Após a revisão deste item, esta Avaliação será liberada e não será possível revisar outros itens.\n\nClique em OK se todos os itens CONFORME e NÃO EXECUTA já tiverem sido revisados, caso contrário, clique em Cancelar e realize a revisão dos itens.')){
                                          window.open('../../../itens_controle_revisliber.cfm?pg=pt&Unid=#qryPapelTrabalho.RIP_Unidade#&Ninsp=#qryPapelTrabalho.INP_NumInspecao#&Ngrup=#qryPapelTrabalho.Grp_Codigo#&Nitem=#qryPapelTrabalho.Itn_NumItem#&situacao=#qSituAcao.Pos_Situacao_Resp#&vlrdec=#qryPapelTrabalho.Itn_ValorDeclarado#&modal=#qryPapelTrabalho.INP_Modalidade#&tpunid=#qryPapelTrabalho.TUN_Codigo#','_self');}">
-                            </a>   
+                            </a>
+                        <cfelse> 
+                            
                         </cfif>
-                        
                           <a style="cursor:pointer;"  onclick="capturaPosicaoScroll();if(window.confirm('Atenção! Após a revisão deste item, esta Avaliação será liberada e não será possível revisar outros itens.\n\nClique em OK se todos os itens CONFORME e NÃO EXECUTA já tiverem sido revisados, caso contrário, clique em Cancelar e realize a revisão dos itens.')){
-                                         window.open('../../../itens_controle_revisliber.cfm?pg=pt&Unid=#qryPapelTrabalho.RIP_Unidade#&Ninsp=#qryPapelTrabalho.INP_NumInspecao#&Ngrup=#qryPapelTrabalho.Grp_Codigo#&Nitem=#qryPapelTrabalho.Itn_NumItem#&situacao=#qSituAcao.Pos_Situacao_Resp#&vlrdec=#qryPapelTrabalho.Itn_ValorDeclarado#&modal=#qryPapelTrabalho.INP_Modalidade#&tpunid=#qryPapelTrabalho.TUN_Codigo#','_self');}">
-                                         <a style="cursor:pointer;"  onclick="capturaPosicaoScroll();window.open('../../../itens_controle_revisliber.cfm?pg=pt&Unid=#qryPapelTrabalho.RIP_Unidade#&Ninsp=#qryPapelTrabalho.INP_NumInspecao#&Ngrup=#qryPapelTrabalho.Grp_Codigo#&Nitem=#qryPapelTrabalho.Itn_NumItem#&situacao=#qSituAcao.Pos_Situacao_Resp#&vlrdec=#qryPapelTrabalho.Itn_ValorDeclarado#&modal=#qryPapelTrabalho.INP_Modalidade#&tpunid=#qryPapelTrabalho.TUN_Codigo#','_self')">
+                                         window.open('../../../itens_controle_revisliber.cfm?pg=pt&Unid=#qryPapelTrabalho.RIP_Unidade#&Ninsp=#qryPapelTrabalho.INP_NumInspecao#&Ngrup=#qryPapelTrabalho.Grp_Codigo#&Nitem=#qryPapelTrabalho.Itn_NumItem#&situacao=#qSituAcao.Pos_Situacao_Resp#&vlrdec=#qryPapelTrabalho.Itn_ValorDeclarado#&modal=#qryPapelTrabalho.INP_Modalidade#&tpunid=#qryPapelTrabalho.TUN_Codigo#','_self');}"><a style="cursor:pointer;"  onclick="capturaPosicaoScroll();window.open('../../../itens_controle_revisliber.cfm?pg=pt&Unid=#qryPapelTrabalho.RIP_Unidade#&Ninsp=#qryPapelTrabalho.INP_NumInspecao#&Ngrup=#qryPapelTrabalho.Grp_Codigo#&Nitem=#qryPapelTrabalho.Itn_NumItem#&situacao=#qSituAcao.Pos_Situacao_Resp#&vlrdec=#qryPapelTrabalho.Itn_ValorDeclarado#&modal=#qryPapelTrabalho.INP_Modalidade#&tpunid=#qryPapelTrabalho.TUN_Codigo#','_self')">
                           <div ><img  alt="Revisar" src="../../../figuras/revisar.png" width="25"   border="0" /></div>
                           <div style="color:darkred;position:relative;font-size:12px">Revisar</div>
-                          </a></a></div>
-                          
+                          </a> </a></div>
                           <cfset qtdrevisar = qtdrevisar + 1>
                         </cfif>
                     </cfif>  
@@ -938,8 +1181,7 @@ z-index:1000;visibility:hidden;position:absolute;" >
                           </a>
                         </div>
                     </cfif>                     
-                  
-                    </td>
+                  </td>
               </tr>
               <tr>
                 <td valign="top" bordercolor="999999" bgcolor="" scope="row"><div align="left" class="labelcell"></div></td>
@@ -951,7 +1193,6 @@ z-index:1000;visibility:hidden;position:absolute;" >
             </tr>
           </cfoutput>
 <!--- --->
-          
           <cfquery name="rsBusca" datasource="#dsn_inspecao#">
             SELECT RIP_Unidade, RIP_NumInspecao, RIP_NumGrupo, RIP_NumItem, RIP_Resposta, RIP_Recomendacao, RIP_Falta, RIP_Sobra, RIP_EmRisco, RIP_ReincInspecao, RIP_ReincGrupo, RIP_ReincItem
             FROM Resultado_Inspecao
