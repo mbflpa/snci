@@ -33,9 +33,10 @@ component {
         }
 
        application.rsUsuarioParametros = queryExecute(
-            "SELECT us.*, un.*
+            "SELECT us.*, un.*, d.* 
             FROM Usuarios us
             LEFT JOIN Unidades un ON un.Und_Codigo = us.Usu_Lotacao
+            INNER JOIN Diretoria d ON d.Dir_Codigo = un.Und_CodDiretoria
             WHERE trim(us.Usu_Login) = :login",
             {login = {value=local.loginUsuario, cfsqltype="cf_sql_varchar"}},
             {datasource=application.dsn_avaliacoes_automatizadas}

@@ -1,4 +1,10 @@
 <cfprocessingdirective pageencoding = "utf-8">
+<cfif FindNoCase("homologacaope", application.auxsite) or FindNoCase("desenvolvimentope", application.auxsite) or FindNoCase("localhost", application.auxsite)>
+  <cfquery name="rsSE" datasource="#application.dsn_avaliacoes_automatizadas#">
+    SELECT Dir_Codigo, Dir_Sigla FROM Diretoria WHERE Dir_Codigo<>'01'
+  </cfquery>
+</cfif>
+
 
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -40,14 +46,14 @@
     <link rel="stylesheet" href="../SNCI_AVALIACOES_AUTOMATIZADAS/dist/css/stylesSNCI.css">
 
    <cfset links = [
-  { href = "index.cfm", icon = "fas fa-home", text = "Principal" },
-  { href = "aa_deficiencias_controle.cfm", icon = "fas fa-bug", text = "Deficiências de Controle" },
-  { href = "teste.cfm", icon = "fas fa-shield-alt", text = "Vulnerabilidades" },
-  { href = "teste.cfm", icon = "fas fa-tasks", text = "Testes Aplicados" },
-  { href = "relatorios.cfm", icon = "fas fa-database", text = "Base de Eventos" },
-  { href = "orientacoes.cfm", icon = "fas fa-info-circle", text = "Orientações" },
-  { href = "historicoAnual.cfm", icon = "fas fa-history", text = "Histórico Anual" }
-] />
+        { href = "index.cfm", icon = "fas fa-home", text = "Principal" },
+        { href = "aa_deficiencias_controle.cfm", icon = "fas fa-bug", text = "Deficiências de Controle" },
+        { href = "teste.cfm", icon = "fas fa-shield-alt", text = "Vulnerabilidades" },
+        { href = "teste.cfm", icon = "fas fa-tasks", text = "Testes Aplicados" },
+        { href = "relatorios.cfm", icon = "fas fa-database", text = "Base de Eventos" },
+        { href = "orientacoes.cfm", icon = "fas fa-info-circle", text = "Orientações" },
+        { href = "historicoAnual.cfm", icon = "fas fa-history", text = "Histórico Anual" }
+      ] />
 
 
     
@@ -282,17 +288,18 @@
           </div>
 
           <!---Se servidor não for de produção, aparecerá o select para alteração de perfil e lotação --->
-          <cfif FindNoCase("homologacaope", application.auxsite) or FindNoCase("desenvolvimentope", application.auxsite) or FindNoCase("localhost2", application.auxsite)>
+          <cfif FindNoCase("homologacaope", application.auxsite) or FindNoCase("desenvolvimentope", application.auxsite) or FindNoCase("localhost", application.auxsite)>
             <div class="modern-profile-section">
               <div class="form-group" style="margin-bottom: 0;">
-                <select id="mudarPerfil" name="mudarPerfil" class="form-control" style="height:40px;">
+                <select id="mudarSE" name="mudarSE" class="form-control" style="height:40px;">
                   <option selected="" disabled="" value="">Selecionar SE</option>
-                  
+                  <cfoutput query="rsSE">
+                    <option value="#Dir_Codigo#">#Dir_Sigla#</option>
+                  </cfoutput>
                 </select> 
 
-                <select id="mudarLotacao" name="mudarLotacao" class="form-control" style="height:40px;">
-                  <option selected="" disabled="" value="">Selecionar Unidade</option>
-                  
+                <select id="mudarUnidade" name="mudarUnidade" class="form-control" style="height:40px;" disabled>
+                  <option value="">Primeiro selecione uma SE</option>
                 </select>   
               </div>
             </div>
@@ -467,9 +474,126 @@
     }
 
     $(document).ready(function() {	//executa quando a página terminar de carregar
-       
-    });
-
+        
+        // Inicializar Select2 apenas uma vez
+        $('#mudarSE').select2({
+          theme: 'bootstrap4'
+        });
+        
+        $('#mudarUnidade').select2({
+          theme: 'bootstrap4'
+        });
+        
+        // Filtro dinâmico entre SE e Unidade
+        $('#mudarSE').change(function() {
+          var selectedSE = $(this).val();
+          var unidadeSelect = $('#mudarUnidade');
+          
+          if (selectedSE) {
+            // Desabilitar select e mostrar loading
+            unidadeSelect.prop('disabled', true);
+            
+            // Limpar opções e adicionar loading
+            unidadeSelect.empty();
+            unidadeSelect.append('<option value="">Carregando...</option>');
+            unidadeSelect.trigger('change');
+            
+            // Fazer requisição AJAX
+            $.ajax({
+              url: '../SNCI_AVALIACOES_AUTOMATIZADAS/cfc/DeficienciasControleDados.cfc',
+              type: 'POST',
+              data: {
+                method: 'getUnidadesPorSE',
+                codDiretoria: selectedSE
+              },
+              dataType: 'json',
+              success: function(response) {
+                // Limpar select
+                unidadeSelect.empty();
+                
+                if (response.success && response.data.length > 0) {
+                  // Adicionar opção padrão
+                  unidadeSelect.append('<option value="">Selecionar Unidade</option>');
+                  
+                  // Adicionar unidades
+                  $.each(response.data, function(index, unidade) {
+                    unidadeSelect.append('<option value="' + unidade.codigo + '">' + unidade.nome + '</option>');
+                  });
+                } else {
+                  unidadeSelect.append('<option value="">Nenhuma unidade encontrada</option>');
+                }
+                
+                // Habilitar select e atualizar
+                unidadeSelect.prop('disabled', false);
+                unidadeSelect.trigger('change');
+              },
+              error: function(xhr, status, error) {
+                console.error('Erro na requisição AJAX:', error);
+                unidadeSelect.empty();
+                unidadeSelect.append('<option value="">Erro ao carregar unidades</option>');
+                unidadeSelect.prop('disabled', true);
+                unidadeSelect.trigger('change');
+              }
+            });
+          } else {
+            // Se nenhuma SE selecionada, resetar unidades
+            unidadeSelect.empty();
+            unidadeSelect.append('<option value="">Primeiro selecione uma SE</option>');
+            unidadeSelect.prop('disabled', true);
+            unidadeSelect.trigger('change');
+          }
+        });
+        
+        // Event listener para mudança de unidade
+        $('#mudarUnidade').change(function() {
+          var selectedUnidade = $(this).val();
+          var selectedUnidadeText = $(this).find('option:selected').text();
+          
+          if (selectedUnidade) {
+            console.log('Unidade selecionada:', selectedUnidade);
+            
+            // Mostrar loading
+            $(this).prop('disabled', true);
+            
+            // Atualizar lotação do usuário
+            $.ajax({
+              url: '../SNCI_AVALIACOES_AUTOMATIZADAS/cfc/DeficienciasControleDados.cfc',
+              type: 'POST',
+              data: {
+                method: 'atualizarLotacaoUsuario',
+                codigoUnidade: selectedUnidade,
+                nomeUnidade: selectedUnidadeText,
+                matriculaUsuario: '<cfoutput>#application.rsUsuarioParametros.Usu_Matricula#</cfoutput>'
+              },
+              dataType: 'json',
+              success: function(response) {
+                if (response.success) {
+                  // Mostrar mensagem de sucesso
+                  toastr.options = {
+                      "positionClass": "toast-top-center"
+                  };
+                      toastr.success('Lotação atualizada com sucesso!');
+                  
+                  // Recarregar a página após um breve delay
+                  setTimeout(function() {
+                    window.location.reload();
+                  }, 1500);
+                } else {
+                  console.error('Erro:', response.message);
+                  toastr.error('Erro ao atualizar lotação: ' + response.message);
+                  $(this).prop('disabled', false);
+                }
+              },
+              error: function(xhr, status, error) {
+                console.error('Erro na requisição AJAX:', error);
+                toastr.error('Erro ao atualizar lotação');
+                $(this).prop('disabled', false);
+              }
+            });
+          }
+        });
+        
+      });
 		
   </script>
 

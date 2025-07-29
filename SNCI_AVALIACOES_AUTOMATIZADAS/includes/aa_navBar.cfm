@@ -34,7 +34,7 @@
 					</a>
 				</li>
 				<li class="nav-item d-none d-sm-inline-block " style="overflow:hidden;">
-					<span class="tituloPagina">Análise das Não Conformidades - <cfoutput>#application.rsUsuarioParametros.Und_Descricao#</cfoutput></span>
+					<span class="tituloPagina">Análise das Não Conformidades - <cfoutput>#application.rsUsuarioParametros.Und_Descricao# (#application.rsUsuarioParametros.Und_MCU#) - #application.rsUsuarioParametros.Dir_Sigla#</cfoutput></span>
 				</li>
 			
 				<li class="nav-item d-none d-sm-inline-block ml-auto" style="background-color:var(--amarelo_prisma_escuro_correios);height:56px;position:relative;overflow:hidden;">

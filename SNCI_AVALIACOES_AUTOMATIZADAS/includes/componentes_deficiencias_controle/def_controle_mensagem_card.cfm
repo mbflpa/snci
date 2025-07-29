@@ -10,6 +10,22 @@
 <cfset mesAtualId = dadosMeses.mesAtualId>
 <cfset mesAnteriorId = dadosMeses.mesAnteriorId>
 
+<!--- Função auxiliar para obter nome do mês de forma segura --->
+<cffunction name="obterNomeMes" returntype="string" access="private">
+    <cfargument name="mesId" type="string" required="true">
+    <cfargument name="nomeMes" type="string" required="false" default="">
+    
+    <cfif len(trim(arguments.mesId)) AND len(trim(arguments.nomeMes))>
+        <cfreturn arguments.nomeMes>
+    <cfelseif len(trim(arguments.mesId)) AND listLen(arguments.mesId, "-") GTE 2>
+        <cfset numeroMes = listLast(arguments.mesId, "-")>
+        <cfif isNumeric(numeroMes) AND numeroMes GTE 1 AND numeroMes LTE 12>
+            <cfreturn monthAsString(numeroMes)>
+        </cfif>
+    </cfif>
+    <cfreturn "mês atual">
+</cffunction>
+
 <!--- Usar dados de eventos já processados --->
 <cfset eventosAtual = dadosMensagem.eventosMensagem.eventosAtual>
 <cfset eventosAnterior = dadosMensagem.eventosMensagem.eventosAnterior>
@@ -27,25 +43,25 @@
     
     <cfif eventosAtual LT eventosAnterior>
         <!--- Mês atual tem MENOS eventos que o anterior = EXCELENTE --->
-        <cfset mensagemCard = "Excelente! Em #monthAsString(listLast(mesAtualId, "-"))#, o total de eventos com deficiências de controle <span class='event-count'>#eventosAtual# evento(s)</span> reduziu #percentualMudanca#% em relação ao mês anterior <span class='event-count'>#eventosAnterior# evento(s)</span>.">
+        <cfset mensagemCard = "Excelente! Em #obterNomeMes(mesAtualId, nomeMesAtual)#, o total de eventos com deficiências de controle <span class='event-count'>#eventosAtual# evento(s)</span> reduziu #percentualMudanca#% em relação ao mês anterior <span class='event-count'>#eventosAnterior# evento(s)</span>.">
         <cfset iconeCard = "fas fa-check-circle">
         <cfset tipoCard = "success">
         <cfset badgeTexto = "Excelente">
     <cfelseif eventosAtual GT eventosAnterior>
         <!--- Mês atual tem MAIS eventos que o anterior = PREOCUPANTE --->
-        <cfset mensagemCard = "Atenção! Em #monthAsString(listLast(mesAtualId, "-"))#, o total de eventos com deficiências de controle <span class='event-count'>#eventosAtual# evento(s)</span> aumentou #percentualMudanca#% em relação ao mês anterior <span class='event-count'>#eventosAnterior# evento(s)</span>.">
+        <cfset mensagemCard = "Atenção! Em #obterNomeMes(mesAtualId, nomeMesAtual)#, o total de eventos com deficiências de controle <span class='event-count'>#eventosAtual# evento(s)</span> aumentou #percentualMudanca#% em relação ao mês anterior <span class='event-count'>#eventosAnterior# evento(s)</span>.">
         <cfset iconeCard = "fas fa-exclamation-triangle">
         <cfset tipoCard = "danger">
         <cfset badgeTexto = "Atenção">
     <cfelse>
         <!--- Mesmo número de eventos --->
         <cfif eventosAtual EQ 0>
-            <cfset mensagemCard = "Perfeito! Em #monthAsString(listLast(mesAtualId, "-"))#, não foram registrados eventos de deficiências de controle, mantendo o excelente resultado do mês anterior.">
+            <cfset mensagemCard = "Perfeito! Em #obterNomeMes(mesAtualId, nomeMesAtual)#, não foram registrados eventos de deficiências de controle, mantendo o excelente resultado do mês anterior.">
             <cfset iconeCard = "fas fa-trophy">
             <cfset tipoCard = "info">
             <cfset badgeTexto = "Perfeito">
         <cfelse>
-            <cfset mensagemCard = "Em #monthAsString(listLast(mesAtualId, "-"))#, o total de eventos com deficiências de controle <span class='event-count'>#eventosAtual# evento(s)</span> manteve-se estável em relação ao mês anterior <span class='event-count'>#eventosAnterior# evento(s)</span>.">
+            <cfset mensagemCard = "Em #obterNomeMes(mesAtualId, nomeMesAtual)#, o total de eventos com deficiências de controle <span class='event-count'>#eventosAtual# evento(s)</span> manteve-se estável em relação ao mês anterior <span class='event-count'>#eventosAnterior# evento(s)</span>.">
             <cfset iconeCard = "fas fa-equals">
             <cfset tipoCard = "info">
             <cfset badgeTexto = "Estável">
@@ -53,25 +69,25 @@
     </cfif>
 <cfelseif eventosAnterior EQ 0 AND eventosAtual GT 0>
     <!--- Não havia eventos no mês anterior e agora há = PIOROU --->
-    <cfset mensagemCard = "Atenção! Em #monthAsString(listLast(mesAtualId, "-"))#, foram registrados <span class='event-count'>#eventosAtual# evento(s)</span> de deficiências de controle, e nenhum evento no mês anterior.">
+    <cfset mensagemCard = "Atenção! Em #obterNomeMes(mesAtualId, nomeMesAtual)#, foram registrados <span class='event-count'>#eventosAtual# evento(s)</span> de deficiências de controle, e nenhum evento no mês anterior.">
     <cfset iconeCard = "fas fa-exclamation-triangle">
     <cfset tipoCard = "warning">
     <cfset badgeTexto = "Atenção">
 <cfelseif eventosAnterior EQ 0 AND eventosAtual EQ 0>
     <!--- Não havia eventos e continua não havendo = EXCELENTE --->
-    <cfset mensagemCard = "Perfeito! Em #monthAsString(listLast(mesAtualId, "-"))#, não foram registrados eventos de deficiências de controle, mantendo o excelente resultado do mês anterior.">
+    <cfset mensagemCard = "Perfeito! Em #obterNomeMes(mesAtualId, nomeMesAtual)#, não foram registrados eventos de deficiências de controle, mantendo o excelente resultado do mês anterior.">
     <cfset iconeCard = "fas fa-trophy">
     <cfset tipoCard = "info">
     <cfset badgeTexto = "Perfeito">
 <cfelse>
     <!--- Primeiro mês com dados ou casos especiais --->
     <cfif eventosAtual EQ 0>
-        <cfset mensagemCard = "Excelente! Em #monthAsString(listLast(mesAtualId, "-"))#, não foram registrados eventos de deficiências de controle.">
+        <cfset mensagemCard = "Excelente! Em #obterNomeMes(mesAtualId, nomeMesAtual)#, não foram registrados eventos de deficiências de controle.">
         <cfset iconeCard = "fas fa-check-circle">
         <cfset tipoCard = "success">
         <cfset badgeTexto = "Excelente">
     <cfelse>
-        <cfset mensagemCard = "Em #monthAsString(listLast(mesAtualId, "-"))#, foram registrados <span class='event-count'>#eventosAtual# evento(s)</span> de deficiências de controle.">
+        <cfset mensagemCard = "Em #obterNomeMes(mesAtualId, nomeMesAtual)#, foram registrados <span class='event-count'>#eventosAtual# evento(s)</span> de deficiências de controle.">
         <cfset iconeCard = "fas fa-info-circle">
         <cfset tipoCard = "info">
         <cfset badgeTexto = "Informação">

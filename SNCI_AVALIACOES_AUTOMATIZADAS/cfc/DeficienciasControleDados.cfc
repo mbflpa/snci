@@ -226,4 +226,73 @@
         <cfreturn resultado>
     </cffunction>
 
+    <cffunction name="getUnidadesPorSE" access="remote" returnformat="json" returntype="any">
+        <cfargument name="codDiretoria" type="string" required="true">
+        
+        <cfset var result = {}>
+        <cfset var unidades = []>
+        
+        <cftry>
+        <cfquery name="rsUnidades" datasource="#application.dsn_avaliacoes_automatizadas#">
+            SELECT Und_Codigo, Und_Descricao 
+            FROM Unidades 
+            WHERE Und_Status = 'A' 
+            AND Und_CodDiretoria = <cfqueryparam value="#arguments.codDiretoria#" cfsqltype="cf_sql_varchar">
+            ORDER BY Und_Descricao
+        </cfquery>
+        
+        <cfloop query="rsUnidades">
+            <cfset arrayAppend(unidades, {
+            "codigo": Und_Codigo,
+            "nome": Und_Descricao
+            })>
+        </cfloop>
+        
+        <cfset result = {
+            "success": true,
+            "data": unidades
+        }>
+        
+        <cfcatch>
+            <cfset result = {
+            "success": false,
+            "message": "Erro ao buscar unidades: " & cfcatch.message
+            }>
+        </cfcatch>
+        </cftry>
+        
+        <cfreturn result>
+    </cffunction>
+
+    <cffunction name="atualizarLotacaoUsuario" access="remote" returnformat="json" returntype="any">
+        <cfargument name="codigoUnidade" type="string" required="true">
+        <cfargument name="nomeUnidade" type="string" required="true">
+        <cfargument name="matriculaUsuario" type="string" required="true">
+        
+        <cfset var result = {}>
+        
+        <cftry>
+            <cfquery name="updateLotacao" datasource="#application.dsn_avaliacoes_automatizadas#">
+                UPDATE Usuarios 
+                SET Usu_Lotacao = <cfqueryparam value="#arguments.codigoUnidade#" cfsqltype="cf_sql_varchar">,
+                    Usu_LotacaoNome = <cfqueryparam value="#arguments.nomeUnidade#" cfsqltype="cf_sql_varchar">
+                WHERE Usu_Matricula = <cfqueryparam value="#arguments.matriculaUsuario#" cfsqltype="cf_sql_varchar">
+            </cfquery>
+            
+            <cfset result = {
+                "success": true,
+                "message": "Lotação atualizada com sucesso"
+            }>
+            
+        <cfcatch>
+            <cfset result = {
+                "success": false,
+                "message": "Erro ao atualizar lotação: " & cfcatch.message
+            }>
+        </cfcatch>
+        </cftry>
+        
+        <cfreturn result>
+    </cffunction>
+
 </cfcomponent>
