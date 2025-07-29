@@ -23,6 +23,85 @@
 			font-weight:600;
 			color:var(--azul_correios);
 		  }
+		  
+		  /* Estilos para os botões de mês */
+		  .meses-container {
+			margin-top: -3px;
+			display: flex;
+			flex-wrap: wrap;
+			gap: 3px;
+			align-items: center;
+		  }
+		  
+		  .btn-mes {
+			background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+			border: 1px solid #dee2e6;
+			color: #495057;
+			padding: 3px 10px;
+			border-radius: 20px;
+			font-size: 0.75rem;
+			font-weight: 500;
+			cursor: pointer;
+			transition: all 0.3s ease;
+			text-decoration: none;
+			white-space: nowrap;
+			box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+		  }
+		  
+		  .btn-mes:hover {
+			background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+			color: white;
+			border-color: #0056b3;
+			transform: translateY(-1px);
+			box-shadow: 0 2px 6px rgba(0,123,255,0.3);
+			text-decoration: none;
+		  }
+		  
+		  .btn-mes.active {
+			background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
+			color: white;
+			border-color: #1e7e34;
+			box-shadow: 0 2px 6px rgba(40,167,69,0.3);
+		  }
+		  
+		  .btn-mes.loading {
+			background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
+			color: #212529;
+			border-color: #e0a800;
+		  }
+		  
+		  .meses-label {
+			color: var(--azul_correios);
+			font-size: 0.8rem;
+			font-weight: 600;
+			margin-right: 8px;
+		  }
+		  
+		  .meses-scroll {
+			display: flex;
+			gap: 3px;
+			overflow-x: auto;
+			padding: 2px;
+			max-width: 100%;
+		  }
+		  
+		  .meses-scroll::-webkit-scrollbar {
+			height: 4px;
+		  }
+		  
+		  .meses-scroll::-webkit-scrollbar-track {
+			background: #f1f1f1;
+			border-radius: 2px;
+		  }
+		  
+		  .meses-scroll::-webkit-scrollbar-thumb {
+			background: #c1c1c1;
+			border-radius: 2px;
+		  }
+		  
+		  .meses-scroll::-webkit-scrollbar-thumb:hover {
+			background: #a1a1a1;
+		  }
 	 </style>
 	<!-- Navbar -->
 		<link rel="stylesheet" href="../SNCI_AVALIACOES_AUTOMATIZADAS/dist/css/animate.min.css">
@@ -34,7 +113,19 @@
 					</a>
 				</li>
 				<li class="nav-item d-none d-sm-inline-block " style="overflow:hidden;">
-					<span class="tituloPagina">Análise das Não Conformidades - <cfoutput>#application.rsUsuarioParametros.Und_Descricao# - #application.rsUsuarioParametros.Dir_Sigla#<span style="font-weight:400;font-size:0.8rem;">(MCU: #application.rsUsuarioParametros.Und_MCU# / STO: #application.rsUsuarioParametros.Und_Codigo#)</span></cfoutput></span>
+					<div style="display: flex; flex-direction: column;">
+						<span class="tituloPagina">Análise das Não Conformidades - <cfoutput>#application.rsUsuarioParametros.Und_Descricao# - #application.rsUsuarioParametros.Dir_Sigla#<span style="font-weight:400;font-size:0.8rem;margin-left:10px">(MCU: #application.rsUsuarioParametros.Und_MCU# / STO: #application.rsUsuarioParametros.Und_Codigo#)</span></cfoutput></span>
+						
+						<!-- Container dos botões de mês -->
+						<div class="meses-container">
+							<span class="meses-label">Mês:</span>
+							<div class="meses-scroll" id="mesesContainer">
+								<button class="btn-mes loading" id="loadingMeses">
+									<i class="fas fa-spinner fa-spin"></i> Carregando...
+								</button>
+							</div>
+						</div>
+					</div>
 				</li>
 			
 				<li class="nav-item d-none d-sm-inline-block ml-auto" style="background-color:var(--amarelo_prisma_escuro_correios);height:56px;position:relative;overflow:hidden;">
@@ -63,7 +154,95 @@
 			// Garante que o sidebar fique sempre oculto e o navbar full width
 			$(document).ready(function() {
 				//$('body').addClass('sidebar-collapse');
+				
+				// Carregar meses disponíveis
+				carregarMesesDisponiveis();
+				
+				// Verificar se há filtro de mês na URL e marcar botão ativo
+				verificarMesSelecionadoURL();
 			});
+			
+			// Função para verificar mês selecionado na URL
+			function verificarMesSelecionadoURL() {
+				var urlParams = new URLSearchParams(window.location.search);
+				var mesFiltro = urlParams.get('mesFiltro');
+				if (mesFiltro) {
+					// Aguardar carregamento dos botões e depois marcar o ativo
+					setTimeout(function() {
+						$('.btn-mes').removeClass('active');
+						$('.btn-mes[data-mes-id="' + mesFiltro + '"]').addClass('active');
+					}, 100);
+				}
+			}
+			
+			// Função para carregar meses disponíveis
+			function carregarMesesDisponiveis() {
+				$.ajax({
+					url: '../SNCI_AVALIACOES_AUTOMATIZADAS/cfc/DeficienciasControleDados.cfc?method=obterMesesDisponiveis',
+					type: 'POST',
+					dataType: 'json',
+					success: function(response) {
+						if (response.success && response.data.length > 0) {
+							renderizarBotoesMeses(response.data);
+						} else {
+							$('#mesesContainer').html('<span style="color: #6c757d; font-size: 0.75rem;">Nenhum período disponível</span>');
+						}
+					},
+					error: function(xhr, status, error) {
+						console.error('Erro ao carregar meses:', error);
+						$('#mesesContainer').html('<span style="color: #dc3545; font-size: 0.75rem;">Erro ao carregar períodos</span>');
+					}
+				});
+			}
+			
+			// Função para renderizar botões dos meses
+			function renderizarBotoesMeses(meses) {
+				var container = $('#mesesContainer');
+				container.empty();
+				
+				// Verificar se há filtro ativo na URL
+				var urlParams = new URLSearchParams(window.location.search);
+				var mesFiltroAtivo = urlParams.get('mesFiltro');
+				
+				meses.forEach(function(mes, index) {
+					var btnClass = 'btn-mes';
+					
+					// Se há filtro na URL, marcar como ativo o mês correspondente
+					// Se não há filtro, marcar o primeiro como ativo
+					if (mesFiltroAtivo) {
+						if (mes.id === mesFiltroAtivo) {
+							btnClass += ' active';
+						}
+					} else if (index === 0) {
+						btnClass += ' active';
+					}
+					
+					var btn = $('<button>')
+						.addClass(btnClass)
+						.attr('data-mes-id', mes.id)
+						.attr('title', mes.nome + '/' + mes.ano + ' - ' + mes.totalRegistros + ' eventos')
+						.html(mes.nome)
+						.click(function() {
+							selecionarMes(mes.id, $(this));
+						});
+					
+					container.append(btn);
+				});
+			}
+			
+			// Função para selecionar um mês
+			function selecionarMes(mesId, btnElement) {
+				// Remove active de todos os botões
+				$('.btn-mes').removeClass('active');
+				
+				// Adiciona active ao botão clicado
+				btnElement.addClass('active');
+				
+				// Recarregar página com filtro de mês
+				var urlAtual = new URL(window.location);
+				urlAtual.searchParams.set('mesFiltro', mesId);
+				window.location.href = urlAtual.toString();
+			}
 	
 		</script>
 

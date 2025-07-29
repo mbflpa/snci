@@ -1,8 +1,11 @@
 <cfprocessingdirective pageencoding="utf-8">
 
 <!--- Usar dados específicos do CFC --->
+<!--- Verificar se há filtro de mês na URL --->
+<cfparam name="url.mesFiltro" default="">
+
 <cfset objDados = createObject("component", "cfc.DeficienciasControleDados")>
-<cfset dadosDesempenho = objDados.obterDadosDesempenhoAssunto(application.rsUsuarioParametros.Und_MCU)>
+<cfset dadosDesempenho = objDados.obterDadosDesempenhoAssunto(application.rsUsuarioParametros.Und_MCU, url.mesFiltro)>
 
 <cfset dadosMeses = dadosDesempenho.meses>
 <cfset nomeMesAtual = dadosMeses.nomeMesAtual>

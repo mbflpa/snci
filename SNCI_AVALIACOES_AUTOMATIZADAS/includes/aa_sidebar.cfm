@@ -300,7 +300,12 @@
 
                 <select id="mudarUnidade" name="mudarUnidade" class="form-control" style="height:40px;" disabled>
                   <option value="">Primeiro selecione uma SE</option>
-                </select>   
+                </select>
+                
+                <!--- Botão para limpar cache --->
+                <button type="button" id="btnLimparCache" class="btn btn-warning btn-sm mt-2" style="width: 100%; border-radius: 8px; font-size: 0.8rem;">
+                  <i class="fas fa-broom"></i> Limpar Cache
+                </button>
               </div>
             </div>
           </cfif>
@@ -591,6 +596,70 @@
               }
             });
           }
+        });
+        
+        // Event listener para botão de limpar cache
+        $('#btnLimparCache').click(function() {
+          var botao = $(this);
+          var textoOriginal = botao.html();
+          
+          // Confirmar ação
+          swalWithBootstrapButtons.fire({
+            title: 'Confirmar Limpeza',
+            html: logoSNCIsweetalert2('Deseja realmente limpar todos os caches do sistema?<br><small>Esta ação irá forçar a atualização de todos os dados na próxima consulta.</small>'),
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Sim, limpar!',
+            cancelButtonText: 'Cancelar',
+            reverseButtons: true,
+            background: 'var(--azul_correios)',
+            color: '#fff'
+          }).then((result) => {
+            if (result.isConfirmed) {
+              // Desabilitar botão e mostrar loading
+              botao.prop('disabled', true);
+              botao.html('<i class="fas fa-spinner fa-spin"></i> Limpando...');
+              
+              // Fazer requisição AJAX
+              $.ajax({
+                url: '../SNCI_AVALIACOES_AUTOMATIZADAS/cfc/DeficienciasControleDados.cfc',
+                type: 'POST',
+                data: {
+                  method: 'limparCaches'
+                },
+                dataType: 'json',
+                success: function(response) {
+                  if (response.success) {
+                    toastr.options = {
+                      "positionClass": "toast-top-center"
+                    };
+                    toastr.success(response.message);
+                    
+                    // Mostrar resultado detalhado
+                    swalWithBootstrapButtons.fire({
+                      title: 'Cache Limpo!',
+                      html: logoSNCIsweetalert2(response.message),
+                      icon: 'success',
+                      confirmButtonText: 'OK',
+                      background: 'var(--azul_correios)',
+                      color: '#fff'
+                    });
+                  } else {
+                    toastr.error('Erro: ' + response.message);
+                  }
+                },
+                error: function(xhr, status, error) {
+                  console.error('Erro na requisição AJAX:', error);
+                  toastr.error('Erro ao limpar cache');
+                },
+                complete: function() {
+                  // Restaurar botão
+                  botao.prop('disabled', false);
+                  botao.html(textoOriginal);
+                }
+              });
+            }
+          });
         });
         
       });

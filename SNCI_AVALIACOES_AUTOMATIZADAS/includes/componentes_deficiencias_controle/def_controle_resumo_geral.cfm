@@ -1,15 +1,26 @@
 <cfprocessingdirective pageencoding="utf-8">
 
 <cfset anoAtual = dateFormat(now(), "yyyy")>
-<cfparam name="attributes.tituloResumo" default="Resumo Geral de #anoAtual#">
+
+<!--- Definir título baseado no filtro --->
+<cfif len(trim(url.mesFiltro))>
+    <cfset tituloDefault = "Resumo Geral até " & monthAsString(listLast(url.mesFiltro, "-")) & "/" & listFirst(url.mesFiltro, "-")>
+<cfelse>
+    <cfset tituloDefault = "Resumo Geral de " & anoAtual>
+</cfif>
+
+<cfparam name="attributes.tituloResumo" default="#tituloDefault#">
 <cfparam name="attributes.cssClass" default="">
 <cfparam name="attributes.showAnimation" default="true">
 <cfparam name="attributes.dados" default="#structNew()#">
 
 <!--- Usar dados do CFC se não foram fornecidos dados personalizados --->
 <cfif structIsEmpty(attributes.dados)>
+    <!--- Verificar se há filtro de mês na URL --->
+    <cfparam name="url.mesFiltro" default="">
+    
     <cfset objDados = createObject("component", "cfc.DeficienciasControleDados")>
-    <cfset dadosResumo = objDados.obterDadosResumoGeral(application.rsUsuarioParametros.Und_MCU)>
+    <cfset dadosResumo = objDados.obterDadosResumoGeral(application.rsUsuarioParametros.Und_MCU, url.mesFiltro)>
     <cfset dadosHistoricos = dadosResumo.dadosHistoricos>
     
     <cfset attributes.dados = {
