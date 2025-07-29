@@ -391,10 +391,10 @@
         let logo='';
         if(mens == ''){
           logo= '<div  class="logoDivSwal2Correios"><img src="../SNCI_AVALIACOES_AUTOMATIZADAS/dist/img/icone_sistema_standalone_ico.png"class="brand-image logoImagemSwal2Correios" >'
-              + '<span class="font-weight-light azul_correios_textColor" style="font-size:20px!important;position:relative;top:3px">SNCI - Processos</span></div>';
+              + '<span class="font-weight-light azul_correios_textColor" style="font-size:20px!important;position:relative;top:3px">SNCI - Avaliações Automatizadas</span></div>';
         }else{
           logo= '<div  class="logoDivSwal2Correios"><img src="../SNCI_AVALIACOES_AUTOMATIZADAS/dist/img/icone_sistema_standalone_ico.png"class="brand-image logoImagemSwal2Correios" >'
-              + '<span class="font-weight-light azul_correios_textColor " style="font-size:20px!important;width:100%;position:relative;top:3px">SNCI - Processos</span></div>'
+              + '<span class="font-weight-light azul_correios_textColor " style="font-size:20px!important;width:100%;position:relative;top:3px">SNCI - Avaliações Automatizadas</span></div>'
               +'<div class="font-weight-light " style="margin-top:20px;color:#fff">'+ mens + '</div>';
         }
 
