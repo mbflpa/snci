@@ -4,7 +4,7 @@
         <cfargument name="sk_mcu" type="numeric" required="true" hint="Código da unidade MCU">
         <cfargument name="mesAnoFiltro" type="string" required="false" default="" hint="Filtro por mês no formato yyyy-MM">
         
-        <cfset var chaveCache = "cacheDeficiencias_" & arguments.sk_mcu & "_" & arguments.mesAnoFiltro>
+        <cfset var chaveCache = "cacheAADeficiencias_" & arguments.sk_mcu & "_" & arguments.mesAnoFiltro>
         
         <!--- Verificar se os dados já estão em cache nativo --->
         <cfset var dadosCompletos = cacheGet(chaveCache)>
@@ -444,7 +444,7 @@
         
         <cfset var result = {}>
         <cfset var mesesList = []>
-        <cfset var chaveCache = "cacheMesesDisponiveis">
+        <cfset var chaveCache = "cacheAAMesesDisponiveis">
         
         <!--- Verificar se os dados já estão em cache nativo --->
         <cfset var dadosCache = cacheGet(chaveCache)>
@@ -511,46 +511,20 @@
         <cfset var cachesLimpas = 0>
         
         <cftry>
-            <!--- Lista de prefixos de cache utilizados no componente --->
-            <cfset var prefixosCache = ["cacheDeficiencias_", "cacheMesesDisponiveis"]>
+            <!--- Obter todas as chaves de cache do sistema --->
+            <cfset var todasChaves = cacheGetAllIds()>
             
-            <!--- Tentar limpar caches específicos por prefixo --->
-            <cfloop array="#prefixosCache#" index="prefixo">
-                <!--- Para caches de deficiências, precisamos iterar por possíveis combinações --->
-                <cfif prefixo EQ "cacheDeficiencias_">
-                    <!--- Limpar caches de deficiências (aproximação) --->
-                    <cfloop from="1" to="999" index="mcu">
-                        <cfset var chaveCache = prefixo & mcu & "_">
-                        <cfif NOT isNull(cacheGet(chaveCache))>
-                            <cfset cacheRemove(chaveCache)>
-                            <cfset cachesLimpas = cachesLimpas + 1>
-                        </cfif>
-                        <!--- Também tentar com filtro de mês --->
-                        <cfset var chaveComMes = prefixo & mcu & "_2024-">
-                        <cfloop from="1" to="12" index="mes">
-                            <cfset var mesFormatado = numberFormat(mes, "00")>
-                            <cfset var chaveCompleta = prefixo & mcu & "_2024-" & mesFormatado>
-                            <cfif NOT isNull(cacheGet(chaveCompleta))>
-                                <cfset cacheRemove(chaveCompleta)>
-                                <cfset cachesLimpas = cachesLimpas + 1>
-                            </cfif>
-                        </cfloop>
-                    </cfloop>
-                <cfelse>
-                    <!--- Para outros caches, limpar diretamente --->
-                    <cfif NOT isNull(cacheGet(prefixo))>
-                        <cfset cacheRemove(prefixo)>
-                        <cfset cachesLimpas = cachesLimpas + 1>
-                    </cfif>
+            <!--- Remover apenas caches que começam com "cacheAA" --->
+            <cfloop array="#todasChaves#" index="chave">
+                <cfif left(chave, 7) EQ "cacheAA">
+                    <cfset cacheRemove(chave)>
+                    <cfset cachesLimpas = cachesLimpas + 1>
                 </cfif>
             </cfloop>
             
-            <!--- Tentar limpeza geral como fallback --->
-            <cfset cacheRemoveAll()>
-            
             <cfset result = {
                 "success": true,
-                "message": "Caches limpos com sucesso! Total de caches específicos removidos: " & cachesLimpas,
+                "message": "Caches limpos com sucesso! Total removido: " & cachesLimpas,
                 "cachesRemovidos": cachesLimpas
             }>
             
@@ -567,5 +541,4 @@
     </cffunction>
 
 </cfcomponent>
-
-
+                   
