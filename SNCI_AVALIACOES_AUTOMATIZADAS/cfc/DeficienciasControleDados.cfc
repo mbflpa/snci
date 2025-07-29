@@ -3,42 +3,36 @@
     <cffunction name="buscarDadosCompletos" access="private" returntype="struct" hint="Busca todos os dados da base uma única vez">
         <cfargument name="sk_mcu" type="numeric" required="true" hint="Código da unidade MCU">
         
-        <cfset var dadosCompletos = structNew()>
+        <cfset var chaveCache = "cacheDeficiencias_" & arguments.sk_mcu>
         
-        <!--- Consulta principal: dados históricos gerais --->
-        <cfquery name="rsDadosHistoricos" datasource="#application.dsn_avaliacoes_automatizadas#">
-            SELECT   COUNT(DISTINCT CASE WHEN suspenso = 0 AND sk_grupo_item <> 12 THEN sk_grupo_item END) AS testesEnvolvidos
-                    ,SUM(NC_Eventos) AS totalEventos
-                    ,COUNT(CASE WHEN sigla_apontamento in('C','N') THEN sigla_apontamento END) AS testesAplicados
-                    ,COUNT(CASE WHEN sigla_apontamento = 'C' THEN sigla_apontamento END) AS conformes
-                    ,COUNT(CASE WHEN sigla_apontamento = 'N' THEN sigla_apontamento END) AS deficienciasControle
-                    ,SUM(
-                            COALESCE(valor_falta, 0) + 
-                            COALESCE(valor_sobra, 0) + 
-                            CASE 
-                                WHEN nm_teste <> '239-4' THEN COALESCE(valor_risco, 0)
-                                ELSE 0
-                            END
-                        ) AS valorEnvolvido
-                    ,SUM(nr_reincidente) AS reincidencia
-            FROM fato_verificacao f
-            WHERE f.sk_mcu = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.sk_mcu#">
-        </cfquery>
+        <!--- Verificar se os dados já estão em cache nativo --->
+        <cfset var dadosCompletos = cacheGet(chaveCache)>
+        <cfif NOT isDefined("dadosCompletos") OR isNull(dadosCompletos)>
+            
+            <cfset dadosCompletos = structNew()>
+            
+            <!--- Consulta principal: dados históricos gerais --->
+            <cfquery name="rsDadosHistoricos" datasource="#application.dsn_avaliacoes_automatizadas#">
+                SELECT   COUNT(DISTINCT CASE WHEN suspenso = 0 AND sk_grupo_item <> 12 THEN sk_grupo_item END) AS testesEnvolvidos
+                        ,SUM(NC_Eventos) AS totalEventos
+                        ,COUNT(CASE WHEN sigla_apontamento in('C','N') THEN sigla_apontamento END) AS testesAplicados
+                        ,COUNT(CASE WHEN sigla_apontamento = 'C' THEN sigla_apontamento END) AS conformes
+                        ,COUNT(CASE WHEN sigla_apontamento = 'N' THEN sigla_apontamento END) AS deficienciasControle
+                        ,SUM(
+                                COALESCE(valor_falta, 0) + 
+                                COALESCE(valor_sobra, 0) + 
+                                CASE 
+                                    WHEN nm_teste <> '239-4' THEN COALESCE(valor_risco, 0)
+                                    ELSE 0
+                                END
+                            ) AS valorEnvolvido
+                        ,SUM(nr_reincidente) AS reincidencia
+                FROM fato_verificacao f
+                WHERE f.sk_mcu = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.sk_mcu#">
+            </cfquery>
 
-        <!--- Consulta: últimos dois meses disponíveis --->
-        <cfquery name="rsUltimosMeses" datasource="#application.dsn_avaliacoes_automatizadas#">
-            SELECT TOP 2 FORMAT(data_encerramento, 'yyyy-MM') AS mes_ano
-            FROM fato_verificacao
-            WHERE data_encerramento IS NOT NULL
-              AND sk_mcu = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.sk_mcu#">
-              AND sk_grupo_item <> 12
-            GROUP BY FORMAT(data_encerramento, 'yyyy-MM')
-            ORDER BY mes_ano DESC
-        </cfquery>
-
-        <!--- Consulta: dados detalhados por assunto e mês --->
-        <cfquery name="rsDadosDetalhados" datasource="#application.dsn_avaliacoes_automatizadas#">
-            WITH UltimosMeses AS (
+            <!--- Consulta: últimos dois meses disponíveis --->
+            <cfquery name="rsUltimosMeses" datasource="#application.dsn_avaliacoes_automatizadas#">
                 SELECT TOP 2 FORMAT(data_encerramento, 'yyyy-MM') AS mes_ano
                 FROM fato_verificacao
                 WHERE data_encerramento IS NOT NULL
@@ -46,26 +40,42 @@
                   AND sk_grupo_item <> 12
                 GROUP BY FORMAT(data_encerramento, 'yyyy-MM')
                 ORDER BY mes_ano DESC
-            )
-            SELECT 
-                p.MANCHETE,
-                p.sk_grupo_item,
-                FORMAT(f.data_encerramento, 'yyyy-MM') AS mes_ano,
-                SUM(f.NC_Eventos) AS total_eventos
-            FROM fato_verificacao f
-            INNER JOIN dim_teste_processos p ON f.sk_grupo_item = p.sk_grupo_item
-            WHERE f.sk_mcu = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.sk_mcu#">
-              AND f.sk_grupo_item <> 12
-              AND f.suspenso = 0
-              AND FORMAT(f.data_encerramento, 'yyyy-MM') IN (SELECT mes_ano FROM UltimosMeses)
-            GROUP BY p.MANCHETE, p.sk_grupo_item, FORMAT(f.data_encerramento, 'yyyy-MM')
-            ORDER BY mes_ano DESC, p.MANCHETE
-        </cfquery>
+            </cfquery>
 
-        <!--- Armazenar dados brutos --->
-        <cfset dadosCompletos.dadosHistoricos = rsDadosHistoricos>
-        <cfset dadosCompletos.ultimosMeses = rsUltimosMeses>
-        <cfset dadosCompletos.dadosDetalhados = rsDadosDetalhados>
+            <!--- Consulta: dados detalhados por assunto e mês --->
+            <cfquery name="rsDadosDetalhados" datasource="#application.dsn_avaliacoes_automatizadas#">
+                WITH UltimosMeses AS (
+                    SELECT TOP 2 FORMAT(data_encerramento, 'yyyy-MM') AS mes_ano
+                    FROM fato_verificacao
+                    WHERE data_encerramento IS NOT NULL
+                      AND sk_mcu = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.sk_mcu#">
+                      AND sk_grupo_item <> 12
+                    GROUP BY FORMAT(data_encerramento, 'yyyy-MM')
+                    ORDER BY mes_ano DESC
+                )
+                SELECT 
+                    p.MANCHETE,
+                    p.sk_grupo_item,
+                    FORMAT(f.data_encerramento, 'yyyy-MM') AS mes_ano,
+                    SUM(f.NC_Eventos) AS total_eventos
+                FROM fato_verificacao f
+                INNER JOIN dim_teste_processos p ON f.sk_grupo_item = p.sk_grupo_item
+                WHERE f.sk_mcu = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.sk_mcu#">
+                  AND f.sk_grupo_item <> 12
+                  AND f.suspenso = 0
+                  AND FORMAT(f.data_encerramento, 'yyyy-MM') IN (SELECT mes_ano FROM UltimosMeses)
+                GROUP BY p.MANCHETE, p.sk_grupo_item, FORMAT(f.data_encerramento, 'yyyy-MM')
+                ORDER BY mes_ano DESC, p.MANCHETE
+            </cfquery>
+
+            <!--- Armazenar dados brutos --->
+            <cfset dadosCompletos.dadosHistoricos = rsDadosHistoricos>
+            <cfset dadosCompletos.ultimosMeses = rsUltimosMeses>
+            <cfset dadosCompletos.dadosDetalhados = rsDadosDetalhados>
+
+            <!--- Armazenar no cache nativo com expiração de 30 minutos --->
+            <cfset cachePut(chaveCache, dadosCompletos, createTimeSpan(0,0,30,0))>
+        </cfif>
 
         <cfreturn dadosCompletos>
     </cffunction>
@@ -80,18 +90,7 @@
             <cfset arguments.sk_mcu = val(arguments.sk_mcu)>
         </cfif>
         
-        <cfset var chaveCache = "cacheDeficiencias_" & arguments.sk_mcu>
-        
-        <!--- Verificar se os dados já estão em cache --->
-        <cfif NOT structKeyExists(application, chaveCache) OR 
-              dateDiff("n", application[chaveCache].timestamp, now()) GT 30>
-            <cfset application[chaveCache] = {
-                dados = buscarDadosCompletos(arguments.sk_mcu),
-                timestamp = now()
-            }>
-        </cfif>
-        
-        <cfset var dadosBrutos = application[chaveCache].dados>
+        <cfset var dadosBrutos = buscarDadosCompletos(arguments.sk_mcu)>
         <cfset var resultado = structNew()>
         
         <!--- Processar dados históricos --->
@@ -118,18 +117,7 @@
             <cfset arguments.sk_mcu = val(arguments.sk_mcu)>
         </cfif>
         
-        <cfset var chaveCache = "cacheDeficiencias_" & arguments.sk_mcu>
-        
-        <!--- Reutilizar cache se disponível --->
-        <cfif NOT structKeyExists(application, chaveCache) OR 
-              dateDiff("n", application[chaveCache].timestamp, now()) GT 30>
-            <cfset application[chaveCache] = {
-                dados = buscarDadosCompletos(arguments.sk_mcu),
-                timestamp = now()
-            }>
-        </cfif>
-        
-        <cfset var dadosBrutos = application[chaveCache].dados>
+        <cfset var dadosBrutos = buscarDadosCompletos(arguments.sk_mcu)>
         <cfset var resultado = structNew()>
         
         <!--- Definir informações dos meses --->
@@ -180,18 +168,7 @@
             <cfset arguments.sk_mcu = val(arguments.sk_mcu)>
         </cfif>
         
-        <cfset var chaveCache = "cacheDeficiencias_" & arguments.sk_mcu>
-        
-        <!--- Reutilizar cache se disponível --->
-        <cfif NOT structKeyExists(application, chaveCache) OR 
-              dateDiff("n", application[chaveCache].timestamp, now()) GT 30>
-            <cfset application[chaveCache] = {
-                dados = buscarDadosCompletos(arguments.sk_mcu),
-                timestamp = now()
-            }>
-        </cfif>
-        
-        <cfset var dadosBrutos = application[chaveCache].dados>
+        <cfset var dadosBrutos = buscarDadosCompletos(arguments.sk_mcu)>
         <cfset var resultado = structNew()>
         
         <!--- Definir informações dos meses --->
@@ -322,5 +299,6 @@
         
         <cfreturn result>
     </cffunction>
+
 
 </cfcomponent>
