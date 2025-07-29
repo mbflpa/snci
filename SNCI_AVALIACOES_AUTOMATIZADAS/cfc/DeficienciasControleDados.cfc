@@ -71,7 +71,14 @@
     </cffunction>
 
     <cffunction name="obterDadosResumoGeral" access="public" returntype="struct" hint="Obtém dados para o componente de resumo geral">
-        <cfargument name="sk_mcu" type="numeric" required="true" hint="Código da unidade MCU">
+        <cfargument name="sk_mcu" type="any" required="true" hint="Código da unidade MCU">
+        
+        <!--- Validar e converter sk_mcu para numérico --->
+        <cfif NOT isNumeric(arguments.sk_mcu)>
+            <cfset arguments.sk_mcu = 0>
+        <cfelse>
+            <cfset arguments.sk_mcu = val(arguments.sk_mcu)>
+        </cfif>
         
         <cfset var chaveCache = "cacheDeficiencias_" & arguments.sk_mcu>
         
@@ -102,7 +109,14 @@
     </cffunction>
 
     <cffunction name="obterDadosDesempenhoAssunto" access="public" returntype="struct" hint="Obtém dados para o componente de desempenho por assunto">
-        <cfargument name="sk_mcu" type="numeric" required="true" hint="Código da unidade MCU">
+        <cfargument name="sk_mcu" type="any" required="true" hint="Código da unidade MCU">
+        
+        <!--- Validar e converter sk_mcu para numérico --->
+        <cfif NOT isNumeric(arguments.sk_mcu)>
+            <cfset arguments.sk_mcu = 0>
+        <cfelse>
+            <cfset arguments.sk_mcu = val(arguments.sk_mcu)>
+        </cfif>
         
         <cfset var chaveCache = "cacheDeficiencias_" & arguments.sk_mcu>
         
@@ -157,7 +171,14 @@
     </cffunction>
 
     <cffunction name="obterDadosMensagemCard" access="public" returntype="struct" hint="Obtém dados para o componente de mensagem card">
-        <cfargument name="sk_mcu" type="numeric" required="true" hint="Código da unidade MCU">
+        <cfargument name="sk_mcu" type="any" required="true" hint="Código da unidade MCU">
+        
+        <!--- Validar e converter sk_mcu para numérico --->
+        <cfif NOT isNumeric(arguments.sk_mcu)>
+            <cfset arguments.sk_mcu = 0>
+        <cfelse>
+            <cfset arguments.sk_mcu = val(arguments.sk_mcu)>
+        </cfif>
         
         <cfset var chaveCache = "cacheDeficiencias_" & arguments.sk_mcu>
         
@@ -214,7 +235,14 @@
 
     <!--- Função de compatibilidade para manter funcionamento existente --->
     <cffunction name="obterDadosCompletos" access="public" returntype="struct" hint="Função de compatibilidade - obtém todos os dados">
-        <cfargument name="sk_mcu" type="numeric" required="true" hint="Código da unidade MCU">
+        <cfargument name="sk_mcu" type="any" required="true" hint="Código da unidade MCU">
+        
+        <!--- Validar e converter sk_mcu para numérico --->
+        <cfif NOT isNumeric(arguments.sk_mcu)>
+            <cfset arguments.sk_mcu = 0>
+        <cfelse>
+            <cfset arguments.sk_mcu = val(arguments.sk_mcu)>
+        </cfif>
         
         <cfset var resultado = structNew()>
         <cfset resultado.dadosHistoricos = obterDadosResumoGeral(arguments.sk_mcu).dadosHistoricos>

@@ -34,7 +34,7 @@
 					</a>
 				</li>
 				<li class="nav-item d-none d-sm-inline-block " style="overflow:hidden;">
-					<span class="tituloPagina">Análise das Não Conformidades - <cfoutput>#application.rsUsuarioParametros.Und_Descricao# (#application.rsUsuarioParametros.Und_MCU#) - #application.rsUsuarioParametros.Dir_Sigla#</cfoutput></span>
+					<span class="tituloPagina">Análise das Não Conformidades - <cfoutput>#application.rsUsuarioParametros.Und_Descricao# - #application.rsUsuarioParametros.Dir_Sigla#<span style="font-weight:400;font-size:0.8rem;">(MCU: #application.rsUsuarioParametros.Und_MCU# / STO: #application.rsUsuarioParametros.Und_Codigo#)</span></cfoutput></span>
 				</li>
 			
 				<li class="nav-item d-none d-sm-inline-block ml-auto" style="background-color:var(--amarelo_prisma_escuro_correios);height:56px;position:relative;overflow:hidden;">
