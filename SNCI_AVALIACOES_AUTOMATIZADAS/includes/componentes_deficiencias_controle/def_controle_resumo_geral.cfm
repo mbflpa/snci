@@ -1,5 +1,22 @@
 <cfprocessingdirective pageencoding="utf-8">
 
+<!--- Verificar se a unidade foi localizada --->
+<cfif NOT structKeyExists(application, "rsUsuarioParametros") OR NOT structKeyExists(application.rsUsuarioParametros, "Und_Descricao") OR NOT len(trim(application.rsUsuarioParametros.Und_Descricao))>
+    <div class="snci-resumo-geral">
+        <div class="desempenho-container">
+            <div class="comparison-container">
+                <h2>Resumo Geral</h2>
+                <div style="text-align: center; padding: 40px 20px; color: #64748b;">
+                    <i class="fas fa-building" style="font-size: 3rem; margin-bottom: 16px; opacity: 0.5;"></i>
+                    <h3 style="color: #e63946; margin-bottom: 8px;">Unidade Não Localizada</h3>
+                    <p style="margin: 0; font-size: 1rem;">Não foi possível identificar a unidade para exibir os dados.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <cfabort>
+</cfif>
+
 <cfset anoAtual = dateFormat(now(), "yyyy")>
 
 <!--- Definir título baseado no filtro --->

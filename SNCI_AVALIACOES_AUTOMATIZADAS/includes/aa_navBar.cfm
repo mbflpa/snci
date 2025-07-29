@@ -114,15 +114,26 @@
 				</li>
 				<li class="nav-item d-none d-sm-inline-block " style="overflow:hidden;">
 					<div style="display: flex; flex-direction: column;">
-						<span class="tituloPagina">Análise das Não Conformidades - <cfoutput>#application.rsUsuarioParametros.Und_Descricao# - #application.rsUsuarioParametros.Dir_Sigla#<span style="font-weight:400;font-size:0.8rem;margin-left:10px">(MCU: #application.rsUsuarioParametros.Und_MCU# / STO: #application.rsUsuarioParametros.Und_Codigo#)</span></cfoutput></span>
+						<span class="tituloPagina">
+							Análise das Não Conformidades - 
+							<cfif structKeyExists(application, "rsUsuarioParametros") AND structKeyExists(application.rsUsuarioParametros, "Und_Descricao") AND len(trim(application.rsUsuarioParametros.Und_Descricao))>
+								<cfoutput>#application.rsUsuarioParametros.Und_Descricao# - #application.rsUsuarioParametros.Dir_Sigla#<span style="font-weight:400;font-size:0.8rem;margin-left:10px">(MCU: #application.rsUsuarioParametros.Und_MCU# / STO: #application.rsUsuarioParametros.Und_Codigo#)</span></cfoutput>
+							<cfelse>
+								<span style="color: #e63946;">Unidade Não Localizada</span>
+							</cfif>
+						</span>
 						
 						<!-- Container dos botões de mês -->
 						<div class="meses-container">
 							<span class="meses-label">Mês:</span>
 							<div class="meses-scroll" id="mesesContainer">
-								<button class="btn-mes loading" id="loadingMeses">
-									<i class="fas fa-spinner fa-spin"></i> Carregando...
-								</button>
+								<cfif structKeyExists(application, "rsUsuarioParametros") AND structKeyExists(application.rsUsuarioParametros, "Und_Descricao") AND len(trim(application.rsUsuarioParametros.Und_Descricao))>
+									<button class="btn-mes loading" id="loadingMeses">
+										<i class="fas fa-spinner fa-spin"></i> Carregando...
+									</button>
+								<cfelse>
+									<span style="color: #e63946; font-size: 0.75rem;">Unidade necessária para carregar períodos</span>
+								</cfif>
 							</div>
 						</div>
 					</div>
@@ -141,7 +152,7 @@
 								<cfif FindNoCase("homologacaope", application.auxsite) or FindNoCase("desenvolvimentope", application.auxsite) or FindNoCase("localhost", application.auxsite)>
 									<cfoutput>SERVIDOR: #Ucase(application.auxsite)#</cfoutput>
 								<cfelse>
-									SERVIDOR: PRODUÇÃO
+									SERVIDOR: PRODUÇÃO'
 								</cfif>
 							</span>
 						</div>
@@ -182,6 +193,7 @@
 			
 			// Função para carregar meses disponíveis
 			function carregarMesesDisponiveis() {
+				<cfif structKeyExists(application, "rsUsuarioParametros") AND structKeyExists(application.rsUsuarioParametros, "Und_Descricao") AND len(trim(application.rsUsuarioParametros.Und_Descricao))>
 				$.ajax({
 					url: '../SNCI_AVALIACOES_AUTOMATIZADAS/cfc/DeficienciasControleDados.cfc?method=obterMesesDisponiveis',
 					type: 'POST',
@@ -205,6 +217,10 @@
 						$('#mesesContainer').html('<span style="color: #dc3545; font-size: 0.75rem;">Erro ao carregar períodos</span>');
 					}
 				});
+				<cfelse>
+				// Não carregar meses se unidade não localizada
+				console.warn('Unidade não localizada - não é possível carregar meses');
+				</cfif>
 			}
 			
 			// Função para renderizar botões dos meses

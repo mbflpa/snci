@@ -561,8 +561,7 @@
           var selectedUnidadeText = $(this).find('option:selected').text();
           
           if (selectedUnidade) {
-            console.log('Unidade selecionada:', selectedUnidade);
-            
+           
             // Mostrar loading
             $(this).prop('disabled', true);
             

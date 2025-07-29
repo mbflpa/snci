@@ -405,22 +405,87 @@
         <cfset var result = {}>
         
         <cftry>
-            <cfquery name="updateLotacao" datasource="#application.dsn_avaliacoes_automatizadas#">
-                UPDATE Usuarios 
-                SET Usu_Lotacao = <cfqueryparam value="#arguments.codigoUnidade#" cfsqltype="cf_sql_varchar">,
-                    Usu_LotacaoNome = <cfqueryparam value="#arguments.nomeUnidade#" cfsqltype="cf_sql_varchar">
-                WHERE Usu_Matricula = <cfqueryparam value="#arguments.matriculaUsuario#" cfsqltype="cf_sql_varchar">
+            <!--- Primeiro, verificar se a unidade de destino existe --->
+            <cfquery name="verificaUnidadeDestino" datasource="#application.dsn_avaliacoes_automatizadas#">
+                SELECT COUNT(*) as total, Und_Descricao
+                FROM Unidades 
+                WHERE Und_Codigo = <cfqueryparam value="#arguments.codigoUnidade#" cfsqltype="cf_sql_varchar">
+                AND Und_Status = 'A'
+                GROUP BY Und_Descricao
             </cfquery>
             
-            <cfset result = {
-                "success": true,
-                "message": "Lotação atualizada com sucesso"
-            }>
+            <cfif verificaUnidadeDestino.recordCount EQ 0 OR verificaUnidadeDestino.total EQ 0>
+                <cfset result = {
+                    "success": false,
+                    "message": "Unidade de destino '#arguments.codigoUnidade#' não encontrada ou inativa"
+                }>
+            <cfelse>
+                <!--- Verificar dados atuais do usuário --->
+                <cfquery name="verificaUsuario" datasource="#application.dsn_avaliacoes_automatizadas#">
+                    SELECT Usu_Lotacao, Usu_LotacaoNome
+                    FROM Usuarios 
+                    WHERE Usu_Login = <cfqueryparam value="#CGI.REMOTE_USER#" cfsqltype="cf_sql_varchar">
+                </cfquery>
+                
+                <cfif verificaUsuario.recordCount EQ 0>
+                    <cfset result = {
+                        "success": false,
+                        "message": "Usuário com matrícula '#arguments.matriculaUsuario#' não encontrado"
+                    }>
+                <cfelse>
+                    <!--- Verificar se a lotação atual do usuário existe na tabela Unidades --->
+                    <cfset var lotacaoAtualUsuario = verificaUsuario.Usu_Lotacao>
+                    <cfquery name="verificaLotacaoAtual" datasource="#application.dsn_avaliacoes_automatizadas#">
+                        SELECT COUNT(*) as total
+                        FROM Unidades 
+                        WHERE Und_Codigo = <cfqueryparam value="#lotacaoAtualUsuario#" cfsqltype="cf_sql_varchar">
+                    </cfquery>
+                    
+                    <!--- Se a lotação atual não existe, usar UPDATE mais permissivo --->
+                    <cfif verificaLotacaoAtual.total EQ 0>
+                        <!--- Temporariamente, definir lotação como NULL ou usar MERGE --->
+                        <cfquery name="updateLotacaoComProblema" datasource="#application.dsn_avaliacoes_automatizadas#" result="updateResult">
+                            UPDATE Usuarios 
+                            SET Usu_Lotacao = <cfqueryparam value="#arguments.codigoUnidade#" cfsqltype="cf_sql_varchar">,
+                                Usu_LotacaoNome = <cfqueryparam value="#verificaUnidadeDestino.Und_Descricao#" cfsqltype="cf_sql_varchar">
+                           WHERE Usu_Login = <cfqueryparam value="#CGI.REMOTE_USER#" cfsqltype="cf_sql_varchar">
+                            AND NOT EXISTS (
+                                SELECT 1 FROM Unidades u 
+                                WHERE u.Und_Codigo = Usuarios.Usu_Lotacao
+                            )
+                        </cfquery>
+                        
+                        <cfset result = {
+                            "success": true,
+                            "message": "Lotação atualizada (corrigida lotação inválida anterior: '#lotacaoAtualUsuario#')",
+                            "lotacaoAnterior": lotacaoAtualUsuario,
+                            "lotacaoNova": arguments.codigoUnidade,
+                            "observacao": "Usuário tinha lotação inexistente"
+                        }>
+                    <cfelse>
+                        <!--- Fazer UPDATE normal --->
+                        <cfquery name="updateLotacao" datasource="#application.dsn_avaliacoes_automatizadas#" result="updateResult">
+                            UPDATE Usuarios 
+                            SET Usu_Lotacao = <cfqueryparam value="#arguments.codigoUnidade#" cfsqltype="cf_sql_varchar">,
+                                Usu_LotacaoNome = <cfqueryparam value="#verificaUnidadeDestino.Und_Descricao#" cfsqltype="cf_sql_varchar">
+                            WHERE Usu_Login = <cfqueryparam value="#CGI.REMOTE_USER#" cfsqltype="cf_sql_varchar">
+                        </cfquery>
+                        
+                        <cfset result = {
+                            "success": true,
+                            "message": "Lotação atualizada com sucesso",
+                            "lotacaoAnterior": lotacaoAtualUsuario,
+                            "lotacaoNova": arguments.codigoUnidade
+                        }>
+                    </cfif>
+                </cfif>
+            </cfif>
             
         <cfcatch>
             <cfset result = {
                 "success": false,
-                "message": "Erro ao atualizar lotação: " & cfcatch.message
+                "message": "Erro ao atualizar lotação: " & cfcatch.message,
+                "detail": cfcatch.detail
             }>
         </cfcatch>
         </cftry>

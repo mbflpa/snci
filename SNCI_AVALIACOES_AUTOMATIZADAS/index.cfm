@@ -85,7 +85,7 @@
         
         <div class="content-wrapper" >
             <section class="content">
-    
+   
                 <div style="width: 100%; padding: 0 16px; margin-bottom: 16px;">
                     <cfinclude template="includes/componentes_deficiencias_controle/def_controle_mensagem_card.cfm">
                 </div>

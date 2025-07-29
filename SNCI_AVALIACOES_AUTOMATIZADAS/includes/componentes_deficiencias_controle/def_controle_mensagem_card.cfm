@@ -1,5 +1,22 @@
 <cfprocessingdirective pageencoding="utf-8">
 
+<!--- Verificar se a unidade foi localizada --->
+<cfif NOT structKeyExists(application, "rsUsuarioParametros") OR NOT structKeyExists(application.rsUsuarioParametros, "Und_Descricao") OR NOT len(trim(application.rsUsuarioParametros.Und_Descricao))>
+    <div class="status-card info">
+        <div class="status-badge">Aviso</div>
+        <div class="card-content">
+            <div class="status-icon">
+                <i class="fas fa-building"></i>
+            </div>
+            <div class="status-content">
+                <div class="status-title">Unidade Não Localizada</div>
+                <div class="status-message">Não foi possível identificar a unidade para exibir as informações de deficiências de controle.</div>
+            </div>
+        </div>
+    </div>
+    <cfabort>
+</cfif>
+
 <!--- Usar dados específicos do CFC --->
 <!--- Verificar se há filtro de mês na URL --->
 <cfparam name="url.mesFiltro" default="">
