@@ -171,7 +171,12 @@
 					setTimeout(function() {
 						$('.btn-mes').removeClass('active');
 						$('.btn-mes[data-mes-id="' + mesFiltro + '"]').addClass('active');
-					}, 100);
+						
+						// Também atualizar o link ativo do sidebar
+						if (typeof setActiveLink === 'function') {
+							setActiveLink();
+						}
+					}, 200);
 				}
 			}
 			
@@ -184,6 +189,13 @@
 					success: function(response) {
 						if (response.success && response.data.length > 0) {
 							renderizarBotoesMeses(response.data);
+							// Após renderizar os botões, verificar URL e atualizar sidebar
+							setTimeout(function() {
+								verificarMesSelecionadoURL();
+								if (typeof setActiveLink === 'function') {
+									setActiveLink();
+								}
+							}, 100);
 						} else {
 							$('#mesesContainer').html('<span style="color: #6c757d; font-size: 0.75rem;">Nenhum período disponível</span>');
 						}

@@ -413,7 +413,11 @@
         
         navLinks.forEach(link => {
           link.classList.remove('active');
-          if (link.href === currentUrl) {
+          // Remover parâmetros da URL para comparação
+          const linkUrl = new URL(link.href);
+          const currentUrlObj = new URL(currentUrl);
+          
+          if (linkUrl.pathname === currentUrlObj.pathname) {
             link.classList.add('active');
           }
         });
@@ -430,8 +434,10 @@
           }
         );
 
-        // Definir link ativo
-        setActiveLink();
+        // Aguardar um pouco antes de definir link ativo para dar tempo dos filtros carregarem
+        setTimeout(function() {
+          setActiveLink();
+        }, 500);
       });
 
       // Obtem a URL atual da janela
