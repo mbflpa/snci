@@ -12,6 +12,14 @@
             
             <cfset dadosCompletos = structNew()>
             
+            <!--- Calcular intervalo de datas se há filtro --->
+            <cfif len(trim(arguments.mesAnoFiltro))>
+                <cfset var anoFiltro = listFirst(arguments.mesAnoFiltro, "-")>
+                <cfset var mesFiltro = listLast(arguments.mesAnoFiltro, "-")>
+                <cfset var inicioMes = createDateTime(anoFiltro, mesFiltro, 1, 0, 0, 0)>
+                <cfset var fimMes = dateAdd("d", -1, dateAdd("m", 1, inicioMes))>
+            </cfif>
+            
             <!--- Consulta principal: dados históricos gerais --->
             <cfquery name="rsDadosHistoricos" datasource="#application.dsn_avaliacoes_automatizadas#">
                 SELECT   COUNT(DISTINCT CASE WHEN suspenso = 0 AND sk_grupo_item <> 12 THEN sk_grupo_item END) AS testesEnvolvidos
@@ -31,7 +39,8 @@
                 FROM fato_verificacao f
                 WHERE f.sk_mcu = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.sk_mcu#">
                 <cfif len(trim(arguments.mesAnoFiltro))>
-                  AND FORMAT(f.data_encerramento, 'yyyy-MM') = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.mesAnoFiltro#">
+                  AND f.data_encerramento BETWEEN <cfqueryparam cfsqltype="cf_sql_date" value="#inicioMes#">
+                                               AND <cfqueryparam cfsqltype="cf_sql_date" value="#fimMes#">
                 </cfif>
             </cfquery>
 
@@ -63,7 +72,8 @@
                     WHERE f.sk_mcu = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.sk_mcu#">
                       AND f.sk_grupo_item <> 12
                       AND f.suspenso = 0
-                      AND FORMAT(f.data_encerramento, 'yyyy-MM') = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.mesAnoFiltro#">
+                      AND f.data_encerramento BETWEEN <cfqueryparam cfsqltype="cf_sql_date" value="#inicioMes#">
+                                                   AND <cfqueryparam cfsqltype="cf_sql_date" value="#fimMes#">
                     GROUP BY p.MANCHETE, p.sk_grupo_item, FORMAT(f.data_encerramento, 'yyyy-MM')
                     ORDER BY p.MANCHETE
                 <cfelse>
@@ -117,6 +127,11 @@
         
         <!--- Para resumo geral, sempre buscar dados históricos acumulados --->
         <cfif len(trim(arguments.mesAnoFiltro))>
+            <!--- Calcular intervalo de datas --->
+            <cfset var anoFiltro = listFirst(arguments.mesAnoFiltro, "-")>
+            <cfset var mesFiltro = listLast(arguments.mesAnoFiltro, "-")>
+            <cfset var fimMes = dateAdd("d", -1, dateAdd("m", 1, createDateTime(anoFiltro, mesFiltro, 1, 0, 0, 0)))>
+            
             <!--- Buscar dados históricos até o mês selecionado --->
             <cfquery name="rsDadosHistoricosAcumulados" datasource="#application.dsn_avaliacoes_automatizadas#">
                 SELECT   COUNT(DISTINCT CASE WHEN suspenso = 0 AND sk_grupo_item <> 12 THEN sk_grupo_item END) AS testesEnvolvidos
@@ -135,7 +150,7 @@
                         ,SUM(nr_reincidente) AS reincidencia
                 FROM fato_verificacao f
                 WHERE f.sk_mcu = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.sk_mcu#">
-                  AND FORMAT(f.data_encerramento, 'yyyy-MM') <= <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.mesAnoFiltro#">
+                  AND f.data_encerramento <= <cfqueryparam cfsqltype="cf_sql_date" value="#fimMes#">
             </cfquery>
             
             <cfset var resultado = structNew()>
@@ -180,12 +195,17 @@
         
         <!--- Se há filtro específico, buscar dados do mês filtrado e do mês anterior para comparação --->
         <cfif len(trim(arguments.mesAnoFiltro))>
-            <!--- Calcular mês anterior ao filtro --->
+            <!--- Calcular intervalos de datas --->
             <cfset var anoFiltro = listFirst(arguments.mesAnoFiltro, "-")>
             <cfset var mesFiltro = listLast(arguments.mesAnoFiltro, "-")>
             <cfset var dataFiltro = createDate(anoFiltro, mesFiltro, 1)>
             <cfset var dataAnterior = dateAdd("m", -1, dataFiltro)>
             <cfset var mesAnteriorCalculado = dateFormat(dataAnterior, "yyyy-mm")>
+            
+            <cfset var inicioMesAtual = createDateTime(anoFiltro, mesFiltro, 1, 0, 0, 0)>
+            <cfset var fimMesAtual = dateAdd("d", -1, dateAdd("m", 1, inicioMesAtual))>
+            <cfset var inicioMesAnterior = createDateTime(year(dataAnterior), month(dataAnterior), 1, 0, 0, 0)>
+            <cfset var fimMesAnterior = dateAdd("d", -1, dateAdd("m", 1, inicioMesAnterior))>
             
             <!--- Buscar dados comparativos específicos --->
             <cfquery name="rsDadosComparativos" datasource="#application.dsn_avaliacoes_automatizadas#">
@@ -199,9 +219,12 @@
                 WHERE f.sk_mcu = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.sk_mcu#">
                   AND f.sk_grupo_item <> 12
                   AND f.suspenso = 0
-                  AND FORMAT(f.data_encerramento, 'yyyy-MM') IN (
-                    <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.mesAnoFiltro#">,
-                    <cfqueryparam cfsqltype="cf_sql_varchar" value="#mesAnteriorCalculado#">
+                  AND (
+                    (f.data_encerramento BETWEEN <cfqueryparam cfsqltype="cf_sql_date" value="#inicioMesAtual#">
+                                              AND <cfqueryparam cfsqltype="cf_sql_date" value="#fimMesAtual#">)
+                    OR
+                    (f.data_encerramento BETWEEN <cfqueryparam cfsqltype="cf_sql_date" value="#inicioMesAnterior#">
+                                              AND <cfqueryparam cfsqltype="cf_sql_date" value="#fimMesAnterior#">)
                   )
                 GROUP BY p.MANCHETE, p.sk_grupo_item, FORMAT(f.data_encerramento, 'yyyy-MM')
                 ORDER BY mes_ano DESC, p.MANCHETE
@@ -621,4 +644,3 @@
     </cffunction>
 
 </cfcomponent>
-                   
