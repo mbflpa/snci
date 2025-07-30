@@ -27,7 +27,7 @@
             
             <!--- Consulta principal: dados históricos do período específico --->
             <cfquery name="rsDadosHistoricos" datasource="#application.dsn_avaliacoes_automatizadas#">
-                SELECT   COUNT(DISTINCT CASE WHEN suspenso = 0 THEN sk_grupo_item END) AS testesEnvolvidos
+                SELECT   COUNT(DISTINCT CASE WHEN NOT f.nm_teste in ('230_8','239_4_V','239_6_V','238_2_V') THEN sk_grupo_item END) AS testesEnvolvidos
                         ,SUM(CASE WHEN sigla_apontamento = 'N' THEN NC_Eventos ELSE 0 END) AS totalEventos
                         ,COUNT(CASE WHEN sigla_apontamento in('C','N') THEN sigla_apontamento END) AS testesAplicados
                         ,COUNT(CASE WHEN sigla_apontamento = 'C' THEN sigla_apontamento END) AS conformes
@@ -53,7 +53,7 @@
             <!--- Consulta adicional: dados históricos acumulados (apenas quando há filtro) --->
             <cfif len(trim(arguments.mesAnoFiltro))>
                 <cfquery name="rsDadosHistoricosAcumulados" datasource="#application.dsn_avaliacoes_automatizadas#">
-                    SELECT   COUNT(DISTINCT CASE WHEN suspenso = 0  THEN sk_grupo_item END) AS testesEnvolvidos
+                    SELECT   COUNT(DISTINCT CASE WHEN  NOT f.nm_teste in ('230_8','239_4_V','239_6_V','238_2_V')  THEN sk_grupo_item END) AS testesEnvolvidos
                             ,SUM(NC_Eventos) AS totalEventos
                             ,COUNT(CASE WHEN sigla_apontamento in('C','N') THEN sigla_apontamento END) AS testesAplicados
                             ,COUNT(CASE WHEN sigla_apontamento = 'C' THEN sigla_apontamento END) AS conformes
