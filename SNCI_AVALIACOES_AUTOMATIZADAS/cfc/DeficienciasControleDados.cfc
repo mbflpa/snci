@@ -18,9 +18,14 @@
                 <cfset var mesFiltro = listLast(arguments.mesAnoFiltro, "-")>
                 <cfset var inicioMes = createDateTime(anoFiltro, mesFiltro, 1, 0, 0, 0)>
                 <cfset var fimMes = dateAdd("d", -1, dateAdd("m", 1, inicioMes))>
+                
+                <!--- Calcular mês anterior para comparação --->
+                <cfset var dataAnterior = dateAdd("m", -1, createDate(anoFiltro, mesFiltro, 1))>
+                <cfset var inicioMesAnterior = createDateTime(year(dataAnterior), month(dataAnterior), 1, 0, 0, 0)>
+                <cfset var fimMesAnterior = dateAdd("d", -1, dateAdd("m", 1, inicioMesAnterior))>
             </cfif>
             
-            <!--- Consulta principal: dados históricos gerais --->
+            <!--- Consulta principal: dados históricos do período específico --->
             <cfquery name="rsDadosHistoricos" datasource="#application.dsn_avaliacoes_automatizadas#">
                 SELECT   COUNT(DISTINCT CASE WHEN suspenso = 0 AND sk_grupo_item <> 12 THEN sk_grupo_item END) AS testesEnvolvidos
                         ,SUM(CASE WHEN sigla_apontamento = 'N' THEN NC_Eventos ELSE 0 END) AS totalEventos
@@ -43,6 +48,32 @@
                                                AND <cfqueryparam cfsqltype="cf_sql_date" value="#fimMes#">
                 </cfif>
             </cfquery>
+
+            <!--- Consulta adicional: dados históricos acumulados (apenas quando há filtro) --->
+            <cfif len(trim(arguments.mesAnoFiltro))>
+                <cfquery name="rsDadosHistoricosAcumulados" datasource="#application.dsn_avaliacoes_automatizadas#">
+                    SELECT   COUNT(DISTINCT CASE WHEN suspenso = 0 AND sk_grupo_item <> 12 THEN sk_grupo_item END) AS testesEnvolvidos
+                            ,SUM(NC_Eventos) AS totalEventos
+                            ,COUNT(CASE WHEN sigla_apontamento in('C','N') THEN sigla_apontamento END) AS testesAplicados
+                            ,COUNT(CASE WHEN sigla_apontamento = 'C' THEN sigla_apontamento END) AS conformes
+                            ,COUNT(CASE WHEN sigla_apontamento = 'N' THEN sigla_apontamento END) AS deficienciasControle
+                            ,SUM(
+                                    COALESCE(valor_falta, 0) + 
+                                    COALESCE(valor_sobra, 0) + 
+                                    CASE 
+                                        WHEN nm_teste <> '239-4' THEN COALESCE(valor_risco, 0)
+                                        ELSE 0
+                                    END
+                                ) AS valorEnvolvido
+                            ,SUM(nr_reincidente) AS reincidencia
+                    FROM fato_verificacao f
+                    WHERE f.sk_mcu = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.sk_mcu#">
+                      AND f.data_encerramento <= <cfqueryparam cfsqltype="cf_sql_date" value="#fimMes#">
+                </cfquery>
+                
+                <!--- Armazenar dados históricos acumulados --->
+                <cfset dadosCompletos.dadosHistoricosAcumulados = rsDadosHistoricosAcumulados>
+            </cfif>
 
             <!--- Consulta: últimos dois meses disponíveis (ou mês específico se filtrado) --->
             <cfquery name="rsUltimosMeses" datasource="#application.dsn_avaliacoes_automatizadas#">
@@ -72,10 +103,15 @@
                     WHERE f.sk_mcu = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.sk_mcu#">
                       AND f.sk_grupo_item <> 12
                       AND f.suspenso = 0
-                      AND f.data_encerramento BETWEEN <cfqueryparam cfsqltype="cf_sql_date" value="#inicioMes#">
-                                                   AND <cfqueryparam cfsqltype="cf_sql_date" value="#fimMes#">
+                      AND (
+                        (f.data_encerramento BETWEEN <cfqueryparam cfsqltype="cf_sql_date" value="#inicioMes#">
+                                                 AND <cfqueryparam cfsqltype="cf_sql_date" value="#fimMes#">)
+                        OR
+                        (f.data_encerramento BETWEEN <cfqueryparam cfsqltype="cf_sql_date" value="#inicioMesAnterior#">
+                                                 AND <cfqueryparam cfsqltype="cf_sql_date" value="#fimMesAnterior#">)
+                      )
                     GROUP BY p.MANCHETE, p.sk_grupo_item, FORMAT(f.data_encerramento, 'yyyy-MM')
-                    ORDER BY p.MANCHETE
+                    ORDER BY mes_ano DESC, p.MANCHETE
                 <cfelse>
                     WITH UltimosMeses AS (
                         SELECT TOP 2 FORMAT(data_encerramento, 'yyyy-MM') AS mes_ano
@@ -125,49 +161,23 @@
             <cfset arguments.sk_mcu = val(arguments.sk_mcu)>
         </cfif>
         
-        <!--- Para resumo geral, sempre buscar dados históricos acumulados --->
-        <cfif len(trim(arguments.mesAnoFiltro))>
-            <!--- Calcular intervalo de datas --->
-            <cfset var anoFiltro = listFirst(arguments.mesAnoFiltro, "-")>
-            <cfset var mesFiltro = listLast(arguments.mesAnoFiltro, "-")>
-            <cfset var fimMes = dateAdd("d", -1, dateAdd("m", 1, createDateTime(anoFiltro, mesFiltro, 1, 0, 0, 0)))>
-            
-            <!--- Buscar dados históricos até o mês selecionado --->
-            <cfquery name="rsDadosHistoricosAcumulados" datasource="#application.dsn_avaliacoes_automatizadas#">
-                SELECT   COUNT(DISTINCT CASE WHEN suspenso = 0 AND sk_grupo_item <> 12 THEN sk_grupo_item END) AS testesEnvolvidos
-                        ,SUM(NC_Eventos) AS totalEventos
-                        ,COUNT(CASE WHEN sigla_apontamento in('C','N') THEN sigla_apontamento END) AS testesAplicados
-                        ,COUNT(CASE WHEN sigla_apontamento = 'C' THEN sigla_apontamento END) AS conformes
-                        ,COUNT(CASE WHEN sigla_apontamento = 'N' THEN sigla_apontamento END) AS deficienciasControle
-                        ,SUM(
-                                COALESCE(valor_falta, 0) + 
-                                COALESCE(valor_sobra, 0) + 
-                                CASE 
-                                    WHEN nm_teste <> '239-4' THEN COALESCE(valor_risco, 0)
-                                    ELSE 0
-                                END
-                            ) AS valorEnvolvido
-                        ,SUM(nr_reincidente) AS reincidencia
-                FROM fato_verificacao f
-                WHERE f.sk_mcu = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.sk_mcu#">
-                  AND f.data_encerramento <= <cfqueryparam cfsqltype="cf_sql_date" value="#fimMes#">
-            </cfquery>
-            
-            <cfset var resultado = structNew()>
+        <!--- Sempre usar dados em cache da função buscarDadosCompletos --->
+        <cfset var dadosBrutos = buscarDadosCompletos(arguments.sk_mcu, arguments.mesAnoFiltro)>
+        <cfset var resultado = structNew()>
+        
+        <!--- Para resumo geral com filtro, usar dados históricos acumulados --->
+        <cfif len(trim(arguments.mesAnoFiltro)) AND structKeyExists(dadosBrutos, "dadosHistoricosAcumulados")>
             <cfset resultado.dadosHistoricos = {
-                testesEnvolvidos = rsDadosHistoricosAcumulados.testesEnvolvidos,
-                totalEventos = rsDadosHistoricosAcumulados.totalEventos,
-                testesAplicados = rsDadosHistoricosAcumulados.testesAplicados,
-                conformes = rsDadosHistoricosAcumulados.conformes,
-                deficienciasControle = rsDadosHistoricosAcumulados.deficienciasControle,
-                valorEnvolvido = rsDadosHistoricosAcumulados.valorEnvolvido,
-                reincidencia = rsDadosHistoricosAcumulados.reincidencia
+                testesEnvolvidos = dadosBrutos.dadosHistoricosAcumulados.testesEnvolvidos,
+                totalEventos = dadosBrutos.dadosHistoricosAcumulados.totalEventos,
+                testesAplicados = dadosBrutos.dadosHistoricosAcumulados.testesAplicados,
+                conformes = dadosBrutos.dadosHistoricosAcumulados.conformes,
+                deficienciasControle = dadosBrutos.dadosHistoricosAcumulados.deficienciasControle,
+                valorEnvolvido = dadosBrutos.dadosHistoricosAcumulados.valorEnvolvido,
+                reincidencia = dadosBrutos.dadosHistoricosAcumulados.reincidencia
             }>
         <cfelse>
-            <!--- Usar lógica original sem filtro --->
-            <cfset var dadosBrutos = buscarDadosCompletos(arguments.sk_mcu, arguments.mesAnoFiltro)>
-            <cfset var resultado = structNew()>
-            
+            <!--- Para casos sem filtro, usar dados históricos normais --->
             <cfset resultado.dadosHistoricos = {
                 testesEnvolvidos = dadosBrutos.dadosHistoricos.testesEnvolvidos,
                 totalEventos = dadosBrutos.dadosHistoricos.totalEventos,
@@ -193,68 +203,23 @@
             <cfset arguments.sk_mcu = val(arguments.sk_mcu)>
         </cfif>
         
-        <!--- Se há filtro específico, buscar dados do mês filtrado e do mês anterior para comparação --->
+        <!--- Sempre usar dados em cache primeiro --->
+        <cfset var dadosBrutos = buscarDadosCompletos(arguments.sk_mcu, arguments.mesAnoFiltro)>
+        
+        <!--- Definir informações dos meses --->
         <cfif len(trim(arguments.mesAnoFiltro))>
-            <!--- Calcular intervalos de datas --->
+            <!--- Para filtro específico, calcular mês anterior --->
             <cfset var anoFiltro = listFirst(arguments.mesAnoFiltro, "-")>
             <cfset var mesFiltro = listLast(arguments.mesAnoFiltro, "-")>
-            <cfset var dataFiltro = createDate(anoFiltro, mesFiltro, 1)>
-            <cfset var dataAnterior = dateAdd("m", -1, dataFiltro)>
+            <cfset var dataAnterior = dateAdd("m", -1, createDate(anoFiltro, mesFiltro, 1))>
             <cfset var mesAnteriorCalculado = dateFormat(dataAnterior, "yyyy-mm")>
             
-            <cfset var inicioMesAtual = createDateTime(anoFiltro, mesFiltro, 1, 0, 0, 0)>
-            <cfset var fimMesAtual = dateAdd("d", -1, dateAdd("m", 1, inicioMesAtual))>
-            <cfset var inicioMesAnterior = createDateTime(year(dataAnterior), month(dataAnterior), 1, 0, 0, 0)>
-            <cfset var fimMesAnterior = dateAdd("d", -1, dateAdd("m", 1, inicioMesAnterior))>
-            
-            <!--- Buscar dados comparativos específicos --->
-            <cfquery name="rsDadosComparativos" datasource="#application.dsn_avaliacoes_automatizadas#">
-                SELECT 
-                    p.MANCHETE,
-                    p.sk_grupo_item,
-                    FORMAT(f.data_encerramento, 'yyyy-MM') AS mes_ano,
-                    SUM(f.NC_Eventos) AS total_eventos
-                FROM fato_verificacao f
-                INNER JOIN dim_teste_processos p ON f.sk_grupo_item = p.sk_grupo_item
-                WHERE f.sk_mcu = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.sk_mcu#">
-                  AND f.sk_grupo_item <> 12
-                  AND f.suspenso = 0
-                  AND (
-                    (f.data_encerramento BETWEEN <cfqueryparam cfsqltype="cf_sql_date" value="#inicioMesAtual#">
-                                              AND <cfqueryparam cfsqltype="cf_sql_date" value="#fimMesAtual#">)
-                    OR
-                    (f.data_encerramento BETWEEN <cfqueryparam cfsqltype="cf_sql_date" value="#inicioMesAnterior#">
-                                              AND <cfqueryparam cfsqltype="cf_sql_date" value="#fimMesAnterior#">)
-                  )
-                GROUP BY p.MANCHETE, p.sk_grupo_item, FORMAT(f.data_encerramento, 'yyyy-MM')
-                ORDER BY mes_ano DESC, p.MANCHETE
-            </cfquery>
-            
-            <!--- Definir informações dos meses para comparação --->
             <cfset var mesAtualId = arguments.mesAnoFiltro>
             <cfset var mesAnteriorId = mesAnteriorCalculado>
             <cfset var nomeMesAtual = monthAsString(val(mesFiltro)) & "/" & anoFiltro>
             <cfset var nomeMesAnterior = monthAsString(month(dataAnterior)) & "/" & year(dataAnterior)>
-            
-            <!--- Processar dados por assunto --->
-            <cfset var dadosAssunto = {}>
-            <cfloop query="rsDadosComparativos">
-                <cfset var chave = rereplace(MANCHETE, "[^A-Za-z0-9]", "", "all")>
-                <cfif NOT structKeyExists(dadosAssunto, chave)>
-                    <cfset dadosAssunto[chave] = { titulo = MANCHETE, anterior = 0, atual = 0 }>
-                </cfif>
-                <cfif mes_ano EQ mesAnteriorId>
-                    <cfset dadosAssunto[chave].anterior = total_eventos>
-                <cfelseif mes_ano EQ mesAtualId>
-                    <cfset dadosAssunto[chave].atual = total_eventos>
-                </cfif>
-            </cfloop>
-            
         <cfelse>
-            <!--- Usar a lógica original para sem filtro --->
-            <cfset var dadosBrutos = buscarDadosCompletos(arguments.sk_mcu, arguments.mesAnoFiltro)>
-            
-            <!--- Definir informações dos meses --->
+            <!--- Para casos sem filtro, usar dados dos últimos dois meses --->
             <cfif dadosBrutos.ultimosMeses.recordCount GTE 2>
                 <cfset var mesAtualId = dadosBrutos.ultimosMeses.mes_ano[1]>
                 <cfset var mesAnteriorId = dadosBrutos.ultimosMeses.mes_ano[2]>
@@ -271,21 +236,21 @@
                 <cfset var nomeMesAtual = "Mês Atual">
                 <cfset var nomeMesAnterior = "Mês Anterior">
             </cfif>
-
-            <!--- Processar dados por assunto --->
-            <cfset var dadosAssunto = {}>
-            <cfloop query="dadosBrutos.dadosDetalhados">
-                <cfset var chave = rereplace(MANCHETE, "[^A-Za-z0-9]", "", "all")>
-                <cfif NOT structKeyExists(dadosAssunto, chave)>
-                    <cfset dadosAssunto[chave] = { titulo = MANCHETE, anterior = 0, atual = 0 }>
-                </cfif>
-                <cfif mes_ano EQ mesAnteriorId>
-                    <cfset dadosAssunto[chave].anterior = total_eventos>
-                <cfelseif mes_ano EQ mesAtualId>
-                    <cfset dadosAssunto[chave].atual = total_eventos>
-                </cfif>
-            </cfloop>
         </cfif>
+
+        <!--- Processar dados por assunto usando dados já em cache --->
+        <cfset var dadosAssunto = {}>
+        <cfloop query="dadosBrutos.dadosDetalhados">
+            <cfset var chave = rereplace(MANCHETE, "[^A-Za-z0-9]", "", "all")>
+            <cfif NOT structKeyExists(dadosAssunto, chave)>
+                <cfset dadosAssunto[chave] = { titulo = MANCHETE, anterior = 0, atual = 0 }>
+            </cfif>
+            <cfif mes_ano EQ mesAnteriorId>
+                <cfset dadosAssunto[chave].anterior = total_eventos>
+            <cfelseif mes_ano EQ mesAtualId>
+                <cfset dadosAssunto[chave].atual = total_eventos>
+            </cfif>
+        </cfloop>
 
         <cfset var resultado = structNew()>
         <cfset resultado.meses = {
@@ -644,3 +609,4 @@
     </cffunction>
 
 </cfcomponent>
+        
