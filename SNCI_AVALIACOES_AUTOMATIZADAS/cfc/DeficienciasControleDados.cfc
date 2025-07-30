@@ -428,7 +428,7 @@
                        <cfif (FindNoCase("localhost", application.auxsite))>
                            'CORREIOSNET\80859992'
                        <cfelse>     
-                           <cfqueryparam value="#application.rsUsuarioParametros.Usu_Login#" cfsqltype="cf_sql_varchar">
+                           <cfqueryparam value="#application.loginCGI#" cfsqltype="cf_sql_varchar">
                        </cfif>
                 </cfquery>
                 
@@ -457,7 +457,7 @@
                                 <cfif (FindNoCase("localhost", application.auxsite))>
                                     'CORREIOSNET\80859992'
                                 <cfelse>     
-                                    <cfqueryparam value="#application.rsUsuarioParametros.Usu_Login#" cfsqltype="cf_sql_varchar">
+                                    <cfqueryparam value="#application.loginCGI#" cfsqltype="cf_sql_varchar">
                                 </cfif>
                             AND NOT EXISTS (
                                 SELECT 1 FROM Unidades u 
@@ -482,7 +482,7 @@
                                 <cfif (FindNoCase("localhost", application.auxsite))>
                                     'CORREIOSNET\80859992'
                                 <cfelse>     
-                                    <cfqueryparam value="#application.rsUsuarioParametros.Usu_Login#" cfsqltype="cf_sql_varchar">
+                                    <cfqueryparam value="#application.loginCGI#" cfsqltype="cf_sql_varchar">
                                 </cfif>
                         </cfquery>
                         
