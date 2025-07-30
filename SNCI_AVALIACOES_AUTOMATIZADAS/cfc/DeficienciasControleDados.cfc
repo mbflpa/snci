@@ -424,7 +424,12 @@
                 <cfquery name="verificaUsuario" datasource="#application.dsn_avaliacoes_automatizadas#">
                     SELECT Usu_Lotacao, Usu_LotacaoNome
                     FROM Usuarios 
-                    WHERE Usu_Login = <cfqueryparam value="#application.loginCGI#" cfsqltype="cf_sql_varchar">
+                    WHERE Usu_Login = 
+                       <cfif (FindNoCase("localhost", application.auxsite))>
+                           'CORREIOSNET\80859992'
+                       <cfelse>     
+                           <cfqueryparam value="#application.rsUsuarioParametros.Usu_Login#" cfsqltype="cf_sql_varchar">
+                       </cfif>
                 </cfquery>
                 
                 <cfif verificaUsuario.recordCount EQ 0>
@@ -448,7 +453,12 @@
                             UPDATE Usuarios 
                             SET Usu_Lotacao = <cfqueryparam value="#arguments.codigoUnidade#" cfsqltype="cf_sql_varchar">,
                                 Usu_LotacaoNome = <cfqueryparam value="#verificaUnidadeDestino.Und_Descricao#" cfsqltype="cf_sql_varchar">
-                           WHERE Usu_Login = <cfqueryparam value="#application.loginCGI#" cfsqltype="cf_sql_varchar">
+                           WHERE Usu_Login = 
+                                <cfif (FindNoCase("localhost", application.auxsite))>
+                                    'CORREIOSNET\80859992'
+                                <cfelse>     
+                                    <cfqueryparam value="#application.rsUsuarioParametros.Usu_Login#" cfsqltype="cf_sql_varchar">
+                                </cfif>
                             AND NOT EXISTS (
                                 SELECT 1 FROM Unidades u 
                                 WHERE u.Und_Codigo = Usuarios.Usu_Lotacao
@@ -468,7 +478,12 @@
                             UPDATE Usuarios 
                             SET Usu_Lotacao = <cfqueryparam value="#arguments.codigoUnidade#" cfsqltype="cf_sql_varchar">,
                                 Usu_LotacaoNome = <cfqueryparam value="#verificaUnidadeDestino.Und_Descricao#" cfsqltype="cf_sql_varchar">
-                            WHERE Usu_Login = <cfqueryparam value="#application.loginCGI#" cfsqltype="cf_sql_varchar">
+                            WHERE Usu_Login = 
+                                <cfif (FindNoCase("localhost", application.auxsite))>
+                                    'CORREIOSNET\80859992'
+                                <cfelse>     
+                                    <cfqueryparam value="#application.rsUsuarioParametros.Usu_Login#" cfsqltype="cf_sql_varchar">
+                                </cfif>
                         </cfquery>
                         
                         <cfset result = {
