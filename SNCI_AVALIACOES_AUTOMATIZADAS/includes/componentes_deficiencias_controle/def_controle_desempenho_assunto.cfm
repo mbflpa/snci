@@ -59,6 +59,8 @@
             display: flex;
             flex-direction: column;
             gap: 12px;
+            max-height: 500px; /* Altura máxima limitada */
+            overflow-y: auto; /* Scroll vertical quando necessário */
         }
 
         .snci-desempenho-assunto .comparison-container {
@@ -67,6 +69,27 @@
             border-radius: 12px;
             box-shadow: 0 4px 8px rgba(0,0,0,0.05);
             border: 1px solid #e2e8f0;
+            flex: 1;
+            min-height: 0; /* Permite que o container encolha */
+        }
+
+        /* Estilização da barra de rolagem */
+        .snci-desempenho-assunto .desempenho-container::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .snci-desempenho-assunto .desempenho-container::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 4px;
+        }
+
+        .snci-desempenho-assunto .desempenho-container::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+
+        .snci-desempenho-assunto .desempenho-container::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
         }
 
         .snci-desempenho-assunto .comparison-container h2 {
@@ -75,7 +98,10 @@
             margin-bottom: 16px;
             color: #1e293b;
             padding-bottom: 6px;
-            position: relative;
+            position: sticky; /* Mantém o título fixo no topo durante o scroll */
+            top: 0;
+            background: #fff;
+            z-index: 10;
         }
 
         .snci-desempenho-assunto .comparison-container h2::after {
@@ -174,11 +200,14 @@
         .snci-desempenho-assunto .decrease { color: #2a9d8f; }
 
         @media (max-width: 768px) {
+            .snci-desempenho-assunto .desempenho-container {
+                max-height: 400px; /* Altura menor em mobile */
+            }
+            
             .snci-desempenho-assunto .comparison-item {
                 grid-template-columns: 1fr;
                 gap: 8px;
                 padding: 12px 0;
-                
             }
 
             .snci-desempenho-assunto .item-change {
@@ -204,44 +233,43 @@
             <h2>Desempenho por Assunto <span style="font-size: 0.85rem;">(<cfoutput>#nomeMesAtual# x #nomeMesAnterior#</cfoutput>)</span></h2>
             <cfloop collection="#dados#" item="chave">
                 <cfset item = dados[chave]>
-                <cfif item.anterior GT 0 OR item.atual GT 0>
-                    <div class="comparison-item">
-                        <div class="item-title"><cfoutput>#item.titulo# (#item.teste#)</cfoutput></div>
+                <!--- Remover condição que filtra valores zero --->
+                <div class="comparison-item">
+                    <div class="item-title"><cfoutput>#item.titulo# (#item.teste#)</cfoutput></div>
 
-                        <div class="item-bars">
-                            <div class="label">
-                                <span><cfoutput>#nomeMesAnterior#</cfoutput></span>
-                                <span><cfoutput>#item.anterior#</cfoutput></span>
-                            </div>
-                            <div class="bar-wrapper">
-                                <div class="bar anterior animated-bar" style="width:0%;" data-width="<cfoutput>#(maxValor GT 0 ? round(item.anterior/maxValor*100) : 0)#%</cfoutput>"></div>
-                            </div>
-
-                            <div class="label mt-1">
-                                <span><cfoutput>#nomeMesAtual#</cfoutput></span>
-                                <span><cfoutput>#item.atual#</cfoutput></span>
-                            </div>
-                            <div class="bar-wrapper">
-                                <div class="bar atual animated-bar" style="width:0%;" data-width="<cfoutput>#(maxValor GT 0 ? round(item.atual/maxValor*100) : 0)#%</cfoutput>"></div>
-                            </div>
+                    <div class="item-bars">
+                        <div class="label">
+                            <span><cfoutput>#nomeMesAnterior#</cfoutput></span>
+                            <span><cfoutput>#item.anterior#</cfoutput></span>
+                        </div>
+                        <div class="bar-wrapper">
+                            <div class="bar anterior animated-bar" style="width:0%;" data-width="<cfoutput>#(maxValor GT 0 ? round(item.anterior/maxValor*100) : 0)#%</cfoutput>"></div>
                         </div>
 
-                        <div class="item-change <cfoutput>#item.tipo#</cfoutput>">
-                            <span class="value">
-                                <cfif item.tipo eq "increase">↑<cfelse>↓</cfif>
-                                <cfoutput>#abs(item.delta)#</cfoutput>
-                            </span>
-                            <span class="status">
-                                <cfif item.anterior GT 0>
-                                    <cfoutput>#abs(item.percentual)#%</cfoutput>
-                                <cfelse>
-                                    <cfoutput>#(item.atual GT 0 ? 100 : 0)#%</cfoutput>
-                                </cfif>
-                                <cfif item.tipo eq "increase"> de aumento<cfelse> de redução</cfif>
-                            </span>
+                        <div class="label mt-1">
+                            <span><cfoutput>#nomeMesAtual#</cfoutput></span>
+                            <span><cfoutput>#item.atual#</cfoutput></span>
+                        </div>
+                        <div class="bar-wrapper">
+                            <div class="bar atual animated-bar" style="width:0%;" data-width="<cfoutput>#(maxValor GT 0 ? round(item.atual/maxValor*100) : 0)#%</cfoutput>"></div>
                         </div>
                     </div>
-                </cfif>
+
+                    <div class="item-change <cfoutput>#item.tipo#</cfoutput>">
+                        <span class="value">
+                            <cfif item.tipo eq "increase">↑<cfelse>↓</cfif>
+                            <cfoutput>#abs(item.delta)#</cfoutput>
+                        </span>
+                        <span class="status">
+                            <cfif item.anterior GT 0>
+                                <cfoutput>#abs(item.percentual)#%</cfoutput>
+                            <cfelse>
+                                <cfoutput>#(item.atual GT 0 ? 100 : 0)#%</cfoutput>
+                            </cfif>
+                            <cfif item.tipo eq "increase"> de aumento<cfelse> de redução</cfif>
+                        </span>
+                    </div>
+                </div>
             </cfloop>
         </div>
     </div>

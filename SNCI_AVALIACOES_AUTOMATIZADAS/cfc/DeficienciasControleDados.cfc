@@ -100,12 +100,11 @@
                         p.sk_grupo_item,
                         p.TESTE AS teste,
                         FORMAT(f.data_encerramento, 'yyyy-MM') AS mes_ano,
-                        SUM(f.NC_Eventos) AS total_eventos
+                        COALESCE(f.NC_Eventos, 0) AS total_eventos
                     FROM fato_verificacao f
                     INNER JOIN dim_teste_processos p ON f.sk_grupo_item = p.sk_grupo_item
                     WHERE f.sk_mcu = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.sk_mcu#">
-                      AND f.sk_grupo_item <> 12
-                      AND f.suspenso = 0
+                      AND f.sk_grupo_item <> 12 
                       AND (
                         (f.data_encerramento BETWEEN <cfqueryparam cfsqltype="cf_sql_date" value="#inicioMes#">
                                                  AND <cfqueryparam cfsqltype="cf_sql_date" value="#fimMes#">)
@@ -113,7 +112,7 @@
                         (f.data_encerramento BETWEEN <cfqueryparam cfsqltype="cf_sql_date" value="#inicioMesAnterior#">
                                                  AND <cfqueryparam cfsqltype="cf_sql_date" value="#fimMesAnterior#">)
                       )
-                    GROUP BY p.MANCHETE, p.sk_grupo_item,  p.TESTE, FORMAT(f.data_encerramento, 'yyyy-MM')
+                   
                     ORDER BY mes_ano DESC, p.MANCHETE
                 <cfelse>
                     WITH UltimosMeses AS (
@@ -130,14 +129,13 @@
                         p.sk_grupo_item,
                         p.TESTE AS teste,
                         FORMAT(f.data_encerramento, 'yyyy-MM') AS mes_ano,
-                        SUM(f.NC_Eventos) AS total_eventos
+                        COALESCE(f.NC_Eventos, 0) AS total_eventos
                     FROM fato_verificacao f
                     INNER JOIN dim_teste_processos p ON f.sk_grupo_item = p.sk_grupo_item
                     WHERE f.sk_mcu = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.sk_mcu#">
-                      AND f.sk_grupo_item <> 12
-                      AND f.suspenso = 0
-                      AND FORMAT(f.data_encerramento, 'yyyy-MM') IN (SELECT mes_ano FROM UltimosMeses)
-                    GROUP BY p.MANCHETE, p.sk_grupo_item, p.TESTE, FORMAT(f.data_encerramento, 'yyyy-MM')
+                      AND f.sk_grupo_item <> 12 
+                          AND FORMAT(f.data_encerramento, 'yyyy-MM') IN (SELECT mes_ano FROM UltimosMeses)
+                   
                     ORDER BY mes_ano DESC, p.MANCHETE
                 </cfif>
             </cfquery>
