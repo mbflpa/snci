@@ -98,6 +98,7 @@
                     SELECT 
                         p.MANCHETE,
                         p.sk_grupo_item,
+                        p.TESTE AS teste,
                         FORMAT(f.data_encerramento, 'yyyy-MM') AS mes_ano,
                         SUM(f.NC_Eventos) AS total_eventos
                     FROM fato_verificacao f
@@ -112,7 +113,7 @@
                         (f.data_encerramento BETWEEN <cfqueryparam cfsqltype="cf_sql_date" value="#inicioMesAnterior#">
                                                  AND <cfqueryparam cfsqltype="cf_sql_date" value="#fimMesAnterior#">)
                       )
-                    GROUP BY p.MANCHETE, p.sk_grupo_item, FORMAT(f.data_encerramento, 'yyyy-MM')
+                    GROUP BY p.MANCHETE, p.sk_grupo_item,  p.TESTE, FORMAT(f.data_encerramento, 'yyyy-MM')
                     ORDER BY mes_ano DESC, p.MANCHETE
                 <cfelse>
                     WITH UltimosMeses AS (
@@ -127,6 +128,7 @@
                     SELECT 
                         p.MANCHETE,
                         p.sk_grupo_item,
+                        p.TESTE AS teste,
                         FORMAT(f.data_encerramento, 'yyyy-MM') AS mes_ano,
                         SUM(f.NC_Eventos) AS total_eventos
                     FROM fato_verificacao f
@@ -135,7 +137,7 @@
                       AND f.sk_grupo_item <> 12
                       AND f.suspenso = 0
                       AND FORMAT(f.data_encerramento, 'yyyy-MM') IN (SELECT mes_ano FROM UltimosMeses)
-                    GROUP BY p.MANCHETE, p.sk_grupo_item, FORMAT(f.data_encerramento, 'yyyy-MM')
+                    GROUP BY p.MANCHETE, p.sk_grupo_item, p.TESTE, FORMAT(f.data_encerramento, 'yyyy-MM')
                     ORDER BY mes_ano DESC, p.MANCHETE
                 </cfif>
             </cfquery>
@@ -246,6 +248,8 @@
             <cfset var chave = rereplace(MANCHETE, "[^A-Za-z0-9]", "", "all")>
             <cfif NOT structKeyExists(dadosAssunto, chave)>
                 <cfset dadosAssunto[chave] = { titulo = MANCHETE, anterior = 0, atual = 0 }>
+                <cfset dadosAssunto[chave].sk_grupo_item = sk_grupo_item>
+                <cfset dadosAssunto[chave].teste = teste>
             </cfif>
             <cfif mes_ano EQ mesAnteriorId>
                 <cfset dadosAssunto[chave].anterior = total_eventos>

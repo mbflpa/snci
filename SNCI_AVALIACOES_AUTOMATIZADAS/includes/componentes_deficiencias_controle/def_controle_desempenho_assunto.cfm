@@ -30,6 +30,7 @@
 <cfset mesAtualId = dadosMeses.mesAtualId>
 <cfset mesAnteriorId = dadosMeses.mesAnteriorId>
 
+
 <!--- Usar dados já processados do CFC --->
 <cfset dados = dadosDesempenho.dadosAssunto>
 
@@ -205,7 +206,7 @@
                 <cfset item = dados[chave]>
                 <cfif item.anterior GT 0 OR item.atual GT 0>
                     <div class="comparison-item">
-                        <div class="item-title"><cfoutput>#item.titulo#</cfoutput></div>
+                        <div class="item-title"><cfoutput>#item.titulo# (#item.teste#)</cfoutput></div>
 
                         <div class="item-bars">
                             <div class="label">
