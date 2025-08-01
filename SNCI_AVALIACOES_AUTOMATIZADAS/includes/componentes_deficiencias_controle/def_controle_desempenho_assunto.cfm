@@ -138,35 +138,40 @@
     }
 
     .snci-desempenho-assunto .container-header {
-        text-align: center;
-        margin-bottom: 32px;
+        border-bottom: 2px solid #f1f5f9;
+        border-radius: 8px 8px 0 0;
+        padding-top: 20px;
+        padding-left: 0;
+        padding-right: 0;
     }
 
     .snci-desempenho-assunto .container-header h2 {
-        font-size: 1.5rem;
+        font-size: 1.25rem;
         font-weight: 600;
+        margin-bottom: 16px;
         color: #1e293b;
-        margin-bottom: 8px;
+        padding-bottom: 6px;
         position: relative;
-        display: inline-block;
+        text-align: left;
     }
 
     .snci-desempenho-assunto .container-header h2::after {
         content: '';
         position: absolute;
-        bottom: -4px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 80px;
-        height: 3px;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 2px;
         background: linear-gradient(90deg, #457b9d, #a8dadc);
-        border-radius: 2px;
+        border-radius: 1px;
     }
 
     .snci-desempenho-assunto .subtitle {
-        font-size: 1rem;
+        font-size: 0.9rem;
         color: #64748b;
-        margin: 0;
+        margin: 8px 0 0 0;
+        font-weight: 500;
+        text-align: left;
     }
 
     /* Carrossel */
@@ -175,6 +180,7 @@
         overflow: hidden;
         padding: 0 60px;
         width: 100%;
+        padding-top: 10px;
     }
 
     .snci-desempenho-assunto .carousel-track {
@@ -513,8 +519,8 @@
 <div class="snci-desempenho-assunto">
     <div class="desempenho-container">
         <div class="container-header">
-            <h2>Desempenho por Assunto</h2>
-            <p class="subtitle"><cfoutput>#nomeMesAtual# x #nomeMesAnterior#</cfoutput></p>
+            <h2>Desempenho por Assunto <span class="subtitle"><cfoutput>(#nomeMesAtual# x #nomeMesAnterior#)</cfoutput></span></h2>
+            
         </div>
 
         <div class="carousel-container">
