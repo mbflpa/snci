@@ -34,6 +34,49 @@
 <cfset mesAtualId = dadosMeses.mesAtualId>
 <cfset mesAnteriorId = dadosMeses.mesAnteriorId>
 
+<!--- Debug: verificar valores dos meses --->
+<cfoutput>
+    <!-- DEBUG: nomeMesAtual = "#nomeMesAtual#" -->
+    <!-- DEBUG: mesAtualId = "#mesAtualId#" -->
+    <!-- DEBUG: trim(nomeMesAtual) = "#trim(nomeMesAtual)#" -->
+    <!-- DEBUG: lcase(trim(nomeMesAtual)) = "#lcase(trim(nomeMesAtual))#" -->
+</cfoutput>
+
+<!--- Testar múltiplas condições para janeiro --->
+<cfset isJaneiro = (
+    lcase(trim(nomeMesAtual)) EQ "janeiro" OR 
+    lcase(trim(nomeMesAtual)) CONTAINS "jan" OR 
+    mesAtualId EQ 1 OR
+    month(now()) EQ 1
+)>
+
+<!--- Função para abreviar nomes dos meses --->
+<cfscript>
+    function abreviarMes(nomeMes) {
+        var mes = lcase(trim(nomeMes));
+        switch(mes) {
+            case "janeiro": return "JAN";
+            case "fevereiro": return "FEV";
+            case "março": return "MAR";
+            case "abril": return "ABR";
+            case "maio": return "MAI";
+            case "junho": return "JUN";
+            case "julho": return "JUL";
+            case "agosto": return "AGO";
+            case "setembro": return "SET";
+            case "outubro": return "OUT";
+            case "novembro": return "NOV";
+            case "dezembro": return "DEZ";
+            default: return ucase(left(mes, 3));
+        }
+    }
+</cfscript>
+
+<!--- Debug da condição --->
+<cfoutput>
+    <!-- DEBUG: isJaneiro = "#isJaneiro#" -->
+</cfoutput>
+
 <!--- Usar dados já processados do CFC --->
 <cfset dados = dadosDesempenho.dadosAssunto>
 
@@ -611,51 +654,70 @@
                                 <!-- Grid de comparação lado a lado -->
                                 <div class="comparison-grid">
                                     <div class="period-card current">
-                                        <div class="period-label"><cfoutput>#nomeMesAtual#</cfoutput></div>
+                                        <div class="period-label"><cfoutput>#abreviarMes(nomeMesAtual)#</cfoutput></div>
                                         <div class="period-value">
                                             <i class="fas fa-calendar-check value-icon"></i>
                                             <cfoutput>#item.atual#</cfoutput>
                                         </div>
                                         <div style="font-size:0.8rem; color:#64748b; text-align:center;">eventos</div>
                                     </div>
-                                     <div class="period-card previous">
-                                        <div class="period-label"><cfoutput>#nomeMesAnterior#</cfoutput></div>
+                                    <div class="period-card previous">
+                                        <div class="period-label"><cfoutput>#abreviarMes(nomeMesAnterior)#</cfoutput></div>
                                         <div class="period-value">
                                             <i class="fas fa-calendar-alt value-icon"></i>
-                                            <cfoutput>#item.anterior#</cfoutput>
+                                            <cfif isJaneiro>
+                                                <span style="color:#64748b; font-size:1.2rem;">sem dados</span>
+                                            <cfelse>
+                                                <cfoutput>#item.anterior#</cfoutput>
+                                            </cfif>
                                         </div>
-                                        <div style="font-size:0.8rem; color:#64748b; text-align:center;">eventos</div>
+                                        <cfif NOT isJaneiro>
+                                            <div style="font-size:0.8rem; color:#64748b; text-align:center;">eventos</div>
+                                        </cfif>
                                     </div>
                                 </div>
 
                                 <!-- Indicador de tendência aprimorado -->
-                                <div class="trend-indicator <cfoutput>#(item.atual eq item.anterior ? 'stable' : item.tipo)#</cfoutput>">
+                                <div class="trend-indicator <cfoutput>#(isJaneiro ? 'stable' : (item.atual eq item.anterior ? 'stable' : item.tipo))#</cfoutput>">
                                     <div class="trend-icon">
-                                        <cfif item.atual eq item.anterior>
-                                            <i class="fas fa-minus"></i>
-                                        <cfelseif item.tipo eq "increase">
-                                            <i class="fas fa-arrow-up"></i>
-                                        <cfelse>
-                                            <i class="fas fa-arrow-down"></i>
+                                        <cfif isJaneiro>
+                                            <i class="fas fa-info-circle"></i>
+                                        </cfif>
+                                        <cfif NOT isJaneiro>
+                                            <cfif item.atual eq item.anterior>
+                                                <i class="fas fa-minus"></i>
+                                            <cfelseif item.tipo eq "increase">
+                                                <i class="fas fa-arrow-up"></i>
+                                            <cfelse>
+                                                <i class="fas fa-arrow-down"></i>
+                                            </cfif>
                                         </cfif>
                                     </div>
                                     <div class="trend-text">
                                         <div class="trend-percentage">
-                                            <cfif item.atual eq item.anterior>
-                                                0%
-                                            <cfelseif item.anterior GT 0>
-                                                <cfoutput>#abs(item.percentual)#%</cfoutput>
+                                            <cfif isJaneiro>
+                                                
                                             <cfelse>
-                                                <cfoutput>#(item.atual GT 0 ? 100 : 0)#%</cfoutput>
+                                                <cfif item.atual eq item.anterior>
+                                                    0%
+                                                <cfelseif item.anterior GT 0>
+                                                    <cfoutput>#abs(item.percentual)#%</cfoutput>
+                                                <cfelse>
+                                                    <cfoutput>#(item.atual GT 0 ? 100 : 0)#%</cfoutput>
+                                                </cfif>
                                             </cfif>
                                         </div>
                                         <div class="trend-label">
-                                            <cfif item.atual eq item.anterior>
-                                                estável
-                                            <cfelseif item.tipo eq "increase">
-                                                aumento
+                                            <cfif isJaneiro>
+                                                sem dados do mês anterior para comparação
                                             <cfelse>
-                                                redução
+                                                <cfif item.atual eq item.anterior>
+                                                    estável
+                                                <cfelseif item.tipo eq "increase">
+                                                    aumento
+                                                <cfelse>
+                                                    redução
+                                                </cfif>
                                             </cfif>
                                         </div>
                                     </div>
