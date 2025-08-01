@@ -186,37 +186,47 @@
     /* Carrossel */
     .snci-desempenho-assunto .carousel-container {
         position: relative;
-        overflow: hidden;
+        overflow-x: auto; /* Permite barra de rolagem horizontal */
+        overflow-y: visible;
         padding: 0 60px;
         width: 100%;
         padding-top: 10px;
+        scrollbar-width: thin;
+        scrollbar-color: #457b9d #e2e8f0;
+        
     }
-
     .snci-desempenho-assunto .carousel-track {
         display: flex;
-        transition: transform 0.5s ease-in-out;
         gap: 24px;
-        width: 100%;
-        cursor: grab;
+        width: max-content; /* Garante largura para scroll */
+        min-width: 100%;
+        transition: transform 0.5s ease-in-out;
+        /* Remover cursor: grab */
         user-select: none;
         -webkit-user-select: none;
         -moz-user-select: none;
         -ms-user-select: none;
     }
-    
-    .snci-desempenho-assunto .carousel-track.dragging {
-        cursor: grabbing;
-        transition: none;
+    /* Barra de rolagem customizada para navegadores Webkit */
+    .snci-desempenho-assunto .carousel-container::-webkit-scrollbar {
+        height: 12px;
+        cursor: pointer;
+    }
+    .snci-desempenho-assunto .carousel-container::-webkit-scrollbar-thumb {
+        background: #457b9d;
+        border-radius: 6px;
+        cursor: pointer;
+    }
+    .snci-desempenho-assunto .carousel-container::-webkit-scrollbar-thumb:hover {
+        background: #1e3d59;
+        cursor: pointer;
+    }
+    .snci-desempenho-assunto .carousel-container::-webkit-scrollbar-track {
+        background: #e2e8f0;
+        border-radius: 6px;
+        cursor: pointer;
     }
     
-    .snci-desempenho-assunto .carousel-track * {
-        pointer-events: none;
-    }
-    
-    .snci-desempenho-assunto .carousel-track.dragging * {
-        pointer-events: none;
-    }
-
     .snci-desempenho-assunto .carousel-controls {
         position: absolute;
         top: 50%;
@@ -253,7 +263,7 @@
     }
 
     .snci-desempenho-assunto .carousel-next {
-        right: 10px;
+        right: 70px;
     }
 
     .snci-desempenho-assunto .carousel-controls i {
@@ -274,6 +284,7 @@
         position: relative;
         overflow: hidden;
         min-height: 240px;
+        margin-bottom: 10px;
     }
 
     .snci-desempenho-assunto .performance-card::before {
@@ -537,85 +548,88 @@
             padding: 12px;
         }
     }
+
+    .performance-card.empty-card::before {
+        display: none !important;
+        content: none !important;
+    }
 </style>
 
 <div class="snci-desempenho-assunto">
-    <div class="desempenho-container">
+    <div class="desempenho-container" style="position:relative;">
         <div class="container-header">
             <h2>Desempenho por Assunto <span class="subtitle"><cfoutput>(#nomeMesAtual# x #nomeMesAnterior#)</cfoutput></span></h2>
-            
         </div>
-
-        <div class="carousel-container">
-            <div class="carousel-controls carousel-prev">
+        <!-- Botões alinhados horizontalmente, ambos fora do container rolável -->
+        <div style="position: relative;">
+            <div class="carousel-controls carousel-prev" style="position: absolute; left: 0!important; top: 50%; transform: translateY(-50%); z-index: 10;">
                 <i class="fas fa-chevron-left"></i>
             </div>
-            
-            <div class="carousel-track" id="carouselTrack">
-                <cfloop array="#dadosOrdenados#" index="item">
-                    <div class="performance-card">
-                        <div class="card-header">
-                            <h3 class="card-title"><cfoutput>#trim(item.titulo)#</cfoutput></h3>
-                            <p class="card-subtitle"><cfoutput>(#item.teste#)</cfoutput></p>
-                        </div>
-
-                        <div class="progress-section">
-
-                            <div class="progress-bar-container">
-                                <div class="progress-label">
-                                    <span><cfoutput>#nomeMesAtual#</cfoutput></span>
-                                    <span><cfoutput>#item.atual#</cfoutput></span>
-                                </div>
-                                <div class="progress-bar-wrapper">
-                                    <div class="progress-bar atual animated-bar" style="width:0%;" data-width="<cfoutput>#(maxValor GT 0 ? round(item.atual/maxValor*100) : 0)#%</cfoutput>"></div>
-                                </div>
-                            </div>
-
-                            <div class="progress-bar-container">
-                                <div class="progress-label">
-                                    <span><cfoutput>#nomeMesAnterior#</cfoutput></span>
-                                    <span><cfoutput>#item.anterior#</cfoutput></span>
-                                </div>
-                                <div class="progress-bar-wrapper">
-                                    <div class="progress-bar anterior animated-bar" style="width:0%;" data-width="<cfoutput>#(maxValor GT 0 ? round(item.anterior/maxValor*100) : 0)#%</cfoutput>"></div>
-                                </div>
-                            </div>
-
-                        </div>
-
-                        <div class="change-indicator <cfoutput>#item.tipo#</cfoutput>">
-                            <span class="change-value">
-                                <cfif item.tipo eq "increase">↗<cfelse>↘</cfif>
-                                <cfoutput>#abs(item.delta)#</cfoutput>
-                            </span>
-                            <div class="change-details">
-                                <div class="change-percentage">
-                                    <cfif item.anterior GT 0>
-                                        <cfoutput>#abs(item.percentual)#%</cfoutput>
-                                    <cfelse>
-                                        <cfoutput>#(item.atual GT 0 ? 100 : 0)#%</cfoutput>
-                                    </cfif>
-                                </div>
-                                <div class="change-label">
-                                    <cfif item.tipo eq "increase">aumento<cfelse>redução</cfif>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </cfloop>
-            </div>
-
-            <div class="carousel-controls carousel-next">
+            <div class="carousel-controls carousel-next" style="position: absolute; right:0!important; top: 50%; transform: translateY(-50%); z-index: 10;">
                 <i class="fas fa-chevron-right"></i>
             </div>
-        </div>
+            <div class="carousel-container" id="carouselScrollContainer" style="overflow-x:auto;">
+                <div class="carousel-track" id="carouselTrack">
+                    <cfloop array="#dadosOrdenados#" index="item">
+                        <div class="performance-card">
+                            <div class="card-header">
+                                <h3 class="card-title"><cfoutput>#trim(item.titulo)#</cfoutput></h3>
+                                <p class="card-subtitle"><cfoutput>(#item.teste#)</cfoutput></p>
+                            </div>
 
+                            <div class="progress-section">
+
+                                <div class="progress-bar-container">
+                                    <div class="progress-label">
+                                        <span><cfoutput>#nomeMesAtual#</cfoutput></span>
+                                        <span><cfoutput>#item.atual#</cfoutput></span>
+                                    </div>
+                                    <div class="progress-bar-wrapper">
+                                        <div class="progress-bar atual animated-bar" style="width:0%;" data-width="<cfoutput>#(maxValor GT 0 ? round(item.atual/maxValor*100) : 0)#%</cfoutput>"></div>
+                                    </div>
+                                </div>
+
+                                <div class="progress-bar-container">
+                                    <div class="progress-label">
+                                        <span><cfoutput>#nomeMesAnterior#</cfoutput></span>
+                                        <span><cfoutput>#item.anterior#</cfoutput></span>
+                                    </div>
+                                    <div class="progress-bar-wrapper">
+                                        <div class="progress-bar anterior animated-bar" style="width:0%;" data-width="<cfoutput>#(maxValor GT 0 ? round(item.anterior/maxValor*100) : 0)#%</cfoutput>"></div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div class="change-indicator <cfoutput>#item.tipo#</cfoutput>">
+                                <span class="change-value">
+                                    <cfif item.tipo eq "increase">↗<cfelse>↘</cfif>
+                                    <cfoutput>#abs(item.delta)#</cfoutput>
+                                </span>
+                                <div class="change-details">
+                                    <div class="change-percentage">
+                                        <cfif item.anterior GT 0>
+                                            <cfoutput>#abs(item.percentual)#%</cfoutput>
+                                        <cfelse>
+                                            <cfoutput>#(item.atual GT 0 ? 100 : 0)#%</cfoutput>
+                                        </cfif>
+                                    </div>
+                                    <div class="change-label">
+                                        <cfif item.tipo eq "increase">aumento<cfelse>redução</cfif>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </cfloop>
+                    <div class="performance-card empty-card" style="background:transparent; border:none; box-shadow:none; pointer-events:none;"></div>
+                </div>
+            </div>
+        </div>
         <div class="carousel-indicators" id="carouselIndicators">
             <!-- Indicadores serão gerados pelo JavaScript -->
         </div>
     </div>
 </div>
-
 <script>
     $(document).ready(function() {
         // Animar barras de progresso
@@ -804,90 +818,16 @@
             nextBtn.toggleClass('disabled', currentSlide >= totalSlides - 1);
         }
 
-        // Event listeners para mouse
-        track.on('mousedown', dragStart);
-        $(document).on('mousemove', dragMove);
-        $(document).on('mouseup', dragEnd);
+        // Habilita barra de rolagem horizontal manual
+        // E permite que os controles avancem/voltem via scroll
+        const scrollContainer = document.getElementById('carouselScrollContainer');
+        const cardWidth = () => $('.performance-card').first().outerWidth(true) || 274;
 
-        // Event listeners para touch
-        track.on('touchstart', dragStart);
-        $(document).on('touchmove', dragMove);
-        $(document).on('touchend', dragEnd);
-
-        // Prevenir comportamentos padrão
-        track.on('dragstart', function(e) {
-            e.preventDefault();
+        $('.carousel-next').off('click').on('click', function() {
+            scrollContainer.scrollBy({ left: cardWidth(), behavior: 'smooth' });
         });
-
-        track.on('contextmenu', function(e) {
-            e.preventDefault();
+        $('.carousel-prev').off('click').on('click', function() {
+            scrollContainer.scrollBy({ left: -cardWidth(), behavior: 'smooth' });
         });
-
-        // Eventos dos controles
-        nextBtn.click(function() {
-            slideNext();
-        });
-
-        prevBtn.click(function() {
-            slidePrev();
-        });
-
-        // Navegação por teclado
-        $(document).keydown(function(e) {
-            if (e.keyCode === 37) { // Seta esquerda
-                slidePrev();
-            } else if (e.keyCode === 39) { // Seta direita
-                slideNext();
-            }
-        });
-
-        // Inicialização
-        setTimeout(function() {
-            itemsToShow = getItemsToShow();
-            totalSlides = Math.max(0, cards.length - itemsToShow + 1);
-            createIndicators();
-            setSliderPosition();
-            updateCarousel();
-            
-            // Mostrar/ocultar controles se necessário
-            if (totalSlides <= 1) {
-                prevBtn.hide();
-                nextBtn.hide();
-                indicators.hide();
-            } else {
-                prevBtn.show();
-                nextBtn.show();
-                indicators.show();
-            }
-        }, 100);
-
-        // Redimensionamento com debounce
-        let resizeTimeout;
-        $(window).resize(function() {
-            clearTimeout(resizeTimeout);
-            resizeTimeout = setTimeout(function() {
-                handleResize();
-                setSliderPosition();
-            }, 250);
-        });
-
-        // API pública
-        window.carouselAPI = {
-            next: slideNext,
-            prev: slidePrev,
-            goTo: function(index) {
-                if (index >= 0 && index < totalSlides) {
-                    currentSlide = index;
-                    setSliderPosition();
-                    updateCarousel();
-                }
-            },
-            getCurrentSlide: function() {
-                return currentSlide;
-            },
-            getTotalSlides: function() {
-                return totalSlides;
-            }
-        };
     });
 </script>
