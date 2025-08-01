@@ -175,7 +175,7 @@
 				INNER JOIN (Itens_Verificacao INNER JOIN Grupos_Verificacao ON (Itn_Ano = Grp_Ano) AND (Itn_NumGrupo = Grp_Codigo)) ON (Und_TipoUnidade = Itn_TipoUnidade) AND (INP_Modalidade = Itn_Modalidade) AND (Pos_NumItem = Itn_NumItem) AND (Pos_NumGrupo = Itn_NumGrupo)
 				INNER JOIN  Resultado_Inspecao ON (Pos_NumItem = RIP_NumItem) AND (Pos_NumGrupo = RIP_NumGrupo) AND (Pos_Inspecao = RIP_NumInspecao) AND (Pos_Unidade = RIP_Unidade)
 				WHERE (Pos_Inspecao <> '#numinspecao#') and (RIP_Unidade ='#codunid#') and (#grpitmsql#) and Pos_Situacao_Resp in(1,6,7,17,22,2,4,5,8,20,15,16,18,19,23) and (convert(char(4),RIP_Ano)=Itn_Ano) and rip_ano >= #anolimit#
-				order by right(Pos_Inspecao,4) desc
+				order by right(Pos_Inspecao,4) 
             </cfquery>
             <cfreturn rsreincaberto>
         </cftransaction>
@@ -242,7 +242,7 @@
         <cfargument name="item" required="true">
         <cftransaction>
             <cfquery name="rsAvalantes" datasource="DBSNCI">
-				SELECT top 2 
+				SELECT top 1 
 				Itn_Descricao,
 				Grp_Descricao,
 				Itn_Pontuacao,
