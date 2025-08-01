@@ -363,195 +363,225 @@
 
     /* Barras de progresso */
     .snci-desempenho-assunto .progress-section {
-        margin-bottom: 20px;
+        margin-bottom: 0px;
     }
 
-    .snci-desempenho-assunto .progress-bar-container {
-        margin-bottom: 12px;
+    /* Nova seção de comparação moderna */
+    .snci-desempenho-assunto .comparison-section {
+        background: transparent;
     }
 
-    .snci-desempenho-assunto .progress-label {
-        display: flex;
-        justify-content: space-between;
-        font-size: 0.75rem;
-        color: #64748b;
-        margin-bottom: 4px;
+    .snci-desempenho-assunto .comparison-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin-bottom: 16px;
     }
 
-    .snci-desempenho-assunto .progress-bar-wrapper {
-        background-color: #f1f5f9;
-        border-radius: 6px;
-        height: 8px;
+    .snci-desempenho-assunto .period-card {
+        background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+        border-radius: 10px;
+        padding: 12px;
+        text-align: center;
+        border: 2px solid transparent;
+        transition: all 0.3s ease;
         position: relative;
         overflow: hidden;
     }
 
-    .snci-desempenho-assunto .progress-bar {
-        height: 100%;
-        border-radius: 6px;
-        transition: width 1.5s ease-in-out;
+    .snci-desempenho-assunto .period-card::before {
+        content: '';
         position: absolute;
         top: 0;
         left: 0;
-    }
-
-    .snci-desempenho-assunto .progress-bar.anterior {
-        background: linear-gradient(90deg, #a8dadc, #7fb3d3);
-    }
-
-    .snci-desempenho-assunto .progress-bar.atual {
-        background: linear-gradient(90deg, #457b9d, #1e3d59);
-    }
-
-    /* Indicador de mudança */
-    .snci-desempenho-assunto .change-indicator {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 12px;
-        border-radius: 12px;
-        background: rgba(255,255,255,0.8);
-        border: 2px solid #e2e8f0;
-    }
-
-    .snci-desempenho-assunto .change-value {
-        font-size: 1.2rem;
-        font-weight: 700;
-        margin-right: 8px;
-    }
-
-    .snci-desempenho-assunto .change-details {
-        text-align: center;
-    }
-
-    .snci-desempenho-assunto .change-percentage {
-        font-size: 0.9rem;
-        font-weight: 600;
-        margin-bottom: 2px;
-    }
-
-    .snci-desempenho-assunto .change-label {
-        font-size: 0.75rem;
-        opacity: 0.8;
-    }
-
-    .snci-desempenho-assunto .increase {
-        color: #dc2626;
-    }
-
-    .snci-desempenho-assunto .increase .change-indicator {
-        border-color: #fecaca;
-        background: rgba(254, 202, 202, 0.2);
-    }
-
-    .snci-desempenho-assunto .decrease {
-        color: #059669;
-    }
-
-    .snci-desempenho-assunto .decrease .change-indicator {
-        border-color: #a7f3d0;
-        background: rgba(167, 243, 208, 0.2);
-    }
-
-    /* Indicadores de navegação */
-    .snci-desempenho-assunto .carousel-indicators {
-        display: flex;
-        justify-content: center;
-        margin-top: 20px;
-        gap: 8px;
-    }
-
-    .snci-desempenho-assunto .indicator-dot {
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        background: #cbd5e1;
-        cursor: pointer;
+        right: 0;
+        height: 3px;
         transition: all 0.3s ease;
     }
 
-    .snci-desempenho-assunto .indicator-dot.active {
-        background: #457b9d;
-        transform: scale(1.2);
+    .snci-desempenho-assunto .period-card.current::before {
+        background: linear-gradient(90deg, #457b9d, #1e3d59);
     }
 
-    /* Responsividade */
-    @media (max-width: 1400px) {
-        .snci-desempenho-assunto .performance-card {
-            flex: 0 0 300px;
-        }
+    .snci-desempenho-assunto .period-card.previous::before {
+        background: linear-gradient(90deg, #a8dadc, #7fb3d3);
     }
 
-    @media (max-width: 1200px) {
-        .snci-desempenho-assunto .performance-card {
-            flex: 0 0 280px;
-        }
-        
-        .snci-desempenho-assunto .carousel-container {
-            padding: 0 50px;
-        }
+    .snci-desempenho-assunto .period-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(69, 123, 157, 0.15);
+        border-color: rgba(69, 123, 157, 0.2);
     }
 
-    @media (max-width: 992px) {
-        .snci-desempenho-assunto .performance-card {
-            flex: 0 0 260px;
-        }
-        
-        .snci-desempenho-assunto .desempenho-container {
-            padding: 20px;
-        }
+    .snci-desempenho-assunto .period-label {
+        font-size: 0.7rem;
+        font-weight: 600;
+        color: #64748b;
+        margin-bottom: 4px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
     }
 
-    @media (max-width: 768px) {
-        .snci-desempenho-assunto .carousel-container {
-            padding: 0 40px;
-        }
-
-        .snci-desempenho-assunto .performance-card {
-            flex: 0 0 250px;
-            padding: 16px;
-        }
-
-        .snci-desempenho-assunto .carousel-controls {
-            width: 35px;
-            height: 35px;
-        }
-
-        .snci-desempenho-assunto .carousel-prev {
-            left: 2px;
-        }
-
-        .snci-desempenho-assunto .carousel-next {
-            right: 2px;
-        }
-
-        .snci-desempenho-assunto .desempenho-container {
-            padding: 16px;
-        }
+    .snci-desempenho-assunto .period-value {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #1e293b;
+        line-height: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
     }
 
-    @media (max-width: 480px) {
-        .snci-desempenho-assunto .carousel-container {
-            padding: 0 30px;
-        }
+    .snci-desempenho-assunto .period-card.current .period-value {
+        color: #457b9d;
+    }
 
-        .snci-desempenho-assunto .performance-card {
-            flex: 0 0 220px;
-            padding: 14px;
-        }
+    .snci-desempenho-assunto .period-card.previous .period-value {
+        color: #7fb3d3;
+    }
 
-        .snci-desempenho-assunto .container-header h2 {
-            font-size: 1.25rem;
-        }
+    .snci-desempenho-assunto .value-icon {
+        font-size: 1.2rem;
+        opacity: 0.7;
+    }
 
-        .snci-desempenho-assunto .desempenho-container {
-            padding: 12px;
-        }
+    /* Indicador de tendência aprimorado */
+    .snci-desempenho-assunto .trend-indicator {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 10px;
+        border-radius: 10px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        background: rgba(255,255,255,0.6);
+        border: 2px solid transparent;
+        transition: all 0.3s ease;
+    }
+
+    .snci-desempenho-assunto .trend-indicator:hover {
+        transform: scale(1.02);
+    }
+
+    .snci-desempenho-assunto .trend-icon {
+        font-size: 1.1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.8);
+    }
+
+    /* Vermelho adobe para aumento */
+    .snci-desempenho-assunto .trend-indicator.increase {
+        color: #e63946;
+        border-color: rgba(230, 57, 70, 0.2);
+        background: rgba(254, 226, 226, 0.4);
+    }
+
+    /* Verde para redução */
+    .snci-desempenho-assunto .trend-indicator.decrease {
+        color: #059669;
+        border-color: rgba(5, 150, 105, 0.2);
+        background: rgba(209, 250, 229, 0.4);
+    }
+
+    .snci-desempenho-assunto .trend-indicator.stable {
+        color: #6b7280;
+        border-color: rgba(107, 114, 128, 0.2);
+        background: rgba(243, 244, 246, 0.4);
+    }
+
+    .snci-desempenho-assunto .trend-text {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .snci-desempenho-assunto .trend-percentage {
+        font-size: 0.9rem;
+        font-weight: 700;
+    }
+
+    .snci-desempenho-assunto .trend-label {
+        font-size: 0.7rem;
+        opacity: 0.8;
+        text-transform: lowercase;
     }
 
     .performance-card.empty-card::before {
         display: none !important;
         content: none !important;
+    }
+
+    /* Background vermelho discreto para cards com valor atual > 0 */
+    .snci-desempenho-assunto .performance-card.has-current-value {
+        background: linear-gradient(135deg, rgba(220, 38, 38, 0.15) 0%, rgba(248, 113, 113, 0.08) 100%);
+        border-color: rgba(220, 38, 38, 0.25);
+    }
+
+    .snci-desempenho-assunto .performance-card.has-current-value:hover {
+        background: linear-gradient(135deg, rgba(220, 38, 38, 0.2) 0%, rgba(248, 113, 113, 0.12) 100%);
+        border-color: rgba(220, 38, 38, 0.35);
+    }
+
+    /* Ajustar borda superior dos cards com valor atual */
+    .snci-desempenho-assunto .performance-card.has-current-value::before {
+        background: linear-gradient(90deg, #dc2626, #ef4444);
+    }
+
+    /* Ajustar cores dos period-cards internos para melhor contraste */
+    .snci-desempenho-assunto .performance-card.has-current-value .period-card {
+        background: rgba(255, 255, 255, 0.85);
+        border: 1px solid rgba(220, 38, 38, 0.1);
+    }
+
+    .snci-desempenho-assunto .performance-card.has-current-value .period-card:hover {
+        background: rgba(255, 255, 255, 0.95);
+        border-color: rgba(220, 38, 38, 0.2);
+    }
+
+    /* Ajustar indicador de tendência para melhor contraste */
+    .snci-desempenho-assunto .performance-card.has-current-value .trend-indicator {
+        background: rgba(255, 255, 255, 0.8);
+        border-color: rgba(220, 38, 38, 0.15);
+    }
+
+    /* Background verde para cards com redução (decrease) */
+    .snci-desempenho-assunto .performance-card.has-reduction {
+        background: linear-gradient(135deg, rgba(5, 150, 105, 0.15) 0%, rgba(34, 197, 94, 0.08) 100%);
+        border-color: rgba(5, 150, 105, 0.25);
+    }
+
+    .snci-desempenho-assunto .performance-card.has-reduction:hover {
+        background: linear-gradient(135deg, rgba(5, 150, 105, 0.2) 0%, rgba(34, 197, 94, 0.12) 100%);
+        border-color: rgba(5, 150, 105, 0.35);
+    }
+
+    /* Ajustar borda superior dos cards com redução */
+    .snci-desempenho-assunto .performance-card.has-reduction::before {
+        background: linear-gradient(90deg, #059669, #22c55e);
+    }
+
+    /* Ajustar cores dos period-cards internos para melhor contraste */
+    .snci-desempenho-assunto .performance-card.has-reduction .period-card {
+        background: rgba(255, 255, 255, 0.85);
+        border: 1px solid rgba(5, 150, 105, 0.1);
+    }
+
+    .snci-desempenho-assunto .performance-card.has-reduction .period-card:hover {
+        background: rgba(255, 255, 255, 0.95);
+        border-color: rgba(5, 150, 105, 0.2);
+    }
+
+    /* Ajustar indicador de tendência para cards com redução */
+    .snci-desempenho-assunto .performance-card.has-reduction .trend-indicator {
+        background: rgba(255, 255, 255, 0.8);
+        border-color: rgba(5, 150, 105, 0.15);
     }
 </style>
 
@@ -571,51 +601,63 @@
             <div class="carousel-container" id="carouselScrollContainer" style="overflow-x:auto;">
                 <div class="carousel-track" id="carouselTrack">
                     <cfloop array="#dadosOrdenados#" index="item">
-                        <div class="performance-card">
+                        <div class="performance-card<cfif item.atual GT 0> has-current-value<cfelseif item.tipo eq 'decrease'> has-reduction</cfif>">
                             <div class="card-header">
                                 <h3 class="card-title"><cfoutput>#trim(item.titulo)#</cfoutput></h3>
                                 <p class="card-subtitle"><cfoutput>(#item.teste#)</cfoutput></p>
                             </div>
 
-                            <div class="progress-section">
-
-                                <div class="progress-bar-container">
-                                    <div class="progress-label">
-                                        <span><cfoutput>#nomeMesAtual#</cfoutput></span>
-                                        <span><cfoutput>#item.atual#</cfoutput></span>
+                            <div class="comparison-section">
+                                <!-- Grid de comparação lado a lado -->
+                                <div class="comparison-grid">
+                                    <div class="period-card current">
+                                        <div class="period-label"><cfoutput>#nomeMesAtual#</cfoutput></div>
+                                        <div class="period-value">
+                                            <i class="fas fa-calendar-check value-icon"></i>
+                                            <cfoutput>#item.atual#</cfoutput>
+                                        </div>
+                                        <div style="font-size:0.8rem; color:#64748b; text-align:center;">eventos</div>
                                     </div>
-                                    <div class="progress-bar-wrapper">
-                                        <div class="progress-bar atual animated-bar" style="width:0%;" data-width="<cfoutput>#(maxValor GT 0 ? round(item.atual/maxValor*100) : 0)#%</cfoutput>"></div>
+                                     <div class="period-card previous">
+                                        <div class="period-label"><cfoutput>#nomeMesAnterior#</cfoutput></div>
+                                        <div class="period-value">
+                                            <i class="fas fa-calendar-alt value-icon"></i>
+                                            <cfoutput>#item.anterior#</cfoutput>
+                                        </div>
+                                        <div style="font-size:0.8rem; color:#64748b; text-align:center;">eventos</div>
                                     </div>
                                 </div>
 
-                                <div class="progress-bar-container">
-                                    <div class="progress-label">
-                                        <span><cfoutput>#nomeMesAnterior#</cfoutput></span>
-                                        <span><cfoutput>#item.anterior#</cfoutput></span>
-                                    </div>
-                                    <div class="progress-bar-wrapper">
-                                        <div class="progress-bar anterior animated-bar" style="width:0%;" data-width="<cfoutput>#(maxValor GT 0 ? round(item.anterior/maxValor*100) : 0)#%</cfoutput>"></div>
-                                    </div>
-                                </div>
-
-                            </div>
-
-                            <div class="change-indicator <cfoutput>#item.tipo#</cfoutput>">
-                                <span class="change-value">
-                                    <cfif item.tipo eq "increase">↗<cfelse>↘</cfif>
-                                    <cfoutput>#abs(item.delta)#</cfoutput>
-                                </span>
-                                <div class="change-details">
-                                    <div class="change-percentage">
-                                        <cfif item.anterior GT 0>
-                                            <cfoutput>#abs(item.percentual)#%</cfoutput>
+                                <!-- Indicador de tendência aprimorado -->
+                                <div class="trend-indicator <cfoutput>#(item.atual eq item.anterior ? 'stable' : item.tipo)#</cfoutput>">
+                                    <div class="trend-icon">
+                                        <cfif item.atual eq item.anterior>
+                                            <i class="fas fa-minus"></i>
+                                        <cfelseif item.tipo eq "increase">
+                                            <i class="fas fa-arrow-up"></i>
                                         <cfelse>
-                                            <cfoutput>#(item.atual GT 0 ? 100 : 0)#%</cfoutput>
+                                            <i class="fas fa-arrow-down"></i>
                                         </cfif>
                                     </div>
-                                    <div class="change-label">
-                                        <cfif item.tipo eq "increase">aumento<cfelse>redução</cfif>
+                                    <div class="trend-text">
+                                        <div class="trend-percentage">
+                                            <cfif item.atual eq item.anterior>
+                                                0%
+                                            <cfelseif item.anterior GT 0>
+                                                <cfoutput>#abs(item.percentual)#%</cfoutput>
+                                            <cfelse>
+                                                <cfoutput>#(item.atual GT 0 ? 100 : 0)#%</cfoutput>
+                                            </cfif>
+                                        </div>
+                                        <div class="trend-label">
+                                            <cfif item.atual eq item.anterior>
+                                                estável
+                                            <cfelseif item.tipo eq "increase">
+                                                aumento
+                                            <cfelse>
+                                                redução
+                                            </cfif>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -637,6 +679,15 @@
             var width = $(this).data('width');
             $(this).css('width', width);
         });
+
+        // Animar gráficos de comparação
+        setTimeout(function() {
+            $('.animated-chart').each(function(){
+                var height = $(this).data('height');
+                $(this).css('height', height);
+                $(this).addClass('visible');
+            });
+        }, 500);
 
         // Configuração do carrossel
         const track = $('#carouselTrack');
