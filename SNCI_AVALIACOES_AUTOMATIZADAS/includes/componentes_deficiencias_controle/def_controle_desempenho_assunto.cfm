@@ -197,6 +197,24 @@
         transition: transform 0.5s ease-in-out;
         gap: 24px;
         width: 100%;
+        cursor: grab;
+        user-select: none;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+    }
+    
+    .snci-desempenho-assunto .carousel-track.dragging {
+        cursor: grabbing;
+        transition: none;
+    }
+    
+    .snci-desempenho-assunto .carousel-track * {
+        pointer-events: none;
+    }
+    
+    .snci-desempenho-assunto .carousel-track.dragging * {
+        pointer-events: none;
     }
 
     .snci-desempenho-assunto .carousel-controls {
@@ -606,7 +624,7 @@
             $(this).css('width', width);
         });
 
-        // Configuração do carrossel - Baseado no Bootstrap 4
+        // Configuração do carrossel
         const track = $('#carouselTrack');
         const cards = track.find('.performance-card');
         const prevBtn = $('.carousel-prev');
@@ -617,12 +635,19 @@
         let itemsToShow = getItemsToShow();
         let totalSlides = Math.max(0, cards.length - itemsToShow + 1);
 
-        // Função para calcular quantos itens mostrar (baseada no Bootstrap 4)
+        // Variáveis para drag
+        let isDragging = false;
+        let startPos = 0;
+        let currentTranslate = 0;
+        let prevTranslate = 0;
+        let animationId = 0;
+
+        // Função para calcular quantos itens mostrar
         function getItemsToShow() {
-            const containerWidth = $('.carousel-container').width() - 120; // 60px padding cada lado
+            const containerWidth = $('.carousel-container').width() - 120;
             const singleCardWidth = $('.performance-card').first().outerWidth(true);
             
-            if (singleCardWidth === 0) return 1; // fallback
+            if (singleCardWidth === 0) return 1;
             
             const itemsPossible = Math.floor(containerWidth / singleCardWidth);
             return Math.max(1, itemsPossible);
@@ -633,7 +658,7 @@
             return $('.performance-card').first().outerWidth(true) || 274;
         }
 
-        // Atualizar carrossel - similar ao Bootstrap 4
+        // Atualizar carrossel
         function updateCarousel() {
             const cardWidth = getCardWidth();
             const translateX = -currentSlide * cardWidth;
@@ -648,7 +673,7 @@
             updateIndicators();
         }
 
-        // Criar indicadores baseado no Bootstrap 4
+        // Criar indicadores
         function createIndicators() {
             indicators.empty();
             
@@ -676,7 +701,7 @@
             indicators.find('.indicator-dot').removeClass('active').eq(currentPage).addClass('active');
         }
 
-        // Navegação próximo item (como Bootstrap 4)
+        // Navegação próximo item
         function slideNext() {
             if (currentSlide < totalSlides - 1) {
                 currentSlide++;
@@ -684,7 +709,7 @@
             }
         }
 
-        // Navegação item anterior (como Bootstrap 4)
+        // Navegação item anterior
         function slidePrev() {
             if (currentSlide > 0) {
                 currentSlide--;
@@ -692,7 +717,7 @@
             }
         }
 
-        // Redimensionar - recalcular como Bootstrap 4
+        // Redimensionar
         function handleResize() {
             const newItemsToShow = getItemsToShow();
             
@@ -700,7 +725,6 @@
                 itemsToShow = newItemsToShow;
                 totalSlides = Math.max(0, cards.length - itemsToShow + 1);
                 
-                // Ajustar slide atual para não ultrapassar limites
                 currentSlide = Math.min(currentSlide, totalSlides - 1);
                 currentSlide = Math.max(0, currentSlide);
                 
@@ -709,6 +733,96 @@
             }
         }
 
+        // Função para obter posição X do evento
+        function getPositionX(event) {
+            return event.type.includes('mouse') ? event.clientX : event.touches[0].clientX;
+        }
+
+        // Função para definir posição do slider
+        function setSliderPosition() {
+            const cardWidth = getCardWidth();
+            currentTranslate = currentSlide * -cardWidth;
+            prevTranslate = currentTranslate;
+            track.css('transform', `translateX(${currentTranslate}px)`);
+        }
+
+        // Função de animação durante o drag
+        function animation() {
+            track.css('transform', `translateX(${currentTranslate}px)`);
+            if (isDragging) requestAnimationFrame(animation);
+        }
+
+        // Início do drag/touch
+        function dragStart(event) {
+            if (event.type === 'mousedown') {
+                event.preventDefault();
+            }
+            
+            isDragging = true;
+            startPos = getPositionX(event);
+            
+            track.addClass('dragging');
+            track.css('transition', 'none');
+            
+            animationId = requestAnimationFrame(animation);
+        }
+
+        // Movimento durante drag/touch
+        function dragMove(event) {
+            if (isDragging) {
+                event.preventDefault();
+                const currentPosition = getPositionX(event);
+                currentTranslate = prevTranslate + currentPosition - startPos;
+            }
+        }
+
+        // Fim do drag/touch
+        function dragEnd() {
+            isDragging = false;
+            cancelAnimationFrame(animationId);
+            
+            track.removeClass('dragging');
+            track.css('transition', 'transform 0.5s ease-in-out');
+            
+            const movedBy = currentTranslate - prevTranslate;
+            const cardWidth = getCardWidth();
+            
+            // Se moveu mais que 100px, mudar slide
+            if (movedBy < -100 && currentSlide < totalSlides - 1) {
+                currentSlide++;
+            }
+            
+            if (movedBy > 100 && currentSlide > 0) {
+                currentSlide--;
+            }
+            
+            setSliderPosition();
+            updateIndicators();
+            
+            // Atualizar controles
+            prevBtn.toggleClass('disabled', currentSlide === 0);
+            nextBtn.toggleClass('disabled', currentSlide >= totalSlides - 1);
+        }
+
+        // Event listeners para mouse
+        track.on('mousedown', dragStart);
+        $(document).on('mousemove', dragMove);
+        $(document).on('mouseup', dragEnd);
+
+        // Event listeners para touch
+        track.on('touchstart', dragStart);
+        $(document).on('touchmove', dragMove);
+        $(document).on('touchend', dragEnd);
+
+        // Prevenir comportamentos padrão
+        track.on('dragstart', function(e) {
+            e.preventDefault();
+        });
+
+        track.on('contextmenu', function(e) {
+            e.preventDefault();
+        });
+
         // Eventos dos controles
         nextBtn.click(function() {
             slideNext();
@@ -716,52 +830,6 @@
 
         prevBtn.click(function() {
             slidePrev();
-        });
-
-        // Touch/Swipe - implementação do Bootstrap 4
-        let touchStartX = 0;
-        let touchEndX = 0;
-        let isSwiping = false;
-
-        track.on('touchstart', function(e) {
-            touchStartX = e.originalEvent.touches[0].clientX;
-            isSwiping = true;
-            track.css('transition', 'none');
-        });
-
-        track.on('touchmove', function(e) {
-            if (!isSwiping) return;
-            
-            touchEndX = e.originalEvent.touches[0].clientX;
-            const diff = touchStartX - touchEndX;
-            
-            // Mostrar preview do movimento
-            const cardWidth = getCardWidth();
-            const currentTranslateX = -currentSlide * cardWidth;
-            const newTranslateX = currentTranslateX - diff * 0.3; // 30% da diferença para suavizar
-            
-            track.css('transform', `translateX(${newTranslateX}px)`);
-        });
-
-        track.on('touchend', function(e) {
-            if (!isSwiping) return;
-            
-            isSwiping = false;
-            track.css('transition', 'transform 0.5s ease-in-out');
-            
-            const swipeDistance = touchStartX - touchEndX;
-            const threshold = 50;
-            
-            if (Math.abs(swipeDistance) > threshold) {
-                if (swipeDistance > 0) {
-                    slideNext();
-                } else {
-                    slidePrev();
-                }
-            } else {
-                // Voltar à posição original
-                updateCarousel();
-            }
         });
 
         // Navegação por teclado
@@ -778,6 +846,7 @@
             itemsToShow = getItemsToShow();
             totalSlides = Math.max(0, cards.length - itemsToShow + 1);
             createIndicators();
+            setSliderPosition();
             updateCarousel();
             
             // Mostrar/ocultar controles se necessário
@@ -796,16 +865,20 @@
         let resizeTimeout;
         $(window).resize(function() {
             clearTimeout(resizeTimeout);
-            resizeTimeout = setTimeout(handleResize, 250);
+            resizeTimeout = setTimeout(function() {
+                handleResize();
+                setSliderPosition();
+            }, 250);
         });
 
-        // API pública (similar ao Bootstrap 4)
+        // API pública
         window.carouselAPI = {
             next: slideNext,
             prev: slidePrev,
             goTo: function(index) {
                 if (index >= 0 && index < totalSlides) {
                     currentSlide = index;
+                    setSliderPosition();
                     updateCarousel();
                 }
             },
