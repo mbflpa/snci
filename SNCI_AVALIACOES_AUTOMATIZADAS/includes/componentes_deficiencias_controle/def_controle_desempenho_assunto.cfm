@@ -138,7 +138,6 @@
     }
 
     .snci-desempenho-assunto .container-header {
-        border-bottom: 2px solid #f1f5f9;
         border-radius: 8px 8px 0 0;
         padding-top: 20px;
         padding-left: 0;
@@ -236,10 +235,11 @@
 
     /* Cards */
     .snci-desempenho-assunto .performance-card {
-        flex: 0 0 320px;
+        flex: 0 0 250px;
         background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
         border-radius: 16px;
-        padding: 24px;
+        padding: 10px;
+        padding-top:0;
         border: 1px solid #e2e8f0;
         box-shadow: 0 4px 12px rgba(0,0,0,0.08);
         transition: all 0.3s ease;
@@ -264,10 +264,6 @@
         border-color: #cbd5e1;
     }
 
-    .snci-desempenho-assunto .card-header {
-        text-align: center;
-        margin-bottom: 20px;
-    }
 
     .snci-desempenho-assunto .card-title {
         font-size: 0.6rem;
@@ -715,30 +711,30 @@
             }
         });
 
-        // Auto-play (opcional)
-        let autoplayInterval;
-        function startAutoplay() {
-            autoplayInterval = setInterval(function() {
-                if (currentIndex < totalSlides - 1) {
-                    currentIndex++;
-                } else {
-                    currentIndex = 0;
-                }
-                updateCarousel();
-            }, 5000);
-        }
+        // // Auto-play (opcional)
+        // let autoplayInterval;
+        // function startAutoplay() {
+        //     autoplayInterval = setInterval(function() {
+        //         if (currentIndex < totalSlides - 1) {
+        //             currentIndex++;
+        //         } else {
+        //             currentIndex = 0;
+        //         }
+        //         updateCarousel();
+        //     }, 5000);
+        // }
 
-        function stopAutoplay() {
-            clearInterval(autoplayInterval);
-        }
+        // function stopAutoplay() {
+        //     clearInterval(autoplayInterval);
+        // }
 
         // Pausar autoplay ao passar o mouse
-        $('.snci-desempenho-assunto').hover(stopAutoplay, startAutoplay);
+        //$('.snci-desempenho-assunto').hover(stopAutoplay, startAutoplay);
 
         // Inicialização
         createIndicators();
         updateCarousel();
-        startAutoplay();
+       // startAutoplay();
 
         // Redimensionamento da tela
         $(window).resize(handleResize);
