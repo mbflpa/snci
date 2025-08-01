@@ -44,7 +44,7 @@
            
         <cftransaction>
             <cfquery name="rsAlterarITM" datasource="DBSNCI">
-                SELECT Itn_TipoUnidade,Itn_Descricao,Itn_Manchete,Itn_ValorDeclarado,Itn_ValidacaoObrigatoria,Itn_Orientacao,Itn_Amostra,Itn_Norma,Itn_PreRelato,Itn_OrientacaoRelato,Itn_ClassificacaoControle,Itn_ControleTestado,Itn_CategoriaControle,Itn_RiscoIdentificado,Itn_RiscoIdentificadoOutros,Itn_MacroProcesso,Itn_ProcessoN1,Itn_ProcessoN1NaoAplicar,Itn_ProcessoN2,Itn_ProcessoN3,Itn_ProcessoN3Outros,Itn_GestorProcessoDir,Itn_GestorProcessoDepto,Itn_ObjetivoEstrategico,Itn_RiscoEstrategico,Itn_IndicadorEstrategico,Itn_Coso2013Componente,Itn_Coso2013Principios,Itn_PTC_Seq
+                SELECT Itn_TipoUnidade,Itn_Descricao,Itn_Manchete,Itn_ValorDeclarado,Itn_ValidacaoObrigatoria,Itn_Orientacao,Itn_Amostra,Itn_Norma,Itn_PreRelato,Itn_OrientacaoRelato,Itn_ClassificacaoControle,Itn_ControleTestado,Itn_CategoriaControle,Itn_RiscoIdentificado,Itn_RiscoIdentificadoOutros,Itn_MacroProcesso,Itn_ProcessoN1,Itn_ProcessoN1NaoAplicar,Itn_ProcessoN2,Itn_ProcessoN3,Itn_ProcessoN3Outros,Itn_GestorProcessoDir,Itn_GestorProcessoDepto,Itn_ObjetivoEstrategico,Itn_RiscoEstrategico,Itn_IndicadorEstrategico,Itn_Coso2013Componente,Itn_Coso2013Principios,Itn_PTC_Seq,Itn_ImpactarTipos,Itn_Reincidentes
                 FROM Itens_Verificacao
                 WHERE Itn_Ano=<cfqueryparam value="#ano#" cfsqltype="cf_sql_char"> AND 
                 Itn_Modalidade=<cfqueryparam value="#modal#" cfsqltype="cf_sql_char"> AND 
@@ -62,9 +62,9 @@
             <cfquery name="rsModalidade" datasource="DBSNCI">
                 SELECT TUI_Modalidade,
                 CASE 
-                    WHEN TUI_Modalidade = 0 THEN 'Presencial'
-                    WHEN TUI_Modalidade = 1 THEN 'A Distância'
-                    ELSE 'Mista'
+                    WHEN TUI_Modalidade = 0 THEN 'PRESENCIAL (0)'
+                    WHEN TUI_Modalidade = 1 THEN 'A DISTÂNCIA (1)'
+                    ELSE 'TODAS (0 e 1)'
                 END as nome_modalidade
                 FROM Itens_Verificacao 
                 INNER JOIN TipoUnidade_ItemVerificacao ON TUI_GrupoItem = Itn_NumGrupo and 
@@ -94,6 +94,22 @@
           <cfreturn rsitmverif>
         </cftransaction>
     </cffunction>  
+    <!--- Este método retorna grupos inclusão --->
+    <cffunction  name="cadgruposverificacao" access="remote" ReturnFormat="json" returntype="any">
+        <cfargument name="anogrupo" required="true">
+        <cftransaction>
+            <cfquery name="rscadgrpverif" datasource="DBSNCI">
+                SELECT distinct Grp_Codigo, Grp_Descricao, Itn_NumGrupo
+                FROM (Grupos_Verificacao 
+                LEFT JOIN Itens_Verificacao ON (Grp_Ano = Itn_Ano) AND (Grp_Codigo = Itn_NumGrupo)) 
+                LEFT JOIN TipoUnidade_ItemVerificacao ON (Itn_Ano = TUI_Ano) AND (Itn_NumItem = TUI_ItemVerif) AND (Itn_NumGrupo = TUI_GrupoItem) AND (Itn_TipoUnidade = TUI_TipoUnid) AND (Itn_Modalidade = TUI_Modalidade)
+                GROUP BY Grp_Ano, Itn_Modalidade, Itn_TipoUnidade, Grp_Codigo, Grp_Descricao, Itn_NumGrupo
+                HAVING Grp_Ano=<cfqueryparam value="#anogrupo#" cfsqltype="cf_sql_char"> 
+                ORDER BY Grp_Descricao
+            </cfquery>
+            <cfreturn rscadgrpverif>
+        </cftransaction>
+    </cffunction>    
     <!--- Este método retorna grupos --->
     <cffunction  name="gruposverificacao" access="remote" ReturnFormat="json" returntype="any">
         <cfargument name="anogrupo" required="true">
@@ -104,7 +120,7 @@
                 FROM (Grupos_Verificacao INNER JOIN Itens_Verificacao ON (Grp_Codigo = Itn_NumGrupo) AND (Grp_Ano = Itn_Ano)) INNER JOIN TipoUnidade_ItemVerificacao ON (Itn_NumItem = TipoUnidade_ItemVerificacao.TUI_ItemVerif) AND (Itn_NumGrupo = TipoUnidade_ItemVerificacao.TUI_GrupoItem) AND (Itn_TipoUnidade = TipoUnidade_ItemVerificacao.TUI_TipoUnid) AND (Itn_Ano = TipoUnidade_ItemVerificacao.TUI_Ano) AND (Itn_Modalidade = TipoUnidade_ItemVerificacao.TUI_Modalidade)
                 WHERE (Grp_Ano= <cfqueryparam value="#anogrupo#" cfsqltype="cf_sql_char">) AND (Itn_Modalidade = <cfqueryparam value="#modalgrupo#" cfsqltype="cf_sql_char">)
                 GROUP BY Grp_Codigo, Grp_Descricao
-                ORDER BY Grp_Codigo
+                ORDER BY Grp_Descricao
           </cfquery>
           <cfreturn rsgrpverif>
         </cftransaction>

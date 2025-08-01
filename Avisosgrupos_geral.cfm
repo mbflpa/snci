@@ -487,7 +487,7 @@ if (frm.frmmensagem.value == ''){
 	SELECT AVGR_ANO, AVGR_ID, AVGR_DT_INICIO, AVGR_DT_FINAL, AVGR_GRUPOACESSO, AVGR_AVISO, AVGR_status, AVGR_username, AVGR_TITULO, AVGR_ANEXO
 	FROM AvisosGrupos
 	<!--- where (AVGR_ID = 8 or AVGR_ID = 10) --->
-	ORDER BY AVGR_ANO, AVGR_status, AVGR_DT_INICIO
+	ORDER BY AVGR_ANO DESC, AVGR_ID desc, AVGR_DT_INICIO DESC,AVGR_status
 	</cfquery>
 	  <table width="100%" border="0" align="center">
 	  <tr class="titulosClaro">

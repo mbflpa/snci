@@ -207,19 +207,25 @@
                     Itn_NumGrupo = #form.selAltItemGrupo# AND 
                     Itn_NumItem = #form.selAltItem# 
             </cfquery>
+            <cfset ripcaractvlr = 'NAO QUANTIFICADO'>
+            <cfset itnimpactartipos= 'N,N,N'>
+            <cfif listfind('#altpontuacaoseq#','10')>
+                <cfset ripcaractvlr = 'QUANTIFICADO'>
+                 <cfset itnimpactartipos= #form.selaltfalta# & ',' & #form.selaltsobra# & ',' & #form.selaltrisco#>
+            </cfif>	            
             <cfif rsExisteItemVerif.recordcount lte 0>
                 <!-- Inclusão -->
                 <cfquery datasource="#dsn_inspecao#">
                     INSERT INTO Itens_Verificacao 
-                        (Itn_Modalidade,Itn_Ano,Itn_TipoUnidade,Itn_NumGrupo,Itn_NumItem,Itn_Descricao,Itn_Orientacao,Itn_Situacao,Itn_DtUltAtu,Itn_UserName,Itn_ValorDeclarado,Itn_Amostra,Itn_Norma,Itn_ValidacaoObrigatoria,Itn_PreRelato,Itn_OrientacaoRelato,Itn_Pontuacao,Itn_PTC_Seq,Itn_Classificacao,Itn_Manchete,Itn_ClassificacaoControle,Itn_ControleTestado,Itn_CategoriaControle,Itn_RiscoIdentificado,Itn_RiscoIdentificadoOutros,Itn_MacroProcesso,Itn_ProcessoN1,Itn_ProcessoN1NaoAplicar,Itn_ProcessoN2,Itn_ProcessoN3,Itn_ProcessoN3Outros,Itn_GestorProcessoDir,Itn_GestorProcessoDepto,Itn_ObjetivoEstrategico,Itn_RiscoEstrategico,Itn_IndicadorEstrategico,Itn_Coso2013Componente,Itn_Coso2013Principios)
+                        (Itn_Modalidade,Itn_Ano,Itn_TipoUnidade,Itn_NumGrupo,Itn_NumItem,Itn_Descricao,Itn_Orientacao,Itn_Situacao,Itn_DtUltAtu,Itn_UserName,Itn_ValorDeclarado,Itn_Amostra,Itn_Norma,Itn_ValidacaoObrigatoria,Itn_PreRelato,Itn_OrientacaoRelato,Itn_Pontuacao,Itn_PTC_Seq,Itn_Reincidentes,Itn_ImpactarTipos,Itn_Classificacao,Itn_Manchete,Itn_ClassificacaoControle,Itn_ControleTestado,Itn_CategoriaControle,Itn_RiscoIdentificado,Itn_RiscoIdentificadoOutros,Itn_MacroProcesso,Itn_ProcessoN1,Itn_ProcessoN1NaoAplicar,Itn_ProcessoN2,Itn_ProcessoN3,Itn_ProcessoN3Outros,Itn_GestorProcessoDir,Itn_GestorProcessoDepto,Itn_ObjetivoEstrategico,Itn_RiscoEstrategico,Itn_IndicadorEstrategico,Itn_Coso2013Componente,Itn_Coso2013Principios)
                     VALUES 
-                        ('#form.selAltModalidade#',#form.selAltItemAno#,#tipo#,#form.selAltItemGrupo#,#form.selAltItem#,'#form.altItemDescricao#','#form.altItemOrientacao#','D',CONVERT(DATETIME, getdate(), 103),'#qAcesso.Usu_Matricula#','#form.selAltItemValorDec#','#form.altItemAmostra#','#form.altItemNorma#','#form.selAltValidObrig#','#form.altItemPreRelato#','#form.altItemOrientacaoRelato#',#pontuacao#,'#altpontuacaoseq#','#ClassifITEM#','#form.altItemManchete#','#form.altclassifcontrole#','#form.altcontroletestado#','#form.itncategoriacontroleAlt#','#form.altcategoriarisco#','#form.altcategoriariscooutros#',#form.altmacroprocesso#,'#altprocesson1#','#form.altprocesson1naoseaplica#','#altprocesson2#','#altprocesson3#','#form.altprocesson3outros#',#form.altgestordir#,'#form.altgestordepto#','#form.itnaltobjetivoestrategicoAlt#','#form.itnaltriscoestrategicoAlt#','#form.itnaltindicadorestrategicoAlt#',#form.altcomponentecoso#,#form.altprincipioscoso#)                                    
+                        ('#form.selAltModalidade#',#form.selAltItemAno#,#tipo#,#form.selAltItemGrupo#,#form.selAltItem#,'#form.altItemDescricao#','#form.altItemOrientacao#','D',CONVERT(DATETIME, getdate(), 103),'#qAcesso.Usu_Matricula#','#form.selAltItemValorDec#','#form.altItemAmostra#','#form.altItemNorma#','#form.selAltValidObrig#','#form.altItemPreRelato#','#form.altItemOrientacaoRelato#',#pontuacao#,'#altpontuacaoseq#','#form.selaltreindencias#','#itnimpactartipos#','#ClassifITEM#','#form.altItemManchete#','#form.altclassifcontrole#','#form.altcontroletestado#','#form.itncategoriacontroleAlt#','#form.altcategoriarisco#','#form.altcategoriariscooutros#',#form.altmacroprocesso#,'#altprocesson1#','#form.altprocesson1naoseaplica#','#altprocesson2#','#altprocesson3#','#form.altprocesson3outros#',#form.altgestordir#,'#form.altgestordepto#','#form.itnaltobjetivoestrategicoAlt#','#form.itnaltriscoestrategicoAlt#','#form.itnaltindicadorestrategicoAlt#',#form.altcomponentecoso#,#form.altprincipioscoso#)                                    
                 </cfquery>                 
             <cfelse>
                 <!-- Alteração -->
                 <cfquery datasource="#dsn_inspecao#">
                     UPDATE Itens_Verificacao SET
-                        Itn_Descricao='#form.altItemDescricao#'
+                         Itn_Descricao='#form.altItemDescricao#'
                         ,Itn_Orientacao='#form.altItemOrientacao#'
                         ,Itn_DtUltAtu=CONVERT(DATETIME, getdate(), 103)
                         ,Itn_UserName='#qAcesso.Usu_Matricula#'
@@ -231,6 +237,8 @@
                         ,Itn_OrientacaoRelato='#form.altItemOrientacaoRelato#'
                         ,Itn_Pontuacao=#pontuacao#
                         ,Itn_PTC_Seq='#altpontuacaoseq#'
+                        ,Itn_Reincidentes = '#form.selaltreindencias#'
+                        ,Itn_ImpactarTipos='#itnimpactartipos#'
                         ,Itn_Classificacao='#ClassifITEM#'
                         ,Itn_Manchete='#form.altItemManchete#'
                         ,Itn_ClassificacaoControle='#form.altclassifcontrole#'
@@ -260,13 +268,11 @@
                 </cfquery>
                            
             </cfif> 
-            <cfset RIPCaractvlr = 'NAO QUANTIFICADO'>
-            <cfif listfind('#altpontuacaoseq#','10')>
-                <cfset RIPCaractvlr = 'QUANTIFICADO'>
-            </cfif>	   
+   
             <cfquery datasource="#dsn_inspecao#">
-                UPDATE Resultado_Inspecao SET 
-                    RIP_Caractvlr = '#RIPCaractvlr#'
+                UPDATE Resultado_Inspecao 
+                SET 
+                     RIP_Caractvlr = '#ripcaractvlr#'
                 WHERE 
                     RIP_Ano = #form.selAltItemAno# AND 
                     RIP_NumGrupo = #form.selAltItemGrupo# AND 
@@ -319,15 +325,6 @@
         <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
         <script type="text/javascript" src="ckeditor/ckeditor.js"></script>
         <link rel="stylesheet" href="public/bootstrap/bootstrap.min.css">     
-        <style type="text/css">    
-            .tituloDivCadGrupo{
-                padding:5px;
-                position:relative;
-                top: -29px;
-                background: #003366;
-                border: 1px solid #fff;
-            }
-        </style>
     </head>
     <body id="main_body_alt" style="background:#ccc;">
         <div align="left" style="background:#003366">   
@@ -344,10 +341,10 @@
                 <div style="background:#fff;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">
                     <h2 id="altum">
                         <button  type="button" style="background:#ccf;color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">
-                            <strong>ANO / GRUPO / ITEM / MODALIDADE</strong>
+                            <strong>ANO / MODALIDADE / GRUPO / ITEM / REINCIDÊNCIA(S)</strong>
                         </button>
                     </h2>
-                    <div id="altprimeiro"  aria-labelledby="altum" >
+                    <div id="altprimeiro"  aria-labelledby="altum" class="entrada">
                         <div>
                             <div class="row">
                                 <div class="col">
@@ -414,6 +411,23 @@
                                     </label>
                                 </div>
                             </div> 
+                            <div class="row"> 
+                                <div class="col">
+                                    <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">____________________________________________________________________________________________________________________________________________________________________________________________________________________</label>
+                                </div>
+                            </div>   
+                            <div class="row">
+                                <div class="col">
+                                    <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:16px;">Reincidência(s) (grupo/item)</label><label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:11px;">&nbsp; ex. 1000_1  ou 230_1,242_3,230_1,241_1,242_3,230_1,241_1,242_3,243_3</label>
+                                </div>   
+                            </div>                                  
+                            <div class="row">                            
+                                <div class="col">
+                                    <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">            
+                                        <input name="selaltreindencias" id="selaltreindencias" type="text" class="form-control-sm" value="" size="110" maxlength="100" onKeyPress="altformatoreincidentes()">
+                                    </label>
+                                </div>
+                            </div>                             
                             <br>                                                               
                         </div>
                     </div>
@@ -827,7 +841,7 @@
                     <div class="accordion-item">
                         <h2 class="accordion-header" id="altdez">
                             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#altdecimo" aria-expanded="false" aria-controls="altdecimo" style="background:#ccf;color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">
-                                <strong>PLANO DE TESTE</strong>
+                                <strong>PLANO DE TESTE / CARACTERÍSTICAS DE ALCANCE DO IMPACTO FINANCEIRO DIRETO</strong>
                             </button>
                         </h2>
                         <div id="altdecimo" class="accordion-collapse collapse" aria-labelledby="altdez" data-bs-parent="#acordion-altgrpitm">
@@ -905,7 +919,7 @@
                                                     <input type="text" id="pontuacaoCalculadaAlt" name="pontuacaoCalculadaAlt" readonly  size="3" class="form-control" style="color:#009;font-size:26px;text-align:center;" value="0"></strong></input>
                                                 </div>
                                             </div>  
-                                        </div>                                         
+                                        </div>                                                                               
                                     </div>
                                     <div id="franquiaalt">
                                         <div class="row"> 
@@ -940,8 +954,58 @@
                                                     <input type="text" id="pontuacaoCalculadaAltAGF" name="pontuacaoCalculadaAltAGF" readonly  class="form-control" size="3" style="color:#009;font-size:26px;text-align:center;" value="0"></strong></input>
                                                 </div>
                                             </div> 
-                                        </div>
+                                        </div>                                         
                                     </div>
+                                    <div id="altimpactartipos">
+                                        <br>
+                                        <div class="row">
+                                            <div class="col">
+                                                <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">_______________________________________________________________________________________________________________________________________________________________________________________________________________</label>
+                                            </div>  
+                                        </div>                                        
+                                        <div class="row"> 
+                                            <div class="col">
+                                                <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;"><strong>CARACTERÍSTICAS DE ALCANCE DO IMPACTO FINANCEIRO DIRETO</strong></label>
+                                            </div> 
+                                        </div>                                             
+                                        <div class="row">
+                                            <div class="col">
+                                                <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:12px;">Estimado a Recuperar(R$)</label>
+                                            </div>
+                                            <div class="col">
+                                                <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:12px;">Estimado Não Planejado/Extrapolado/Sobra(R$)</label>
+                                            </div>
+                                            <div class="col">
+                                                <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:12px;">Estimado em Risco ou Envolvido(R$)</label>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col">
+                                                <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">            
+                                                    <select name="selaltfalta" id="selaltfalta" class="form-select" aria-label="Default select example">									                                                                                                                     
+                                                        <option value="N" selected>N</option>
+                                                        <option value="F">F</option> 
+                                                    </select>	
+                                                </label>
+                                            </div>
+                                            <div class="col">
+                                                <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">
+                                                    <select name="selaltsobra" id="selaltsobra" class="form-select" aria-label="Default select example">                                      
+                                                        <option value="N" selected>N</option>
+                                                        <option value="S">S</option> 
+                                                    </select>     
+                                                </label>                                  
+                                            </div>
+                                            <div class="col">
+                                                <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">
+                                                    <select name="selaltrisco" id="selaltrisco" class="form-select" aria-label="Default select example">                                      
+                                                        <option value="N" selected>N</option>
+                                                        <option value="R">R</option> 
+                                                    </select>     
+                                                </label>                                  
+                                            </div>
+                                        </div>
+                                    </div>                                     
                                 </div>
                             </div>
                         </div>
@@ -980,6 +1044,9 @@
                 <input type="hidden" id="altprocesson2_db" name="altprocesson2_db" value=""> 
                 <input type="hidden" id="altprocesson3_sel" name="altprocesson3_sel" value=""> 
                 <input type="hidden" id="altprocesson3_db" name="altprocesson3_db" value="">
+                <input type="hidden" id="db_selaltfalta" name="db_selaltfalta" value="">
+                <input type="hidden" id="db_selaltsobra" name="db_selaltsobra" value="">
+                <input type="hidden" id="db_selaltrisco" name="db_selaltrisco" value="">
             </form>
         </div>
 
@@ -987,13 +1054,14 @@
         <script src="public/jquery-3.7.1.min.js"></script>
         <script type="text/javascript" src="public/axios.min.js"></script>
         <script type="text/javascript"> 
-            //alert('Dom inicializado!');     
-            function CKupdate(){
-                for ( instance in CKEDITOR.instances )
-                CKEDITOR.instances[instance].updateElement();
-            }
-            //var local = "parametros.cfm";
-//            function editar_altItemOrientacao(){
+	        $(function(e){
+                $('#altimpactartipos').hide()
+                //alert('Dom inicializado!');     
+                function CKupdate(){
+                    for ( instance in CKEDITOR.instances )
+                    CKEDITOR.instances[instance].updateElement();
+                }
+                //var local = "parametros.cfm";
                 CKEDITOR.replace('altItemOrientacao', {
                     width: '100%',
                     height: 50,   
@@ -1009,10 +1077,8 @@
                         ['HorizontalRule','SpecialChar', '-', 'Styles', 'Font','FontSize','TextColor', 'BGColor','Maximize','Table'  ]
                     ]
 
-                });
-//            }
-
-//            function altItem_PreRelato(){    
+                })
+  
                 CKEDITOR.replace('altItemPreRelato', {
                     width: '100%',
                     height: 50,
@@ -1027,10 +1093,8 @@
                         ['JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock','-'], 
                         ['HorizontalRule','SpecialChar', '-', 'Styles', 'Font','FontSize','TextColor', 'BGColor','Maximize','Table'  ]
                     ]
-                });
-//            }   
-
-//            function altItem_altItemOrientacaoRelato(){      
+                })
+    
                 CKEDITOR.replace('altItemOrientacaoRelato', {
                     width: '100%',
                     height: 50,
@@ -1047,9 +1111,7 @@
                     ]
 
                 });
-//            }
-
-//            function altItem_altItemAmostra(){       
+     
                 CKEDITOR.replace('altItemAmostra', {
                 width: '100%',
                 height: 50,
@@ -1062,11 +1124,8 @@
                         ['JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock','-'], 
                         ['HorizontalRule','SpecialChar', '-', 'Styles', 'Font','FontSize','TextColor', 'BGColor','Maximize','Table'  ]
                     ]				
-                });
-//            }
+                })
 
-//            function altItem_altItemNorma(){ 
-//                alert('aqui linha 1080')
                 CKEDITOR.replace('altItemNorma', {
                 width: '100%',
                 height: 50,
@@ -1079,8 +1138,8 @@
                         ['JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock','-'], 
                         ['HorizontalRule','SpecialChar', '-', 'Styles', 'Font','FontSize','TextColor', 'BGColor','Maximize','Table'  ]
                     ]
-                });
-//            }
+                })
+            })                
             //Efetuar limpeza dos campos em tela
             function ajustarcampos(){
                 let prots = '<option value="">---</option>'
@@ -1260,7 +1319,10 @@
                 }
                 })
                 .then(data =>{
+                    //Itn_TipoUnidade,Itn_Descricao,Itn_Manchete,Itn_ValorDeclarado,Itn_ValidacaoObrigatoria,Itn_Orientacao,Itn_Amostra,Itn_Norma,Itn_PreRelato,Itn_OrientacaoRelato,Itn_ClassificacaoControle,Itn_ControleTestado,Itn_CategoriaControle,Itn_RiscoIdentificado,Itn_RiscoIdentificadoOutros,Itn_MacroProcesso,Itn_ProcessoN1,Itn_ProcessoN1NaoAplicar,Itn_ProcessoN2,Itn_ProcessoN3,Itn_ProcessoN3Outros,Itn_GestorProcessoDir,Itn_GestorProcessoDepto,Itn_ObjetivoEstrategico,Itn_RiscoEstrategico,Itn_IndicadorEstrategico,Itn_Coso2013Componente,Itn_Coso2013Principios,Itn_PTC_Seq,Itn_ImpactarTipos,Itn_Reincidentes
+                    //      0               1            2                3                      4                 5              6          7           8                 9                    10                     11                   12                     13                       14                      15               16                 17                  18             19                20                    21                     22                      23                    24                     25                     26                     27                28             29                30
                     let prots = '<option value="">---</option>';
+                    let frsprots = '';
                     let vlrdeclarado = '';
                     let visualizar = '';
                     let validarobrig = '';
@@ -1286,6 +1348,10 @@
                     let princoso2013 = ''
                     let itnptcseq=''
                     let itntpunid='0'
+                    let itnfalta='N'
+                    let itnsobra='N'
+                    let itnrisco='N'
+                    let impacto10sn = 'N'
                     
                     //console.log(data.data)
                     //console.log(data.data.indexOf("COLUMNS"));
@@ -1334,6 +1400,51 @@
                         compcoso2013 = ret[26]
                         princoso2013 = ret[27]
                         if(itnptcseq.length < ret[28].length) {itnptcseq = ret[28]}
+                        let intimpactartipos = ret[29]	
+                        var arr = intimpactartipos.split(',')
+                        $.each( arr, function( i, val ) {
+                            if(i == 0){
+                                itnfalta = val
+                            }
+                            if(i == 1){
+                                itnsobra = val
+                            }
+                            if(i == 2){
+                                itnrisco = val
+                            }
+                        })
+                        $('#db_selaltfalta').val(itnfalta) 
+                        $('#db_selaltsobra').val(itnsobra) 
+                        $('#db_selaltrisco').val(itnrisco) 
+                        let selecionar = ''
+                        if(itnfalta == "F"){selecionar = 'selected'}else{selecionar = ''}
+                        frsprots = '<option value="N"'+selecionar+'>N</option>'
+                        frsprots += '<option value="F"'+selecionar+'>F</option>'
+                        $("#selaltfalta").html(frsprots) 
+                        if(itnsobra == "S"){selecionar = 'selected'}else{selecionar = ''}
+                        frsprots = '<option value="N"'+selecionar+'>N</option>'
+                        frsprots += '<option value="S"'+selecionar+'>S</option>'
+                        $("#selaltsobra").html(frsprots) 
+                        if(itnrisco == "R"){selecionar = 'selected'}else{selecionar = ''}
+                        frsprots = '<option value="N"'+selecionar+'>N</option>'
+                        frsprots += '<option value="R"'+selecionar+'>R</option>'
+                        $("#selaltrisco").html(frsprots) 
+                        if(itnptcseq != ''){
+                            var arr = itnptcseq.split(',')
+                            $.each( arr, function( i, val ) {
+                                if(val == 10){
+                                    impacto10sn = 'S'
+                                }
+                            })
+                        }
+                        if(impacto10sn == 'N'){
+                            $("#selaltfalta").html('<option value="N">N</option>') 
+                            $("#selaltsobra").html('<option value="N">N</option>') 
+                            $("#selaltrisco").html('<option value="N">N</option>') 
+                            $('#altimpactartipos').hide()
+                        }else{$('#altimpactartipos').show(500)}
+                        $('#selaltreindencias').val(ret[30])
+                        
                         itntpunid += ','+ret[0]
                     });
                     if(visualizar == '99') {
@@ -2178,18 +2289,50 @@
                 //Tipo de Unidade Própria foi clicado
                 $('.checkPontuacaoAlt').click(function(){
                     var total = 0
+                    let title = 0
+                    let impacto10sn = 'N'
+                    let frsprots = ''
+                    let selecionar = ''
                     $( ".checkPontuacaoAlt" ).each(function( index ) {
                         if($(this).is(':checked')){
                             total = total + eval($(this).val())
+                            title = $(this).attr("title")
+                            if(title == 10){
+                                impacto10sn = 'S'
+                                //alert('$(this).val() '+$(this).val()+ ' title: '+title+' impacto10sn: '+impacto10sn)
+                            }
                         }
-                    });
+                    })
                     $('#pontuacaoCalculadaAlt').val(total); 
-                    altsomaragf()
+                    altsomaragf()                    
+                    if(impacto10sn == 'N'){
+                        $("#selaltfalta").html('<option value="N">N</option>') 
+                        $("#selaltsobra").html('<option value="N">N</option>') 
+                        $("#selaltrisco").html('<option value="N">N</option>') 
+                         $('#altimpactartipos').hide()
+                    }else{
+                        let itnfalta = $('#db_selaltfalta').val() 
+                        let itnsobra = $('#db_selaltsobra').val() 
+                        let itnrisco = $('#db_selaltrisco').val()
+                        if(itnfalta == "F"){selecionar = 'selected'}else{selecionar = ''}
+                        frsprots = '<option value="N"'+selecionar+'>N</option>'
+                        frsprots += '<option value="F"'+selecionar+'>F</option>'
+                        $("#selaltfalta").html(frsprots) 
+                        if(itnsobra == "S"){selecionar = 'selected'}else{selecionar = ''}
+                        frsprots = '<option value="N"'+selecionar+'>N</option>'
+                        frsprots += '<option value="S"'+selecionar+'>S</option>'
+                        $("#selaltsobra").html(frsprots) 
+                        if(itnrisco == "R"){selecionar = 'selected'}else{selecionar = ''}
+                        frsprots = '<option value="N"'+selecionar+'>N</option>'
+                        frsprots += '<option value="R"'+selecionar+'>R</option>'
+                        $("#selaltrisco").html(frsprots)   
+                         $('#altimpactartipos').show(500)                      
+                    }
                 })//Tipo de Unidade Própria foi clicado 
                 //Tipo de Unidade AGF foi clicado
                 $('.checkPontuacaoAltAGF').click(function(){
                     var total = eval($(this).val())
-                    $('#pontuacaoCalculadaAltAGF').val(total); 
+                    $('#pontuacaoCalculadaAltAGF').val(total)
                     altsomaragf()
                 })//Tipo de Unidade AGF foi clicado    
                 //calcular total AGF
@@ -2384,7 +2527,11 @@
                     frm.selAltItemAno.focus();
                     return false;
                 }
-
+                if (frm.selAltModalidade.value == '') {
+                    alert('Selecione a Modalidade para item!');
+                    frm.selAltModalidade.focus();
+                    return false;
+                }
                 if (frm.selAltItemGrupo.value == '') {
                     alert('Informe um grupo para item!');
                     frm.selAltItemGrupo.focus();
@@ -2397,11 +2544,33 @@
                     return false;
                 }
 
-                if (frm.selAltModalidade.value == '') {
-                    alert('Selecione a Modalidade para item!');
-                    frm.selAltModalidade.focus();
+                var frmselaltreindencias = frm.selaltreindencias.value
+                if (frmselaltreindencias == '') {
+                    alert('Informar Reincidência(s) (grupo/item)!');
+                    frm.selaltreindencias.focus();
                     return false;
                 }
+
+                let recusarsn = 'N'
+                let contarr = 0
+                var arr = frmselaltreindencias.split(',')         
+                $.each( arr, function( i, val ) {
+                    if (val.indexOf(",") > 0 || val.indexOf("_") < 0) {
+                        recusarsn = 'S'
+                    } 
+                    contarr++ 
+                })
+                if (contarr == 1) {
+                    if ((frmselaltreindencias.indexOf(",") <= 0 && frmselaltreindencias.indexOf("_") != frmselaltreindencias.lastIndexOf("_"))) 
+                    {
+                        recusarsn = 'S'
+                    } 
+                }  
+                if (recusarsn == 'S') {
+                    alert('Reincidência(s) (grupo/item), fora do padrão, verificar exemplos de preenchimento!');
+                    frm.selaltreindencias.focus();
+                    return false;
+                }                  
 
                 if (frm.altItemDescricao.value == '') {
                     alert('Informe uma descrição para item!');
@@ -2634,8 +2803,17 @@
                     }else{return false;}
                 }
             }            
-            // fim da críticas do submit     
-                                                     
+            // fim da críticas do submit    
+
+            function altformatoreincidentes() {
+                var tecla = window.event.keyCode;
+                //alert(tecla)
+                //permite digitação das teclas numéricas (48 a 57, 96 a 105), Delete e Backspace (8 e 46), TAB (9) e ESC (27)	
+                    if ((tecla < 48 || tecla > 57) && (tecla != 44 && tecla != 95)) {
+                    //alert(tecla);
+                    event.returnValue = false;
+                }
+            }                                                      
         </script>
     </body>
 </html>

@@ -34,7 +34,7 @@
         WHERE PTC_Ano = '#year(now())#'
     </cfquery>
 
-<cfif isDefined("form.selCadItemAno") and '#form.selCadItemAno#' neq ''>
+<cfif isDefined("form.selCadItemAno") and '#form.selCadItemAno#' neq ''>      
     <cfquery name="rsPta" datasource="#dsn_inspecao#">
         SELECT PTC_Seq, PTC_Valor, PTC_Descricao, PTC_Status, PTC_dtultatu, PTC_Username, PTC_Franquia 
         FROM Pontuacao 
@@ -62,6 +62,7 @@
 </cfquery>
 
 <cfif isDefined("form.acao") and "#form.acao#" eq 'cadItem'>
+
     <cfquery datasource="#dsn_inspecao#" name="rsItemExiste">
         SELECT Itn_Descricao FROM Itens_Verificacao 
         WHERE Itn_Descricao = '#form.cadItemDescricao#' AND Itn_Ano = #form.selCadItemAno# 
@@ -78,6 +79,8 @@
         <cfif '#rsNumItem.numItem#' neq ''>
             <cfset numItem = '#rsNumItem.numItem#'>  
         </cfif> 
+        <cfset itnreincidentes = #trim(form.selcadreindencias)#>
+        <cfset itnreincidentes = #form.selCadItemGrupo# & '_' & #numItem# & "," & #itnreincidentes#>
         <cfset tiposunidcad = form.tiposCad>
         <cfloop list="#tiposunidcad#" index="j">   
             <cfset tipoCad = j>    
@@ -100,7 +103,8 @@
                 <cfset pontuacao = #form.pontuacaoCalculadaCad#>
                 <cfset altpontuacaoseq = #form.checkpontuacaocadseq#>
                 <cfset PercClassifItem = NumberFormat(((#pontuacao# / rsPtoMax.TUP_PontuacaoMaxima) * 100),999)>	
-            </cfif>                    
+            </cfif>  
+            <cfset itnimpactartipos= #form.selcadfalta# & ',' & #form.selcadsobra# & ',' & #form.selcadrisco#>                  
             <!--- calculo da descricao do item a saber GRAVE, MEDIANO ou LEVE --->
             <cfif PercClassifItem gt 40>
                 <cfset ClassifITEM = 'GRAVE'> 
@@ -123,8 +127,9 @@
                     <cfset processon3 = 0>
                 </cfif>
             </cfif>
+         
             <!--- Fim ajustes de campos para Não aplicar Processo N1 --->          
-            <cfif '#form.selModalidade#' eq 'todas'>
+            <cfif '#form.selCadModalidade#' eq '2'>
                     <cfquery datasource="#dsn_inspecao#">
                         INSERT INTO TipoUnidade_ItemVerificacao 
                             (TUI_Ano,TUI_Modalidade,TUI_TipoUnid,TUI_GrupoItem,TUI_ItemVerif,TUI_DtUltAtu,TUI_UserName,TUI_Ativo,TUI_Pontuacao,TUI_Pontuacao_Seq,TUI_Classificacao)
@@ -133,9 +138,9 @@
                     </cfquery>
                     <cfquery datasource="#dsn_inspecao#">
                         INSERT INTO Itens_Verificacao 
-                            (Itn_Modalidade,Itn_Ano,Itn_TipoUnidade,Itn_NumGrupo,Itn_NumItem,Itn_Descricao,Itn_Orientacao,Itn_Situacao,Itn_DtUltAtu,Itn_UserName,Itn_ValorDeclarado,Itn_Amostra,Itn_Norma,Itn_ValidacaoObrigatoria,Itn_PreRelato,Itn_OrientacaoRelato,Itn_Pontuacao,Itn_PTC_Seq,Itn_Classificacao,Itn_Manchete,Itn_ClassificacaoControle,Itn_ControleTestado,Itn_CategoriaControle,Itn_RiscoIdentificado,Itn_RiscoIdentificadoOutros,Itn_MacroProcesso,Itn_ProcessoN1,Itn_ProcessoN1NaoAplicar,Itn_ProcessoN2,Itn_ProcessoN3,Itn_ProcessoN3Outros,Itn_GestorProcessoDir,Itn_GestorProcessoDepto,,,Itn_ObjetivoEstrategico,Itn_RiscoEstrategico,Itn_IndicadorEstrategico,Itn_Coso2013Componente,Itn_Coso2013Principios)
+                            (Itn_Modalidade,Itn_Ano,Itn_TipoUnidade,Itn_NumGrupo,Itn_NumItem,Itn_Descricao,Itn_Orientacao,Itn_Situacao,Itn_DtUltAtu,Itn_UserName,Itn_ValorDeclarado,Itn_Amostra,Itn_Norma,Itn_ValidacaoObrigatoria,Itn_PreRelato,Itn_OrientacaoRelato,Itn_Pontuacao,Itn_PTC_Seq,Itn_Reincidentes,Itn_ImpactarTipos,Itn_Classificacao,Itn_Manchete,Itn_ClassificacaoControle,Itn_ControleTestado,Itn_CategoriaControle,Itn_RiscoIdentificado,Itn_RiscoIdentificadoOutros,Itn_MacroProcesso,Itn_ProcessoN1,Itn_ProcessoN1NaoAplicar,Itn_ProcessoN2,Itn_ProcessoN3,Itn_ProcessoN3Outros,Itn_GestorProcessoDir,Itn_GestorProcessoDepto,Itn_ObjetivoEstrategico,Itn_RiscoEstrategico,Itn_IndicadorEstrategico,Itn_Coso2013Componente,Itn_Coso2013Principios)
                         VALUES 
-                            ('0',#form.selCadItemAno#,#tipoCad#,#form.selCadItemGrupo#,#numItem#,'#form.cadItemDescricao#','#form.cadItemOrientacao#','D',CONVERT(DATETIME, getdate(), 103),'#qAcesso.Usu_Matricula#','#form.selCadItemValorDec#','#form.cadItemAmostra#','#form.cadItemNorma#','#form.selCadItemValidObrig#','#form.cadItemPreRelato#','#form.cadItemOrientacaoRelato#',#pontuacao#,'#altpontuacaoseq#','#ClassifITEM#','#form.cadItemManchete#','#form.itnclassificacontrole#','#form.controletestado#','#form.itncategoriacontrole#',#form.categoriarisco#,'#form.categoriariscooutros#',#form.macroprocesso#,#processon1#,'#form.macroprocesson1naoseaplica#',#processon2#,#processon3#,'#form.macroprocesson3outros#',#form.gestordir#,'#form.gestordepto#','#form.itnobjetivoestrategico#','#form.itnriscoestrategico#','#form.itnindicadorestrategico#',#form.componentecoso#,#form.principioscoso#)                                    
+                            ('0',#form.selCadItemAno#,#tipoCad#,#form.selCadItemGrupo#,#numItem#,'#form.cadItemDescricao#','#form.cadItemOrientacao#','D',CONVERT(DATETIME, getdate(), 103),'#qAcesso.Usu_Matricula#','#form.selCadItemValorDec#','#form.cadItemAmostra#','#form.cadItemNorma#','#form.selCadItemValidObrig#','#form.cadItemPreRelato#','#form.cadItemOrientacaoRelato#',#pontuacao#,'#altpontuacaoseq#','#itnreincidentes#','#itnimpactartipos#','#ClassifITEM#','#form.cadItemManchete#','#form.itnclassificacontrole#','#form.controletestado#','#form.itncategoriacontrole#',#form.categoriarisco#,'#form.categoriariscooutros#',#form.macroprocesso#,#processon1#,'#form.macroprocesson1naoseaplica#',#processon2#,#processon3#,'#form.macroprocesson3outros#',#form.gestordir#,'#form.gestordepto#','#form.itnobjetivoestrategico#','#form.itnriscoestrategico#','#form.itnindicadorestrategico#',#form.componentecoso#,#form.principioscoso#)                                    
                     </cfquery>                    
                     <cfquery datasource="#dsn_inspecao#">
                         INSERT INTO TipoUnidade_ItemVerificacao 
@@ -145,25 +150,25 @@
                     </cfquery>
                     <cfquery datasource="#dsn_inspecao#">
                         INSERT INTO Itens_Verificacao 
-                            (Itn_Modalidade,Itn_Ano,Itn_TipoUnidade,Itn_NumGrupo,Itn_NumItem,Itn_Descricao,Itn_Orientacao,Itn_Situacao,Itn_DtUltAtu,Itn_UserName,Itn_ValorDeclarado,Itn_Amostra,Itn_Norma,Itn_ValidacaoObrigatoria,Itn_PreRelato,Itn_OrientacaoRelato,Itn_Pontuacao,Itn_PTC_Seq,Itn_Classificacao,Itn_Manchete,Itn_ClassificacaoControle,Itn_ControleTestado,Itn_CategoriaControle,Itn_RiscoIdentificado,Itn_RiscoIdentificadoOutros,Itn_MacroProcesso,Itn_ProcessoN1,Itn_ProcessoN1NaoAplicar,Itn_ProcessoN2,Itn_ProcessoN3,Itn_ProcessoN3Outros,Itn_GestorProcessoDir,Itn_GestorProcessoDepto,Itn_ObjetivoEstrategico,Itn_RiscoEstrategico,Itn_IndicadorEstrategico,Itn_Coso2013Componente,Itn_Coso2013Principios)
+                            (Itn_Modalidade,Itn_Ano,Itn_TipoUnidade,Itn_NumGrupo,Itn_NumItem,Itn_Descricao,Itn_Orientacao,Itn_Situacao,Itn_DtUltAtu,Itn_UserName,Itn_ValorDeclarado,Itn_Amostra,Itn_Norma,Itn_ValidacaoObrigatoria,Itn_PreRelato,Itn_OrientacaoRelato,Itn_Pontuacao,Itn_PTC_Seq,Itn_Reincidentes,Itn_ImpactarTipos,Itn_Classificacao,Itn_Manchete,Itn_ClassificacaoControle,Itn_ControleTestado,Itn_CategoriaControle,Itn_RiscoIdentificado,Itn_RiscoIdentificadoOutros,Itn_MacroProcesso,Itn_ProcessoN1,Itn_ProcessoN1NaoAplicar,Itn_ProcessoN2,Itn_ProcessoN3,Itn_ProcessoN3Outros,Itn_GestorProcessoDir,Itn_GestorProcessoDepto,Itn_ObjetivoEstrategico,Itn_RiscoEstrategico,Itn_IndicadorEstrategico,Itn_Coso2013Componente,Itn_Coso2013Principios)
                         VALUES 
-                            ('1',#form.selCadItemAno#,#tipoCad#,#form.selCadItemGrupo#,#numItem#,'#form.cadItemDescricao#','#form.cadItemOrientacao#','D',CONVERT(DATETIME, getdate(), 103),'#qAcesso.Usu_Matricula#','#form.selCadItemValorDec#','#form.cadItemAmostra#','#form.cadItemNorma#','#form.selCadItemValidObrig#','#form.cadItemPreRelato#','#form.cadItemOrientacaoRelato#',#pontuacao#,'#altpontuacaoseq#','#ClassifITEM#','#form.cadItemManchete#','#form.itnclassificacontrole#','#form.controletestado#','#form.itncategoriacontrole#',#form.categoriarisco#,'#form.categoriariscooutros#',#form.macroprocesso#,#processon1#,'#form.macroprocesson1naoseaplica#',#processon2#,#processon3#,'#form.macroprocesson3outros#',#form.gestordir#,'#form.gestordepto#','#form.itnobjetivoestrategico#','#form.itnriscoestrategico#','#form.itnindicadorestrategico#',#form.componentecoso#,#form.principioscoso#)                                    
+                            ('1',#form.selCadItemAno#,#tipoCad#,#form.selCadItemGrupo#,#numItem#,'#form.cadItemDescricao#','#form.cadItemOrientacao#','D',CONVERT(DATETIME, getdate(), 103),'#qAcesso.Usu_Matricula#','#form.selCadItemValorDec#','#form.cadItemAmostra#','#form.cadItemNorma#','#form.selCadItemValidObrig#','#form.cadItemPreRelato#','#form.cadItemOrientacaoRelato#',#pontuacao#,'#altpontuacaoseq#','#itnreincidentes#','#itnimpactartipos#','#ClassifITEM#','#form.cadItemManchete#','#form.itnclassificacontrole#','#form.controletestado#','#form.itncategoriacontrole#',#form.categoriarisco#,'#form.categoriariscooutros#',#form.macroprocesso#,#processon1#,'#form.macroprocesson1naoseaplica#',#processon2#,#processon3#,'#form.macroprocesson3outros#',#form.gestordir#,'#form.gestordepto#','#form.itnobjetivoestrategico#','#form.itnriscoestrategico#','#form.itnindicadorestrategico#',#form.componentecoso#,#form.principioscoso#)                                    
                     </cfquery>   		
-            <cfelse>                      
+            <cfelse>                   
                 <cfquery datasource="#dsn_inspecao#">
                     INSERT INTO TipoUnidade_ItemVerificacao 
                         (TUI_Ano,TUI_Modalidade,TUI_TipoUnid,TUI_GrupoItem,TUI_ItemVerif,TUI_DtUltAtu,TUI_UserName,TUI_Ativo,TUI_Pontuacao,TUI_Pontuacao_Seq,TUI_Classificacao)
                     VALUES 
-                        (#form.selCadItemAno#,'#form.selModalidade#',#tipoCad#,#form.selCadItemGrupo#,#numItem#,CONVERT(DATETIME, getdate(), 103),'#qAcesso.Usu_Matricula#',0,#pontuacao#,'#altpontuacaoseq#','#ClassifITEM#') 
+                        (#form.selCadItemAno#,'#form.selCadModalidade#',#tipoCad#,#form.selCadItemGrupo#,#numItem#,CONVERT(DATETIME, getdate(), 103),'#qAcesso.Usu_Matricula#',0,#pontuacao#,'#altpontuacaoseq#','#ClassifITEM#') 
                 </cfquery>
               
                 <cfquery datasource="#dsn_inspecao#">
                     INSERT INTO Itens_Verificacao 
-                        (Itn_Modalidade,Itn_Ano,Itn_TipoUnidade,Itn_NumGrupo,Itn_NumItem,Itn_Descricao,Itn_Orientacao,Itn_Situacao,Itn_DtUltAtu,Itn_UserName,Itn_ValorDeclarado,Itn_Amostra,Itn_Norma,Itn_ValidacaoObrigatoria,Itn_PreRelato,Itn_OrientacaoRelato,Itn_Pontuacao,Itn_PTC_Seq,Itn_Classificacao,Itn_Manchete,Itn_ClassificacaoControle,Itn_ControleTestado,Itn_CategoriaControle,Itn_RiscoIdentificado,Itn_RiscoIdentificadoOutros,Itn_MacroProcesso,Itn_ProcessoN1,Itn_ProcessoN1NaoAplicar,Itn_ProcessoN2,Itn_ProcessoN3,Itn_ProcessoN3Outros,Itn_GestorProcessoDir,Itn_GestorProcessoDepto,Itn_ObjetivoEstrategico,Itn_RiscoEstrategico,Itn_IndicadorEstrategico,Itn_Coso2013Componente,Itn_Coso2013Principios)
+                        (Itn_Modalidade,Itn_Ano,Itn_TipoUnidade,Itn_NumGrupo,Itn_NumItem,Itn_Descricao,Itn_Orientacao,Itn_Situacao,Itn_DtUltAtu,Itn_UserName,Itn_ValorDeclarado,Itn_Amostra,Itn_Norma,Itn_ValidacaoObrigatoria,Itn_PreRelato,Itn_OrientacaoRelato,Itn_Pontuacao,Itn_PTC_Seq,Itn_Reincidentes,Itn_ImpactarTipos,Itn_Classificacao,Itn_Manchete,Itn_ClassificacaoControle,Itn_ControleTestado,Itn_CategoriaControle,Itn_RiscoIdentificado,Itn_RiscoIdentificadoOutros,Itn_MacroProcesso,Itn_ProcessoN1,Itn_ProcessoN1NaoAplicar,Itn_ProcessoN2,Itn_ProcessoN3,Itn_ProcessoN3Outros,Itn_GestorProcessoDir,Itn_GestorProcessoDepto,Itn_ObjetivoEstrategico,Itn_RiscoEstrategico,Itn_IndicadorEstrategico,Itn_Coso2013Componente,Itn_Coso2013Principios)
                     VALUES 
-                        ('#form.selModalidade#',#form.selCadItemAno#,#tipoCad#,#form.selCadItemGrupo#,#numItem#,'#form.cadItemDescricao#','#form.cadItemOrientacao#','D',CONVERT(DATETIME, getdate(), 103),'#qAcesso.Usu_Matricula#','#form.selCadItemValorDec#','#form.cadItemAmostra#','#form.cadItemNorma#','#form.selCadItemValidObrig#','#form.cadItemPreRelato#','#form.cadItemOrientacaoRelato#',#pontuacao#,'#altpontuacaoseq#','#ClassifITEM#','#form.cadItemManchete#','#form.itnclassificacontrole#','#form.controletestado#','#form.itncategoriacontrole#',#form.categoriarisco#,'#form.categoriariscooutros#',#form.macroprocesso#,#processon1#,'#form.macroprocesson1naoseaplica#',#processon2#,#processon3#,'#form.macroprocesson3outros#',#form.gestordir#,'#form.gestordepto#','#form.itnobjetivoestrategico#','#form.itnriscoestrategico#','#form.itnindicadorestrategico#',#form.componentecoso#,#form.principioscoso#)                                    
+                        ('#form.selCadModalidade#',#form.selCadItemAno#,#tipoCad#,#form.selCadItemGrupo#,#numItem#,'#form.cadItemDescricao#','#form.cadItemOrientacao#','D',CONVERT(DATETIME, getdate(), 103),'#qAcesso.Usu_Matricula#','#form.selCadItemValorDec#','#form.cadItemAmostra#','#form.cadItemNorma#','#form.selCadItemValidObrig#','#form.cadItemPreRelato#','#form.cadItemOrientacaoRelato#',#pontuacao#,'#altpontuacaoseq#','#itnreincidentes#','#itnimpactartipos#','#ClassifITEM#','#form.cadItemManchete#','#form.itnclassificacontrole#','#form.controletestado#','#form.itncategoriacontrole#',#form.categoriarisco#,'#form.categoriariscooutros#',#form.macroprocesso#,#processon1#,'#form.macroprocesson1naoseaplica#',#processon2#,#processon3#,'#form.macroprocesson3outros#',#form.gestordir#,'#form.gestordepto#','#form.itnobjetivoestrategico#','#form.itnriscoestrategico#','#form.itnindicadorestrategico#',#form.componentecoso#,#form.principioscoso#)                                    
                 </cfquery>  
-            </cfif>            
+            </cfif> 
         </cfloop>
 
         <script>
@@ -193,7 +198,7 @@
                 top: -29px;
                 background: #003366;
                 border: 1px solid #fff;
-            }
+            }           
         </style>
     </head>
     <body id="main_body" style="background:#ccc;" onLoad="">
@@ -208,74 +213,99 @@
                         <span class="tituloDivAltGrupo">Cadastrar Item PLANO DE TESTE</span>
                     </div>                                                                     
                 </div> 
-                <!--- Inicio acordeon --->
-                <div class="accordion" id="acordion-cadgrpitm">
-                    <div class="accordion-item">
-                        <h2 class="accordion-header" id="cadum">
-                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#cadprimeiro" aria-expanded="true" aria-controls="cadprimeiro" style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">
-                               <strong>ANO / GRUPO / VALOR DECLARADO / VALIDAÇÃO OBRIGATÓRIA</strong>
-                            </button>
-                            </h2>
-                        <div id="cadprimeiro" class="accordion-collapse collapse show" aria-labelledby="cadum" data-bs-parent="#acordion-cadgrpitm">
-                            <div class="accordion-body">
-                                <div class="row">
-                                    <div class="col">
-                                        <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">Ano</label>
-                                    </div>
-                                    <div class="col">
-                                        <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">Grupos</label>
-                                    </div>
+                <div style="background:#fff;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">
+                    <h2 class="entrada" id="cadum">
+                        <button  type="button" style="background:#ccf;color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">
+                            <strong>ANO / GRUPO / MODALIDADE / VALOR DECLARADO / VALIDAÇÃO OBRIGATÓRIA / REINCIDÊNCIA(S)</strong>
+                        </button>
+                    </h2>
+                    <div class="entrada" aria-labelledby="cadum" data-bs-parent="">
+                        <div class="accordion-body">
+                            <div class="row">
+                                <div class="col">
+                                    <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:12px;">Ano</label>
                                 </div>
-                                <div class="row">
-                                    <div class="col">
-                                        <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">            
-                                            <select name="selCadItemAno" id="selCadItemAno" class="form-select" aria-label="Default select example">									                                                                                                                     
-                                                <option value="" selected>---</option>   
-                                                <cfloop query="rsAnoPontuacao">                                             
-                                                    <option value="<cfoutput>#rsAnoPontuacao.PTC_Ano#</cfoutput>"><cfoutput>#rsAnoPontuacao.PTC_Ano#</cfoutput></option>
-                                                </cfloop>
-                                            </select>	
-                                        </label>
-                                    </div>
-                                    <div class="col">
-                                        <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">            
-                                            <select name="selCadItemGrupo" id="selCadItemGrupo" class="form-select" aria-label="Default select example">										
-                                            </select> 
-                                        </label>
-                                    </div>
-                                </div>   
-                                <br>  
-                                <div class="row">
-                                    <div class="col">
-                                        <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">VALOR DECLARADO</label>
-                                    </div>
-                                    <div class="col">
-                                        <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">VALIDAÇÃO OBRIGATÓRIA</label>
-                                    </div>
-                                </div>  
-                                <div class="row">
-                                    <div class="col">
-                                        <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">
-                                            <select name="selCadItemValorDec" id="selCadItemValorDec" class="form-select" aria-label="Default select example">
-                                                <option value="" selected>---</option>
-                                                <option value="N">Não</option>
-                                                <option value="S">Sim</option>
-                                            </select>
-                                        </label>
-                                    </div>
-                                    <div class="col">
-                                        <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">
-                                            <select name="selCadItemValidObrig" id="selCadItemValidObrig" class="form-select" aria-label="Default select example">
-                                                <option value="" selected>---</option>
-                                                <option value="0">Não</option>
-                                                <option value="1">Sim</option>
-                                            </select>
-                                        </label>
-                                    </div>
-                                </div>                               
+                                <div class="col">
+                                    <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:12px;">Grupos</label>
+                                </div>
                             </div>
+                            <div class="row">
+                                <div class="col">
+                                    <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">            
+                                        <select name="selCadItemAno" id="selCadItemAno" class="form-select" aria-label="Default select example">									                                                                                                                     
+                                            <option value="" selected>---</option>   
+                                            <cfloop query="rsAnoPontuacao">                                             
+                                                <option value="<cfoutput>#rsAnoPontuacao.PTC_Ano#</cfoutput>"><cfoutput>#rsAnoPontuacao.PTC_Ano#</cfoutput></option>
+                                            </cfloop>
+                                        </select>	
+                                    </label>
+                                </div>
+                                <div class="col">
+                                    <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">            
+                                        <select name="selCadItemGrupo" id="selCadItemGrupo" class="form-select" aria-label="Default select example">										
+                                        </select> 
+                                    </label>
+                                </div>
+                            </div> 
+                            <br>
+                            <div class="row">
+                                <div class="col">
+                                    <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:12px;">Modalidade</label>
+                                </div>
+                                <div class="col">
+                                    <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:12px;">Valor declarado</label>
+                                </div>
+                                <div class="col">
+                                    <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:12px;">Validação obrigatória</label>
+                                </div>                           
+                            </div>  
+                            <br>                         
+                            <div class="row">
+                                <div class="col">
+                                    <select name="selCadModalidade" id="selCadModalidade" class="form-select" aria-label="Default select example">
+                                        <option selected="selected" value="">---</option>
+                                        <option value="0">PRESENCIAL (0)</option>
+                                        <option value="1">A DISTÁNCIA (1)</option>
+                                        <option value="2">TODAS (0 e 1)</option>
+                                    </select>                                        
+                                </div>                                    
+                                <div class="col">
+                                    <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">
+                                        <select name="selCadItemValorDec" id="selCadItemValorDec" class="form-select" aria-label="Default select example">
+                                            <option value="" selected>---</option>
+                                            <option value="N">Não</option>
+                                            <option value="S">Sim</option>
+                                        </select>
+                                    </label>
+                                </div>
+                                <div class="col">
+                                    <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">
+                                        <select name="selCadItemValidObrig" id="selCadItemValidObrig" class="form-select" aria-label="Default select example">
+                                            <option value="" selected>---</option>
+                                            <option value="0">Não</option>
+                                            <option value="1">Sim</option>
+                                        </select>
+                                    </label>
+                                </div>
+                            </div> 
+                            <br>
+                            <div class="row">
+                                <div class="col">
+                                    <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:12px;">Reincidência(s) (grupo/item)</label><label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:11px;">&nbsp; ex. 1000_1  ou 230_1,242_3,230_1,241_1,242_3,230_1,241_1,242_3,243_3</label>
+                                </div>   
+                            </div>                                  
+                            <div class="row">                            
+                                <div class="col">
+                                    <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">            
+                                        <input name="selcadreindencias" id="selcadreindencias" type="text" class="form-control-sm" value="" size="110" maxlength="100" onKeyPress="cadformatoreincidentes()">
+                                    </label>
+                                </div>
+                            </div>                                           
                         </div>
                     </div>
+                </div>                
+                <!--- Inicio acordeon --->
+                <div class="accordion" id="acordion-cadgrpitm">
                     <!--- final cadprimeiro --->
                     <div class="accordion-item">
                         <h2 class="accordion-header" id="caddois">
@@ -618,26 +648,12 @@
                     <div class="accordion-item">
                         <h2 class="accordion-header" id="caddez">
                             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#caddecimo" aria-expanded="false" aria-controls="caddecimo" style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">
-                                <strong>PLANO DE TESTE</strong>
+                                <strong>PLANO DE TESTE / CARACTERÍSTICAS DE ALCANCE DO IMPACTO FINANCEIRO DIRETO</strong>
                             </button>
                         </h2>
                         <div id="caddecimo" class="accordion-collapse collapse" aria-labelledby="caddez" data-bs-parent="#acordion-cadgrpitm">
                             <div class="accordion-body">
-                                <div align="left" style="margin-top:30px;margin-bottom:10px;padding:10px;border:1px solid #009;">
-                                    <label  for="selModalidade" style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px">
-                                    <strong>MODALIDADE:</strong></label><br>
-                                    <select name="selModalidade" id="selModalidade" class="form-select" aria-label="Default select example">
-                                        <option selected="selected" value="">---</option>
-                                            <option value="todas">TODAS</option>
-                                            <option value="0">PRESENCIAL</option>
-                                            <option value="1">A DISTÁNCIA</option>
-                                    </select>
-                                    <div class="row"> 
-                                        <div class="col">
-                                            <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">____________________________________________________________________________________________________________________________________________________________________________________________________________</label>
-                                        </div>
-                                    </div>
-                                    <p></p>
+                                <div align="left" style="margin-top:5px;margin-bottom:5px;padding:10px;border:1px solid #009;">
                                     <label for="selCadItemTipoUnidade"  style="color:#009; font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px">
                                         <strong>TIPOS DE UNIDADE:</strong> <span style="color:#009">(Selecione os tipos de unidade que terão este item em seu PLANO DE TESTE)</span>
                                     </label>
@@ -646,7 +662,6 @@
                                             <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">____________________________________________________________________________________________________________________________________________________________________________________________________________</label>
                                         </div>
                                     </div>
-                                    <p></p>
                                     <table width="95%" border="0" class="exibir">
                                         <cfset qtdcol = 0>
                                         <tr>	  
@@ -701,21 +716,23 @@
                                             </cfoutput>      
                                         </div>
                                         <div id="totalDivCad">
-                                            <div class="row"> 
+                                            <div class="row">
                                                 <div class="col">
-                                                    <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">_____________________________________________________________________________________________________________________</label>
-                                                </div>                                    
+                                                    <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">________________________________________________________________________________________________________________________________________________________________________________________________</label>
+                                                </div>  
+                                            </div>
+                                            <div class="row">                           
                                                 <div class="col">
                                                     <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;"><strong>TOTAL:</strong></label>                                              
                                                     <input type="text" id="pontuacaoCalculadaCad" name="pontuacaoCalculadaCad" readonly  size="3" class="form-control" style="color:#009;font-size:26px;text-align:center;" value="0"></strong></input>
                                                 </div>
                                             </div>  
-                                        </div>                                         
+                                        </div>                                       
                                     </div>
                                     <div id="franquia">
                                         <div class="row"> 
                                             <div class="col">
-                                                <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">_____________________________________________________________________________________________________________________</label>
+                                                <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">________________________________________________________________________________________________________________________________________________________________________________________________</label>
                                             </div>
                                         </div>                                      
                                         <div class="row"> 
@@ -724,7 +741,7 @@
                                             </div>
                                         </div>  
                                         <div id="ptoagf" style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:12px;">     
-  <!---                                          <input type="radio" class="checkPontuacaoCadAGF checkponto" name="checkPontuacaoCadAGF" title="0" value="0" checked>&nbsp;&nbsp;Pontuação Inicial</input> --->
+                                            <!---        <input type="radio" class="checkPontuacaoCadAGF checkponto" name="checkPontuacaoCadAGF" title="0" value="0" checked>&nbsp;&nbsp;Pontuação Inicial</input> --->
                                             <cfoutput query="rsPta">
                                                 <cfif rsPta.PTC_Franquia is 'S'>
                                                     <div class="row">
@@ -739,7 +756,9 @@
                                             <div class="row"> 
                                                 <div class="col">
                                                     <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">_____________________________________________________________________________________________________________________</label>
-                                                </div>                                    
+                                                </div>
+                                            </div>                                                 
+                                            <div class="row">                                   
                                                 <div class="col">
                                                     <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;"><strong>TOTAL:</strong></label>
                                                     <p></p>                                                
@@ -748,6 +767,56 @@
                                             </div> 
                                         </div>
                                     </div>
+                                    <div id="cadimpactartipos">
+                                        <br>
+                                        <div class="row">
+                                            <div class="col">
+                                                <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">________________________________________________________________________________________________________________________________________________________________________________________________</label>
+                                            </div>  
+                                        </div>                                            
+                                        <div class="row"> 
+                                            <div class="col">
+                                                <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;"><strong>CARACTERÍSTICAS DE ALCANCE DO IMPACTO FINANCEIRO DIRETO</strong></label>
+                                            </div> 
+                                        </div>                                             
+                                        <div class="row">
+                                            <div class="col">
+                                                <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:12px;">Estimado a Recuperar(R$)</label>
+                                            </div>
+                                            <div class="col">
+                                                <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:12px;">Estimado Não Planejado/Extrapolado/Sobra(R$)</label>
+                                            </div>
+                                            <div class="col">
+                                                <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:12px;">Estimado em Risco ou Envolvido(R$)</label>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col">
+                                                <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">            
+                                                    <select name="selcadfalta" id="selcadfalta" class="form-select" aria-label="Default select example">									                                                                                                                     
+                                                        <option value="N" selected>N</option>
+                                                        <option value="F">F</option> 
+                                                    </select>	
+                                                </label>
+                                            </div>
+                                            <div class="col">
+                                                <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">
+                                                    <select name="selcadsobra" id="selcadsobra" class="form-select" aria-label="Default select example">                                      
+                                                        <option value="N" selected>N</option>
+                                                        <option value="S">S</option> 
+                                                    </select>     
+                                                </label>                                  
+                                            </div>
+                                            <div class="col">
+                                                <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">
+                                                    <select name="selcadrisco" id="selcadrisco" class="form-select" aria-label="Default select example">                                      
+                                                        <option value="N" selected>N</option>
+                                                        <option value="R">R</option> 
+                                                    </select>     
+                                                </label>                                  
+                                            </div>
+                                        </div>
+                                    </div>                                       
                                 </div>
                             </div>
                         </div>
@@ -868,6 +937,7 @@
        $(function(e){
         //alert('Dom inicializado!');        
         //alert('aqui');        
+            $('#cadimpactartipos').hide()
             axios.get("CFC/grupoitem.cfc",{
               params: {
               method: "classifctrl"
@@ -1053,12 +1123,18 @@
 //==========================================================================================
         $('#selCadItemAno').change(function(e){
             //buscar os grupos por ano selecionado
-            var anogrupo = $(this).val(); 
-           // alert(anogrupo);
+            let anogrupo = $(this).val()
+            if(anogrupo==''){
+                $('#selCadItemGrupo').html('<option value="" selected>---</option>')
+                $('#selCadModalidade').html('<option value="" selected>---</option>')
+                $('#selCadItemValorDec').html('<option value="" selected>---</option>')
+                $('#selCadItemValidObrig').html('<option value="" selected>---</option>')
+            }
+            //alert('modalgrupo: '+modalgrupo +' anogrupo: '+anogrupo);
             //buscar Grupos
             axios.get("CFC/grupoitem.cfc",{
                 params: {
-                method: "gruposverificacao",
+                method: "cadgruposverificacao",
                 anogrupo: anogrupo
                 }
             })
@@ -1074,51 +1150,15 @@
                 //console.log(json);
                 const dados = json.DATA;
                 let usadoSN=''
+                //Grp_Codigo, Grp_Descricao, Itn_NumItem
+                //    0            1              2
                 dados.map((ret) => {
-                    if(ret[3] == null){usadoSN = '(sem itens) '}
-                    
+                    usadoSN=''
+                    if(ret[2] == undefined){usadoSN = '(sem itens) '}
                     prots += '<option value="' + ret[0] + '">' +usadoSN+ret[0]+'-'+ret[1]+'</option>';
-                });
-                $('#selCadItemGrupo').html(prots);
-            }) 
- /*              
-            //buscar as pontuações do Plano de Teste (próprias e AGF) por ano selecionado e gerar o escopo em tela dos checks/radio       
-                axios.get("CFC/grupoitem.cfc",{
-                    params: {
-                    method: "pontuacao",
-                    anogrupo: anogrupo
-                }
                 })
-                .then(data =>{
-                    let propria = '';
-                    let agf = '<input type="radio" class="checkPontuacaoCadAGF" name="checkPontuacaoCadAGF" value="0" checked>&nbsp;&nbsp;Pontuação Inicial</input><br>';
-                    let ptcseq;
-                    let ptcvalor;
-                    let ptcdesc;
-                    //console.log(data.data)
-                    //console.log(data.data.indexOf("COLUMNS"));
-                    var vlr_ini = data.data.indexOf("COLUMNS");
-                    var vlr_fin = data.data.length
-                    vlr_ini = (vlr_ini - 2);
-                    // console.log('valor inicial: ' + vlr_fin);
-                    const json = JSON.parse(data.data.substring(vlr_ini,vlr_fin));
-                    //console.log(json);
-                    const dados = json.DATA;
-                    dados.map((ret) => {
-                    ptcseq=ret[0];
-                    ptcvalor=ret[1];
-                    ptcdesc=ret[2];
-                    if(ptcseq <= 15) { 
-                        propria += '<input type="checkbox" class="checkPontuacaoCad" name="checkPontuacaoCad" title="'+ptcseq+'" value="'+ptcvalor+'">&nbsp;&nbsp;'+ptcdesc+'&nbsp;&nbsp;=&nbsp;&nbsp;<strong>'+ptcvalor+'&nbsp;&nbsp;pontos</strong></input><br>'
-                    }else{
-                        agf += '<input type="radio" class="checkPontuacaoCadAGF" name="checkPontuacaoCadAGF" title="'+ptcseq+'" value="'+ptcvalor+'">&nbsp;&nbsp;'+ptcdesc+'&nbsp;&nbsp;=&nbsp;&nbsp;<strong>'+ptcvalor+'&nbsp;&nbsp;pontos</strong></input><br>'                                                   
-                    }
-                    });
-
-                    $('#ptoproprias').html(propria);
-                    $('#ptoagf').html(agf);
-                }) // Fim busca por pontuações      
- */ 
+                $('#selCadItemGrupo').html(prots)
+            })               
         })   
       
         //buscar macroporcessoN1
@@ -1459,14 +1499,39 @@
         $('.checkPontuacaoCad').click(function(){
         //alert('Aqui');
             var total = 0
+            let tit = 0
+            let impacto10sn = 'N'
+            let frsprots = ''
+            let selecionar = ''
             $( ".checkPontuacaoCad" ).each(function( index ) {
                 if($(this).is(':checked')){
                     //alert( index + ": " + $(this).val());
                     total = total + eval($(this).val())
+                    tit = $(this).attr("title")
+                    if(tit == '10'){
+                        impacto10sn = 'S'
+                    }                    
                 }
-            });
+            })
             $('#pontuacaoCalculadaCad').val(total); 
             somaragf()
+            if(impacto10sn == 'N'){
+                $("#selcadfalta").html('<option value="N">N</option>') 
+                $("#selcadsobra").html('<option value="N">N</option>') 
+                $("#selcadrisco").html('<option value="N">N</option>') 
+                $('#cadimpactartipos').hide()
+            }else{
+                $('#cadimpactartipos').show(500)
+                frsprots = '<option value="N">N</option>'
+                frsprots += '<option value="F">F</option>'
+                $("#selcadfalta").html(frsprots) 
+                frsprots = '<option value="N">N</option>'
+                frsprots += '<option value="S">S</option>'
+                $("#selcadsobra").html(frsprots) 
+                frsprots = '<option value="N">N</option>'
+                frsprots += '<option value="R">R</option>'
+                $("#selcadrisco").html(frsprots)                         
+            }            
         })
         //somatório pontuação unidade AGF
         $('.checkPontuacaoCadAGF').click(function(){
@@ -1620,7 +1685,11 @@
 				frm.selCadItemGrupo.focus();
 				return false;
 			}
-
+            if (frm.selCadModalidade.value == '') {
+				alert('Informe a modalidade do item do Plano de Teste!');
+				frm.selCadModalidade.focus();
+				return false;
+			}
             if (frm.selCadItemValorDec.value == '') {
 				alert('Informe se o item prevê ou não valor declarado!');
 				frm.selCadItemValorDec.focus();
@@ -1632,6 +1701,32 @@
 				frm.selCadItemValidObrig.focus();
 				return false;
 			}
+
+            var frmselcadreindencias = frm.selcadreindencias.value
+            if (frmselcadreindencias != '') {
+                let recusarsn = 'N'
+                let contarr = 0
+                var arr = frmselcadreindencias.split(',')         
+                $.each( arr, function( i, val ) {
+                    if (val.indexOf(",") > 0 || val.indexOf("_") < 0) {
+                        recusarsn = 'S'
+                    }  
+                    contarr++ 
+                })
+
+                if (contarr == 1) {
+                    if ((frmselcadreindencias.indexOf(",") <= 0 && frmselcadreindencias.indexOf("_") != frmselcadreindencias.lastIndexOf("_"))) 
+                    {
+                        recusarsn = 'S'
+                    } 
+                }  
+                              
+                if (recusarsn == 'S') {
+                    alert('Reincidência(s) (grupo/item), fora do padrão, verificar exemplos de preenchimento!');
+                    frm.selcadreindencias.focus();
+                    return false;
+                }                    
+            }
 
             if (frm.cadItemDescricao.value == '') {
 				alert('Informe uma descrição para item!');
@@ -1785,12 +1880,6 @@
                 return false;
             }// final criticas dos novos campos
 
-            if (frm.selModalidade.value == '') {
-				alert('Informe a modalidade do item do Plano de Teste!');
-				frm.selModalidade.focus();
-				return false;
-			}
-
             if (frm.pontuacaoCalculadaCad.value == 0) {
 				alert('Selecione, ao menos, 01(um) Tipo de Unidade para o qual o item será aplicado nas avaliações.\nSelecionar a Composição de Pontuação do Item!');
 				return false;
@@ -1809,7 +1898,16 @@
                 return true;	
             }else{ return false }
         } //fim das críticas do submit     
-                     
+
+        function cadformatoreincidentes() {
+            var tecla = window.event.keyCode;
+            //alert(tecla)
+            //permite digitação das teclas numéricas (48 a 57, 96 a 105), Delete e Backspace (8 e 46), TAB (9) e ESC (27)	
+                if ((tecla < 48 || tecla > 57) && (tecla != 44 && tecla != 95)) {
+                //alert(tecla);
+                event.returnValue = false;
+            }
+        }                     
 </script>
 </body>
 </html>

@@ -1081,7 +1081,7 @@ label {
 			<cfif listfind('#Itn_PTC_Seq#','10')>
                 <cfset potencvlr = 'S'>
             </cfif>				
-			<div class="box #RIP_Resposta#" align="center" title="Não Avaliado" grp="#RIP_NumGrupo#" grpdesc="#Grp_Descricao#" itm="#RIP_NumItem#" itmdesc="#Itn_Descricao#" matrinsp="#RIP_MatricAvaliador#" nomeinsp="#funome#" pontuacao="#Itn_Pontuacao#" classificacao="#Itn_Classificacao#" resposta="#RIP_Resposta#" potencvlr="#potencvlr#" ripncisei = "#trim(RIP_NCISEI)#" riprecomendacao	= "#ucase(trim(RIP_Recomendacao))#" intimpactartipos="#ucase(trim(Itn_ImpactarTipos))#" Itnreincidentes="#ucase(trim(Itn_Reincidentes))#">
+			<div class="box #RIP_Resposta#" align="center" title="Não Avaliado" grp="#RIP_NumGrupo#" grpdesc="#Grp_Descricao#" itm="#RIP_NumItem#" itmdesc="#Itn_Descricao#" matrinsp="" nomeinsp="" pontuacao="#Itn_Pontuacao#" classificacao="#Itn_Classificacao#" resposta="#RIP_Resposta#" potencvlr="#potencvlr#" ripncisei = "#trim(RIP_NCISEI)#" riprecomendacao	= "#ucase(trim(RIP_Recomendacao))#" intimpactartipos="#ucase(trim(Itn_ImpactarTipos))#" Itnreincidentes="#ucase(trim(Itn_Reincidentes))#">
 				<h5>#RIP_NumGrupo#.#RIP_NumItem#<h5>#RIP_MatricAvaliador#</h5>
 			</div>
 		</cfoutput>
@@ -2094,7 +2094,15 @@ label {
 			CKEDITOR.instances['recomendacoesantes'].setData(recomendacoesantes)
 			$('#blocotmp').hide()
 			$('#blocoreincidentes').hide()
-			$("#blocotmpantes").show(500)   
+			if(dados.length == 0){
+				alert('Não existe avaliação anterior para a unidade/grupo e item selecionados!')
+				$("#botaoanteriorsn").val('N')
+				$('.botaobuscar').html('<h5>Avaliação anterior</h5>')
+				$(this).css('box-shadow', '5px 5px 3px #fff')
+			}else{
+				$("#blocotmpantes").show(500) 
+			}
+			  
 		})  // final busca avaliação anterior	
 	})
 	$('#cdfrmemrisco').click(function(){  
@@ -3344,4 +3352,3 @@ label {
 		
 </script>
 </html>
-
