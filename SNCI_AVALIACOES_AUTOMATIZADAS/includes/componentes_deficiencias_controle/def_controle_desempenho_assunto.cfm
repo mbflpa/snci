@@ -606,55 +606,104 @@
             $(this).css('width', width);
         });
 
-        // Configuração do carrossel
+        // Configuração do carrossel - Baseado no Bootstrap 4
         const track = $('#carouselTrack');
         const cards = track.find('.performance-card');
         const prevBtn = $('.carousel-prev');
         const nextBtn = $('.carousel-next');
         const indicators = $('#carouselIndicators');
         
-        let currentIndex = 0;
-        let cardsPerView = getCardsPerView();
-        let totalSlides = Math.ceil(cards.length / cardsPerView);
+        let currentSlide = 0;
+        let itemsToShow = getItemsToShow();
+        let totalSlides = Math.max(0, cards.length - itemsToShow + 1);
 
-        function getCardsPerView() {
-            const containerWidth = $('.carousel-container').width() - 120; // Subtraindo padding dos controles
-            const cardWidth = $('.performance-card').outerWidth(true) || 344; // Card width + gap
-            return Math.floor(containerWidth / cardWidth) || 1;
+        // Função para calcular quantos itens mostrar (baseada no Bootstrap 4)
+        function getItemsToShow() {
+            const containerWidth = $('.carousel-container').width() - 120; // 60px padding cada lado
+            const singleCardWidth = $('.performance-card').first().outerWidth(true);
+            
+            if (singleCardWidth === 0) return 1; // fallback
+            
+            const itemsPossible = Math.floor(containerWidth / singleCardWidth);
+            return Math.max(1, itemsPossible);
         }
 
+        // Função para calcular largura exata de um card
+        function getCardWidth() {
+            return $('.performance-card').first().outerWidth(true) || 274;
+        }
+
+        // Atualizar carrossel - similar ao Bootstrap 4
         function updateCarousel() {
-            const cardWidth = 280 + 20; // Card width + gap
-            const translateX = -currentIndex * cardsPerView * cardWidth;
+            const cardWidth = getCardWidth();
+            const translateX = -currentSlide * cardWidth;
+            
             track.css('transform', `translateX(${translateX}px)`);
             
             // Atualizar controles
-            prevBtn.toggleClass('disabled', currentIndex === 0);
-            nextBtn.toggleClass('disabled', currentIndex >= totalSlides - 1);
+            prevBtn.toggleClass('disabled', currentSlide === 0);
+            nextBtn.toggleClass('disabled', currentSlide >= totalSlides - 1);
             
             // Atualizar indicadores
-            indicators.find('.indicator-dot').removeClass('active').eq(currentIndex).addClass('active');
+            updateIndicators();
         }
 
+        // Criar indicadores baseado no Bootstrap 4
         function createIndicators() {
             indicators.empty();
-            for (let i = 0; i < totalSlides; i++) {
+            
+            if (totalSlides <= 1) return;
+            
+            const totalPages = Math.ceil(totalSlides / itemsToShow);
+            
+            for (let i = 0; i < totalPages; i++) {
                 const dot = $('<div class="indicator-dot"></div>');
                 if (i === 0) dot.addClass('active');
+                
                 dot.click(function() {
-                    currentIndex = i;
+                    currentSlide = i * itemsToShow;
+                    currentSlide = Math.min(currentSlide, totalSlides - 1);
                     updateCarousel();
                 });
+                
                 indicators.append(dot);
             }
         }
 
+        // Atualizar indicadores
+        function updateIndicators() {
+            const currentPage = Math.floor(currentSlide / itemsToShow);
+            indicators.find('.indicator-dot').removeClass('active').eq(currentPage).addClass('active');
+        }
+
+        // Navegação próximo item (como Bootstrap 4)
+        function slideNext() {
+            if (currentSlide < totalSlides - 1) {
+                currentSlide++;
+                updateCarousel();
+            }
+        }
+
+        // Navegação item anterior (como Bootstrap 4)
+        function slidePrev() {
+            if (currentSlide > 0) {
+                currentSlide--;
+                updateCarousel();
+            }
+        }
+
+        // Redimensionar - recalcular como Bootstrap 4
         function handleResize() {
-            const newCardsPerView = getCardsPerView();
-            if (newCardsPerView !== cardsPerView) {
-                cardsPerView = newCardsPerView;
-                totalSlides = Math.ceil(cards.length / cardsPerView);
-                currentIndex = Math.min(currentIndex, totalSlides - 1);
+            const newItemsToShow = getItemsToShow();
+            
+            if (newItemsToShow !== itemsToShow) {
+                itemsToShow = newItemsToShow;
+                totalSlides = Math.max(0, cards.length - itemsToShow + 1);
+                
+                // Ajustar slide atual para não ultrapassar limites
+                currentSlide = Math.min(currentSlide, totalSlides - 1);
+                currentSlide = Math.max(0, currentSlide);
+                
                 createIndicators();
                 updateCarousel();
             }
@@ -662,90 +711,110 @@
 
         // Eventos dos controles
         nextBtn.click(function() {
-            if (currentIndex < totalSlides - 1) {
-                currentIndex++;
-                updateCarousel();
-            }
+            slideNext();
         });
 
         prevBtn.click(function() {
-            if (currentIndex > 0) {
-                currentIndex--;
-                updateCarousel();
-            }
+            slidePrev();
         });
 
-        // Suporte a touch/swipe para mobile
-        let startX = 0;
-        let isDragging = false;
+        // Touch/Swipe - implementação do Bootstrap 4
+        let touchStartX = 0;
+        let touchEndX = 0;
+        let isSwiping = false;
 
-        track.on('touchstart mousedown', function(e) {
-            startX = e.type === 'touchstart' ? e.originalEvent.touches[0].clientX : e.clientX;
-            isDragging = true;
+        track.on('touchstart', function(e) {
+            touchStartX = e.originalEvent.touches[0].clientX;
+            isSwiping = true;
             track.css('transition', 'none');
         });
 
-        $(document).on('touchmove mousemove', function(e) {
-            if (!isDragging) return;
-            e.preventDefault();
+        track.on('touchmove', function(e) {
+            if (!isSwiping) return;
             
-            const currentX = e.type === 'touchmove' ? e.originalEvent.touches[0].clientX : e.clientX;
-            const diff = startX - currentX;
+            touchEndX = e.originalEvent.touches[0].clientX;
+            const diff = touchStartX - touchEndX;
             
-            if (Math.abs(diff) > 50) {
-                if (diff > 0 && currentIndex < totalSlides - 1) {
-                    currentIndex++;
-                } else if (diff < 0 && currentIndex > 0) {
-                    currentIndex--;
-                }
-                isDragging = false;
-                track.css('transition', 'transform 0.5s ease-in-out');
-                updateCarousel();
-            }
+            // Mostrar preview do movimento
+            const cardWidth = getCardWidth();
+            const currentTranslateX = -currentSlide * cardWidth;
+            const newTranslateX = currentTranslateX - diff * 0.3; // 30% da diferença para suavizar
+            
+            track.css('transform', `translateX(${newTranslateX}px)`);
         });
 
-        $(document).on('touchend mouseup', function() {
-            if (isDragging) {
-                isDragging = false;
-                track.css('transition', 'transform 0.5s ease-in-out');
+        track.on('touchend', function(e) {
+            if (!isSwiping) return;
+            
+            isSwiping = false;
+            track.css('transition', 'transform 0.5s ease-in-out');
+            
+            const swipeDistance = touchStartX - touchEndX;
+            const threshold = 50;
+            
+            if (Math.abs(swipeDistance) > threshold) {
+                if (swipeDistance > 0) {
+                    slideNext();
+                } else {
+                    slidePrev();
+                }
+            } else {
+                // Voltar à posição original
+                updateCarousel();
             }
         });
 
         // Navegação por teclado
         $(document).keydown(function(e) {
             if (e.keyCode === 37) { // Seta esquerda
-                prevBtn.click();
+                slidePrev();
             } else if (e.keyCode === 39) { // Seta direita
-                nextBtn.click();
+                slideNext();
             }
         });
 
-        // // Auto-play (opcional)
-        // let autoplayInterval;
-        // function startAutoplay() {
-        //     autoplayInterval = setInterval(function() {
-        //         if (currentIndex < totalSlides - 1) {
-        //             currentIndex++;
-        //         } else {
-        //             currentIndex = 0;
-        //         }
-        //         updateCarousel();
-        //     }, 5000);
-        // }
-
-        // function stopAutoplay() {
-        //     clearInterval(autoplayInterval);
-        // }
-
-        // Pausar autoplay ao passar o mouse
-        //$('.snci-desempenho-assunto').hover(stopAutoplay, startAutoplay);
-
         // Inicialização
-        createIndicators();
-        updateCarousel();
-       // startAutoplay();
+        setTimeout(function() {
+            itemsToShow = getItemsToShow();
+            totalSlides = Math.max(0, cards.length - itemsToShow + 1);
+            createIndicators();
+            updateCarousel();
+            
+            // Mostrar/ocultar controles se necessário
+            if (totalSlides <= 1) {
+                prevBtn.hide();
+                nextBtn.hide();
+                indicators.hide();
+            } else {
+                prevBtn.show();
+                nextBtn.show();
+                indicators.show();
+            }
+        }, 100);
 
-        // Redimensionamento da tela
-        $(window).resize(handleResize);
+        // Redimensionamento com debounce
+        let resizeTimeout;
+        $(window).resize(function() {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(handleResize, 250);
+        });
+
+        // API pública (similar ao Bootstrap 4)
+        window.carouselAPI = {
+            next: slideNext,
+            prev: slidePrev,
+            goTo: function(index) {
+                if (index >= 0 && index < totalSlides) {
+                    currentSlide = index;
+                    updateCarousel();
+                }
+            },
+            getCurrentSlide: function() {
+                return currentSlide;
+            },
+            getTotalSlides: function() {
+                return totalSlides;
+            }
+        };
     });
 </script>
