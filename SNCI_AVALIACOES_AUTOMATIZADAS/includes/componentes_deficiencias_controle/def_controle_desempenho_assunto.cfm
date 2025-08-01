@@ -127,6 +127,12 @@
 </cfloop>
 
 <style>
+    .card-header {
+        border:none!important;
+        padding-left: 0!important;
+        padding-right: 0!important;
+        min-height: 63px;
+    }
     .snci-desempenho-assunto {
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         width: 100%;
@@ -249,7 +255,7 @@
         transition: all 0.3s ease;
         position: relative;
         overflow: hidden;
-        min-height: 280px;
+        min-height: 240px;
     }
 
     .snci-desempenho-assunto .performance-card::before {
@@ -273,7 +279,6 @@
         font-size: 0.6rem;
         font-weight: 700;
         color: #1e293b;
-        margin-bottom: 6px;
         line-height: 1.2;
         text-transform: uppercase;
         letter-spacing: 0.5px;
