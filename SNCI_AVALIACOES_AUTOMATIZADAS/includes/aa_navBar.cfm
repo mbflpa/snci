@@ -1,4 +1,8 @@
 <cfprocessingdirective pageencoding = "utf-8">
+
+<!--- Adicionar cfparam para url.mesFiltro no início do arquivo --->
+<cfparam name="url.mesFiltro" default="">
+
 	 <cfinclude template="aa_Modal_preloader.cfm">
 	 <cfinclude template="aa_modal_overlay.cfm">
 
@@ -152,7 +156,7 @@
 								<cfif FindNoCase("homologacaope", application.auxsite) or FindNoCase("desenvolvimentope", application.auxsite) or FindNoCase("localhost", application.auxsite)>
 									<cfoutput>SERVIDOR: #Ucase(application.auxsite)#</cfoutput>
 								<cfelse>
-									SERVIDOR: PRODUÇÃO'
+									SERVIDOR: PRODUÇÃO
 								</cfif>
 							</span>
 						</div>

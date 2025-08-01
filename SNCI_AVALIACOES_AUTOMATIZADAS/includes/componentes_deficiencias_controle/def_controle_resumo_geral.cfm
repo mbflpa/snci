@@ -1,5 +1,8 @@
 <cfprocessingdirective pageencoding="utf-8">
 
+<!--- Adicionar cfparam para url.mesFiltro ANTES de usar a variável --->
+<cfparam name="url.mesFiltro" default="">
+
 <!--- Verificar se a unidade foi localizada --->
 <cfif NOT structKeyExists(application, "rsUsuarioParametros") OR NOT structKeyExists(application.rsUsuarioParametros, "Und_Descricao") OR NOT len(trim(application.rsUsuarioParametros.Und_Descricao))>
     <div class="snci-resumo-geral">
@@ -33,8 +36,7 @@
 
 <!--- Usar dados do CFC se não foram fornecidos dados personalizados --->
 <cfif structIsEmpty(attributes.dados)>
-    <!--- Verificar se há filtro de mês na URL --->
-    <cfparam name="url.mesFiltro" default="">
+    <!--- url.mesFiltro já definido acima --->
     
     <cfset objDados = createObject("component", "cfc.DeficienciasControleDados")>
     <cfset dadosResumo = objDados.obterDadosResumoGeral(application.rsUsuarioParametros.Und_MCU, url.mesFiltro)>

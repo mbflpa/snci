@@ -1,5 +1,9 @@
 <cfprocessingdirective pageencoding="utf-8">
 
+
+<!--- Adicionar cfparam para url.mesFiltro ANTES de usar a variável --->
+<cfparam name="url.mesFiltro" default="">
+
 <!--- Verificar se a unidade foi localizada --->
 <cfif NOT structKeyExists(application, "rsUsuarioParametros") OR NOT structKeyExists(application.rsUsuarioParametros, "Und_Descricao") OR NOT len(trim(application.rsUsuarioParametros.Und_Descricao))>
     <div class="container snci-desempenho-assunto">
