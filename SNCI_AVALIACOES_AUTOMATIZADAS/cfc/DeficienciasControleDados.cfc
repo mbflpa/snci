@@ -243,7 +243,7 @@
         <!--- Processar dados por assunto usando dados já em cache --->
         <cfset var dadosAssunto = {}>
         <cfloop query="dadosBrutos.dadosDetalhados">
-            <cfset var chave = rereplace(MANCHETE, "[^A-Za-z0-9]", "", "all")>
+            <cfset var chave = sk_grupo_item>
             <cfif NOT structKeyExists(dadosAssunto, chave)>
                 <cfset dadosAssunto[chave] = { titulo = MANCHETE, anterior = 0, atual = 0 }>
                 <cfset dadosAssunto[chave].sk_grupo_item = sk_grupo_item>
@@ -613,4 +613,3 @@
     </cffunction>
 
 </cfcomponent>
-        

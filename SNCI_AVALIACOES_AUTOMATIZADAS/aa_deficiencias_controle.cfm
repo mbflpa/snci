@@ -15,10 +15,8 @@
     
     <style>
         .deficiencias-geral-layout {
-            display: flex;
             padding: 16px;
-            align-items: flex-start; /* Alinha os itens ao topo */
-            flex-wrap: nowrap; /* Garante que os itens não quebrem para a próxima linha */
+
         }
         
         /* Força alinhamento específico dos containers na página index */
@@ -58,14 +56,12 @@
         }
 
         .dashboard-main-content {
-            width: 65%; /* Adjust as needed */
             flex: none; /* Remove flex shorthand for testing */
         }
 
         .dashboard-kpi-panel {
-            width: 35%; /* Adjust as needed */
             flex: none; /* Remove flex shorthand for testing */
-        }
+          }
 
         /* Responsividade */
         @media (max-width: 1200px) {
@@ -86,12 +82,13 @@
     
  
                 <div class="deficiencias-geral-layout">
-                    <div class="dashboard-main-content">
-                        <cfinclude template="includes/componentes_deficiencias_controle/def_controle_desempenho_assunto.cfm">
-                    </div>
                     <div class="dashboard-kpi-panel">
                         <cfinclude template="includes/componentes_deficiencias_controle/def_controle_resumo_geral.cfm">
                     </div>
+                    <div class="dashboard-main-content">
+                        <cfinclude template="includes/componentes_deficiencias_controle/def_controle_desempenho_assunto.cfm">
+                    </div>
+                    
                 </div>
             </section>
         </div>

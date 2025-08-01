@@ -96,6 +96,9 @@
 
 <style>
     /* Container principal harmonizado com desempenho_assunto */
+    .snci-resumo-geral {
+        margin-bottom: 20px;
+    }
     .snci-resumo-geral .desempenho-container {
         display: flex;
         flex-direction: column;
