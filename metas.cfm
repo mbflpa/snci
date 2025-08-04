@@ -629,7 +629,7 @@ dtlimit: #dtlimit#<br>
       <td colspan="18" class="exibir"><strong>(**)DGCI Acumulado Realizado = (PRCI Acumulado Realizado * 0,55) + (SLNC Acumulado Realizado * 0,45)</strong></td>
     </tr>   
         <tr class="exibir">
-      <td colspan="18" class="exibir"><strong>(***)Resultado em Relação à Meta Mensal = (DGCI Realizado / DGCI Meta Mensal) * 100</strong></td>
+      <td colspan="18" class="exibir"><strong>(***)Resultado em Relação à Meta Mensal = (DGCI Acumulado Realizado / DGCI Meta Mensal) * 100</strong></td>
     </tr>     
     <cffile action="Append" file="#slocal##sarquivo#" output=';Meta Nacional;Resultado Nacional;;Acumulado Realizado Nacional;;Meta Nacional;Resultado Nacional;;Acumulado Realizado Nacional;;Meta Nacional;Resultado Nacional;;Acumulado Realizado Nacional;;;'>
     <!---    <CFSET RESMETnac = numberFormat((DGCIAPnac/DGCInac)*100,999.0)> --->
@@ -637,7 +637,7 @@ dtlimit: #dtlimit#<br>
 <cffile action="Append" file="#slocal##sarquivo#" output=';#PRCInac#;#PRCIAPnac#;#PRCIResNac#;#prciacurealnac#;#prciacurealnacres#;#SLNCnac#;#SLNCAPnac#;#SLNCResNac#;#slncacurealnac#;#slncacurealnacres#;#DGCInac#;#DGCIAPnac#;#DGCIResNac#;#dgciacurealnac#;#dgciacurealnacres#;#RESMETnac#%'>
 <cffile action="Append" file="#slocal##sarquivo#" output='(*) DGCI Realizado = (PRCI Realizado * 0,55) + (SLNC Realizado * 0,45)'>
 <cffile action="Append" file="#slocal##sarquivo#" output='(**)DGCI Acumulado Realizado = (PRCI Acumulado Realizado * 0,55) + (SLNC Acumulado Realizado * 0,45)'>
-<cffile action="Append" file="#slocal##sarquivo#" output='(***)Resultado em Relação à Meta Mensal = (DGCI Realizado / DGCI Meta Mensal) * 100'>
+<cffile action="Append" file="#slocal##sarquivo#" output='(***)Resultado em Relação à Meta Mensal = (DGCI Acumulado Realizado / DGCI Meta Mensal) * 100'>
 
   </cfoutput>
 </table>
