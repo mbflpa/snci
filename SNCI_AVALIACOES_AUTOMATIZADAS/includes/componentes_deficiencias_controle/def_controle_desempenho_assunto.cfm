@@ -326,7 +326,7 @@
         transition: all 0.3s ease;
         position: relative;
         overflow: hidden;
-        min-height: 240px;
+        min-height: 210px;
         margin-bottom: 10px;
     }
 
@@ -494,8 +494,6 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        gap: 8px;
-        padding: 10px;
         border-radius: 10px;
         font-size: 0.8rem;
         font-weight: 600;
@@ -626,6 +624,42 @@
         background: rgba(255, 255, 255, 0.8);
         border-color: rgba(5, 150, 105, 0.15);
     }
+
+    /* Estilo para o container dos eventos com posicionamento relativo */
+    .snci-desempenho-assunto .eventos-container {
+        position: relative;
+        font-size: 0.8rem; 
+        color: #64748b; 
+        text-align: center;
+        margin-top: -4px; /* Move a div "eventos" um pouco mais para cima */
+    }
+
+    /* Estilo para centralizar o badge reincidente */
+    .snci-desempenho-assunto .badge-reincidente {
+        position: absolute;
+        bottom: -12px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 0.65rem;
+        color: #dc3545;
+        font-weight: 700;
+        z-index: 5;
+        white-space: nowrap;
+    }
+
+    /* Estilo para o valor envolvido */
+    .valor-envolvido {
+        display: block;
+        font-size: 0.6rem;
+        color: #6b7280;
+        font-weight: 600;
+        margin-top: 10px;
+        text-align: center;
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 4px;
+        border: 1px solid #e5e7eb;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    }
 </style>
 
 <div class="snci-desempenho-assunto">
@@ -656,15 +690,23 @@
                                     <div class="period-card current">
                                         <div class="period-label"><cfoutput>#abreviarMes(nomeMesAtual)#</cfoutput></div>
                                         <div class="period-value">
-                                            <i class="fas fa-calendar-check value-icon"></i>
                                             <cfoutput>#item.atual#</cfoutput>
                                         </div>
-                                        <div style="font-size:0.8rem; color:#64748b; text-align:center;">eventos</div>
+                                        
+                                        <div class="eventos-container">
+                                            eventos
+                                            <cfif item.reincidencia>
+                                                <span class="badge-reincidente">Reincidente</span>
+                                            </cfif>
+                                        </div>
+                                        <cfif item.valorEnvolvido GT 0>
+                                            <div class="valor-envolvido">V. Env.: R$ <cfoutput>#numberFormat(item.valorEnvolvido, "9,999.99")#</cfoutput></div>
+                                        </cfif>
                                     </div>
                                     <div class="period-card previous">
                                         <div class="period-label"><cfoutput>#abreviarMes(nomeMesAnterior)#</cfoutput></div>
                                         <div class="period-value">
-                                            <i class="fas fa-calendar-alt value-icon"></i>
+                                            
                                             <cfif isJaneiro>
                                                 <span style="color:#64748b; font-size:1.2rem;">sem dados</span>
                                             <cfelse>
@@ -672,7 +714,10 @@
                                             </cfif>
                                         </div>
                                         <cfif NOT isJaneiro>
-                                            <div style="font-size:0.8rem; color:#64748b; text-align:center;">eventos</div>
+                                            <div class="eventos-container">eventos</div>
+                                        </cfif>
+                                        <cfif NOT isJaneiro AND structKeyExists(item, "valorEnvolvidoAnterior") AND item.valorEnvolvidoAnterior GT 0>
+                                            <div class="valor-envolvido">V. Env.: R$ <cfoutput>#numberFormat(item.valorEnvolvidoAnterior, "9,999.99")#</cfoutput></div>
                                         </cfif>
                                     </div>
                                 </div>
@@ -719,6 +764,7 @@
                                                     redução
                                                 </cfif>
                                             </cfif>
+                                            
                                         </div>
                                     </div>
                                 </div>

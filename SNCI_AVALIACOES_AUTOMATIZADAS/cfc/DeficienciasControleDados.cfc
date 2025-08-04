@@ -99,8 +99,17 @@
                         p.MANCHETE,
                         p.sk_grupo_item,
                         p.TESTE AS teste,
+                        CASE WHEN f.sigla_apontamento = 'N' THEN f.nr_reincidente ELSE 0 END as reincidencia,
+                        SUM(
+                            COALESCE(f.valor_falta, 0) + 
+                            COALESCE(f.valor_sobra, 0) + 
+                            CASE 
+                                WHEN f.nm_teste <> '239-4' THEN COALESCE(valor_risco, 0)
+                                ELSE 0
+                            END
+                         ) AS valorEnvolvido,
                         FORMAT(f.data_encerramento, 'yyyy-MM') AS mes_ano,
-                        COALESCE(f.NC_Eventos, 0) AS total_eventos
+                        SUM(COALESCE(f.NC_Eventos, 0)) AS total_eventos
                     FROM fato_verificacao f
                     INNER JOIN dim_teste_processos p ON f.sk_grupo_item = p.sk_grupo_item
                     WHERE f.sk_mcu = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.sk_mcu#">
@@ -112,7 +121,9 @@
                         (f.data_encerramento BETWEEN <cfqueryparam cfsqltype="cf_sql_date" value="#inicioMesAnterior#">
                                                  AND <cfqueryparam cfsqltype="cf_sql_date" value="#fimMesAnterior#">)
                       )
-                   
+                    GROUP BY p.MANCHETE, p.sk_grupo_item, p.TESTE, 
+                             CASE WHEN f.sigla_apontamento = 'N' THEN f.nr_reincidente ELSE 0 END,
+                             FORMAT(f.data_encerramento, 'yyyy-MM')
                     ORDER BY mes_ano DESC, p.MANCHETE
                 <cfelse>
                     WITH UltimosMeses AS (
@@ -128,14 +139,25 @@
                         p.MANCHETE,
                         p.sk_grupo_item,
                         p.TESTE AS teste,
+                        CASE WHEN f.sigla_apontamento = 'N' THEN f.nr_reincidente ELSE 0 END as reincidencia,
+                        SUM(
+                            COALESCE(f.valor_falta, 0) + 
+                            COALESCE(f.valor_sobra, 0) + 
+                            CASE 
+                                WHEN f.nm_teste <> '239-4' THEN COALESCE(valor_risco, 0)
+                                ELSE 0
+                            END
+                         ) AS valorEnvolvido,
                         FORMAT(f.data_encerramento, 'yyyy-MM') AS mes_ano,
-                        COALESCE(f.NC_Eventos, 0) AS total_eventos
+                        SUM(COALESCE(f.NC_Eventos, 0)) AS total_eventos
                     FROM fato_verificacao f
                     INNER JOIN dim_teste_processos p ON f.sk_grupo_item = p.sk_grupo_item
                     WHERE f.sk_mcu = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.sk_mcu#">
                       AND f.sk_grupo_item <> 12 
-                          AND FORMAT(f.data_encerramento, 'yyyy-MM') IN (SELECT mes_ano FROM UltimosMeses)
-                   
+                      AND FORMAT(f.data_encerramento, 'yyyy-MM') IN (SELECT mes_ano FROM UltimosMeses)
+                    GROUP BY p.MANCHETE, p.sk_grupo_item, p.TESTE, 
+                             CASE WHEN f.sigla_apontamento = 'N' THEN f.nr_reincidente ELSE 0 END,
+                             FORMAT(f.data_encerramento, 'yyyy-MM')
                     ORDER BY mes_ano DESC, p.MANCHETE
                 </cfif>
             </cfquery>
@@ -245,14 +267,23 @@
         <cfloop query="dadosBrutos.dadosDetalhados">
             <cfset var chave = sk_grupo_item>
             <cfif NOT structKeyExists(dadosAssunto, chave)>
-                <cfset dadosAssunto[chave] = { titulo = MANCHETE, anterior = 0, atual = 0 }>
+                <cfset dadosAssunto[chave] = { 
+                    titulo = MANCHETE, 
+                    anterior = 0, 
+                    atual = 0,
+                    valorEnvolvidoAnterior = 0,
+                    valorEnvolvido = 0
+                }>
                 <cfset dadosAssunto[chave].sk_grupo_item = sk_grupo_item>
                 <cfset dadosAssunto[chave].teste = teste>
+                <cfset dadosAssunto[chave].reincidencia = reincidencia>
             </cfif>
             <cfif mes_ano EQ mesAnteriorId>
                 <cfset dadosAssunto[chave].anterior = total_eventos>
+                <cfset dadosAssunto[chave].valorEnvolvidoAnterior = valorEnvolvido>
             <cfelseif mes_ano EQ mesAtualId>
                 <cfset dadosAssunto[chave].atual = total_eventos>
+                <cfset dadosAssunto[chave].valorEnvolvido = valorEnvolvido>
             </cfif>
         </cfloop>
 

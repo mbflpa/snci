@@ -278,7 +278,7 @@
                             <div class="title"><cfoutput>#item.titulo#</cfoutput></div>
                             <div class="value <cfif attributes.showAnimation eq 'true'>loading</cfif>">
                                 <cfif structKeyExists(item, 'formatacao') and item.formatacao eq 'moeda'>
-                                    R$ <span class="animated-number" data-target="<cfoutput>#item.valor#</cfoutput>">0</span>
+                                    R$ <span class="animated-number" data-target="<cfoutput>#numberFormat(item.valor, '_.00')#</cfoutput>" data-type="money">0,00</span>
                                 <cfelse>
                                     <span class="animated-number" data-target="<cfoutput>#item.valor#</cfoutput>">0</span>
                                 </cfif>
@@ -297,7 +297,8 @@
         function animateNumbers() {
             $('.desempenho-container .animated-number').each(function() {
                 var $this = $(this);
-                var target = parseInt($this.data('target'));
+                var target = parseFloat($this.data('target'));
+                var isMoney = $this.data('type') === 'money';
                 
                 if (target && !$this.hasClass('animated')) {
                     $this.addClass('animated');
@@ -307,10 +308,24 @@
                         duration: 1500,
                         easing: 'swing',
                         step: function() {
-                            $this.text(Math.floor(this.countNum).toLocaleString('pt-BR'));
+                            if (isMoney) {
+                                $this.text(this.countNum.toLocaleString('pt-BR', {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                }));
+                            } else {
+                                $this.text(Math.floor(this.countNum).toLocaleString('pt-BR'));
+                            }
                         },
                         complete: function() {
-                            $this.text(this.countNum.toLocaleString('pt-BR'));
+                            if (isMoney) {
+                                $this.text(this.countNum.toLocaleString('pt-BR', {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                }));
+                            } else {
+                                $this.text(this.countNum.toLocaleString('pt-BR'));
+                            }
                             $this.closest('.value').removeClass('loading');
                         }
                     });
