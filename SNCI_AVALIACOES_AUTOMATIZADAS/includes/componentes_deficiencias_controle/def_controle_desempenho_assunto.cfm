@@ -700,7 +700,7 @@
                                             </cfif>
                                         </div>
                                         <cfif item.valorEnvolvido GT 0>
-                                            <div class="valor-envolvido">V. Env.: R$ <cfoutput>#numberFormat(item.valorEnvolvido, "9,999.99")#</cfoutput></div>
+                                            <div class="valor-envolvido">Valor Envolvido:<br>R$ <span class="valor-formatada" data-valor="<cfoutput>#item.valorEnvolvido#</cfoutput>">0,00</span></div>
                                         </cfif>
                                     </div>
                                     <div class="period-card previous">
@@ -717,7 +717,7 @@
                                             <div class="eventos-container">eventos</div>
                                         </cfif>
                                         <cfif NOT isJaneiro AND structKeyExists(item, "valorEnvolvidoAnterior") AND item.valorEnvolvidoAnterior GT 0>
-                                            <div class="valor-envolvido">V. Env.: R$ <cfoutput>#numberFormat(item.valorEnvolvidoAnterior, "9,999.99")#</cfoutput></div>
+                                            <div class="valor-envolvido">Valor Envolvido:<br>R$ <span class="valor-formatada" data-valor="<cfoutput>#item.valorEnvolvidoAnterior#</cfoutput>">0,00</span></div>
                                         </cfif>
                                     </div>
                                 </div>
@@ -987,6 +987,18 @@
         });
         $('.carousel-prev').off('click').on('click', function() {
             scrollContainer.scrollBy({ left: -cardWidth(), behavior: 'smooth' });
+        });
+        
+        // Formatar valores monetários em pt-BR
+        $('.valor-formatada').each(function() {
+            var $this = $(this);
+            var valor = parseFloat($this.data('valor'));
+            if (!isNaN(valor)) {
+                $this.text(valor.toLocaleString('pt-BR', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                }));
+            }
         });
     });
 </script>
