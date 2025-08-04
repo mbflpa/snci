@@ -167,7 +167,8 @@ dtlimit: #dtlimit#<br>
     <td class="exibir"><div align="center"><strong>DGCI_DB</strong></div></td>
     <td class="exibir"><div align="center"><strong>Meta Mês</strong></div></td>
     <td class="exibir"><div align="center"><strong>Resultado Mensal</strong></div></td>
-    <td class="exibir"><div align="center"><strong>(DGCI_DB/Meta Mês)*100</strong></div></td>
+    <td class="exibir"><div align="center"><strong>Acumulado<br>Realizado</strong></div></td>
+    <td class="exibir"><div align="center"><strong>(AcumuladoRealizado/Meta Mês)*100</strong></div></td>
     <td class="exibir"><div align="center"><strong>Resultado Mensal</strong></div></td>
     
     
@@ -337,27 +338,28 @@ dtlimit: #dtlimit#<br>
     <tr>
       <td class="exibir"><div align="center">#cl#</div></td>
       <td class="exibir"><div align="center"><strong>#se#</strong></div></td>
-    <td class="exibir"><div align="center"><strong>#totmesDP#</strong></div></td>
-    <td class="exibir"><div align="center"><strong>#totmesFP#</strong></div></td>
-    <td class="exibir"><div align="center"><strong>#TOTMESDPFP#</strong></div></td>
-    <td class="exibir"><div align="center"><strong>#PercDPmes#</strong></div></td>      
-    <td class="exibir"><div align="center"><strong>#MetPRCIAcum#</strong></div></td>
-    <td class="exibir"><div align="center"><strong>#MetPRCI#</strong></div></td>
+      <td class="exibir"><div align="center"><strong>#totmesDP#</strong></div></td>
+      <td class="exibir"><div align="center"><strong>#totmesFP#</strong></div></td>
+      <td class="exibir"><div align="center"><strong>#TOTMESDPFP#</strong></div></td>
+      <td class="exibir"><div align="center"><strong>#PercDPmes#</strong></div></td>      
+      <td class="exibir"><div align="center"><strong>#MetPRCIAcum#</strong></div></td>
+      <td class="exibir"><div align="center"><strong>#MetPRCI#</strong></div></td>
       <td bgcolor="#scord1#" class="exibir"><div align="center">#PRCIRes#</div></td>
-    <td class="exibir"><div align="center"><strong>#totmessesol#</strong></div></td>
-    <td class="exibir"><div align="center"><strong>#totmessependtrat#</strong></div></td>
-    <td class="exibir"><div align="center"><strong>#totmessegeral#</strong></div></td>
-    <td class="exibir"><div align="center"><strong>#slnc_acummes#</strong></div></td>       
+      <td class="exibir"><div align="center"><strong>#totmessesol#</strong></div></td>
+      <td class="exibir"><div align="center"><strong>#totmessependtrat#</strong></div></td>
+      <td class="exibir"><div align="center"><strong>#totmessegeral#</strong></div></td>
+      <td class="exibir"><div align="center"><strong>#slnc_acummes#</strong></div></td>       
       <td class="exibir"><div align="center"><strong>#MetSLNCAcum#</strong></div></td>
-<td class="exibir"><div align="center"><strong>#MetSLNC#</strong></div></td>      
+      <td class="exibir"><div align="center"><strong>#MetSLNC#</strong></div></td>      
       <td bgcolor="#scroi1#" class="exibir"><div align="center">#SLNCRes#</div></td>
-    <td class="exibir"><div align="center"><strong>#dgci_acummes#</strong></div></td> 
-    <td class="exibir"><div align="center"><strong>#rsMetas.Met_DGCI_Acum#</strong></div></td>
-<td class="exibir"><div align="center"><strong>#Met_DGCI#</strong></div></td>    
-    <td  bgcolor="#scorn1#"class="exibir"><div align="center"><strong>#DGCIRes#</strong></div></td>  
-    <td class="exibir"><div align="center"><strong>#permeta#</strong></div></td>
-    <td  bgcolor="#scorp1#"class="exibir"><div align="center"><strong>#DGCIAcuPerRealRes#</strong></div></td>   
-    <td  bgcolor="#scorp1#"class="exibir"><div align="center"></div></td>    
+      <td class="exibir"><div align="center"><strong>#dgci_acummes#</strong></div></td> 
+      <td class="exibir"><div align="center"><strong>#rsMetas.Met_DGCI_Acum#</strong></div></td>
+      <td class="exibir"><div align="center"><strong>#Met_DGCI#</strong></div></td>    
+      <td  bgcolor="#scorn1#"class="exibir"><div align="center"><strong>#DGCIRes#</strong></div></td>  
+      <td class="exibir"><div align="center"><strong>#Met_DGCI_AcumPeriodo#</strong></div></td>
+      <td class="exibir"><div align="center"><strong>#permeta#</strong></div></td>
+      <td  bgcolor="#scorp1#"class="exibir"><div align="center"><strong>#DGCIAcuPerRealRes#</strong></div></td>   
+      <td  bgcolor="#scorp1#"class="exibir"><div align="center"></div></td>    
     </tr>
 
     <cfset prciacurealnac = prciacurealnac + MetPRCIAcumPeriodo>
