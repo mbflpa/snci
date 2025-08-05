@@ -80,6 +80,15 @@
 <!--- Usar dados já processados do CFC --->
 <cfset dados = dadosDesempenho.dadosAssunto>
 
+<!--- Calcular totais de eventos para percentuais --->
+<cfset totalEventosAtual = 0>
+<cfset totalEventosAnterior = 0>
+<cfloop collection="#dados#" item="chave">
+    <cfset registro = dados[chave]>
+    <cfset totalEventosAtual = totalEventosAtual + registro.atual>
+    <cfset totalEventosAnterior = totalEventosAnterior + registro.anterior>
+</cfloop>
+
 <!--- Calcular evolução percentual e encontrar o maior valor para escala das barras --->
 <cfset maxValor = 0>
 <cfloop collection="#dados#" item="chave">
@@ -97,6 +106,20 @@
     <cfset registro.percentual = percentual>
     <cfset registro.tipo = tipo>
     <cfset registro.delta = delta>
+    
+    <!--- Calcular percentuais em relação ao total --->
+    <cfif totalEventosAtual GT 0>
+        <cfset registro.percentualAtual = numberFormat((atual/totalEventosAtual)*100, "0")>
+    <cfelse>
+        <cfset registro.percentualAtual = "0">
+    </cfif>
+
+    <cfif totalEventosAnterior GT 0>
+        <cfset registro.percentualAnterior = numberFormat((anterior/totalEventosAnterior)*100, "0")>
+    <cfelse>
+        <cfset registro.percentualAnterior = "0">
+    </cfif>
+    
     <cfif anterior GT maxValor>
         <cfset maxValor = anterior>
     </cfif>
@@ -633,7 +656,7 @@
     /* Estilo para o container dos eventos com posicionamento relativo */
     .snci-desempenho-assunto .eventos-container {
         position: relative;
-        font-size: 0.8rem; 
+        font-size: 0.7rem; 
         color: #64748b; 
         text-align: center;
         margin-top: -4px; /* Move a div "eventos" um pouco mais para cima */
@@ -702,7 +725,7 @@
                                         </div>
                                         
                                         <div class="eventos-container">
-                                            eventos
+                                            eventos <cfif item.atual GT 0>(<cfoutput>#item.percentualAtual#%</cfoutput>)</cfif>
                                             <cfif item.reincidencia && item.atual GT 0>
                                                 <span class="badge-reincidente">Reincidente</span>
                                             </cfif>
@@ -722,7 +745,7 @@
                                             </cfif>
                                         </div>
                                         <cfif NOT isJaneiro>
-                                            <div class="eventos-container">eventos</div>
+                                            <div class="eventos-container">eventos <cfif item.anterior GT 0>(<cfoutput>#item.percentualAnterior#%</cfoutput>)</cfif></div>
                                         </cfif>
                                         <cfif NOT isJaneiro AND structKeyExists(item, "valorEnvolvidoAnterior") AND item.valorEnvolvidoAnterior GT 0>
                                             <div class="valor-envolvido">Valor Envolvido:<br>R$ <span class="valor-formatada" data-valor="<cfoutput>#item.valorEnvolvidoAnterior#</cfoutput>">0,00</span></div>

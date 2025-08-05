@@ -138,7 +138,7 @@
 				<li class="nav-item d-none d-sm-inline-block " style="overflow:hidden;">
 					<div style="display: flex; flex-direction: column;">
 						<span class="tituloPagina">
-							Análise das Não Conformidades - 
+							Avaliação Automatizada - 
 							<cfif structKeyExists(application, "rsUsuarioParametros") AND structKeyExists(application.rsUsuarioParametros, "Und_Descricao") AND len(trim(application.rsUsuarioParametros.Und_Descricao))>
 								<cfoutput>#application.rsUsuarioParametros.Und_Descricao# - #application.rsUsuarioParametros.Dir_Sigla#<span style="font-weight:400;font-size:0.8rem;margin-left:10px">(MCU: #application.rsUsuarioParametros.Und_MCU# / STO: #application.rsUsuarioParametros.Und_Codigo#)</span></cfoutput>
 							<cfelse>

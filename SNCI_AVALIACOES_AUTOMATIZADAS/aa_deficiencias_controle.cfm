@@ -79,7 +79,13 @@
         
         <div class="content-wrapper">
             <section class="content">
-    
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-12">
+                            <h3 class="m-3">Avaliação Geral - Deficiência do Controle</h3>
+                        </div>
+                    </div>
+                </div>
  
                 <div class="deficiencias-geral-layout">
                     <div class="dashboard-kpi-panel">
