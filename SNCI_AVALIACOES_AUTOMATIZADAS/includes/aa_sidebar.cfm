@@ -37,7 +37,8 @@
     <!-- Select2 -->
     <link rel="stylesheet" href="../SNCI_AVALIACOES_AUTOMATIZADAS/plugins/select2/css/select2.min.css">
     <link rel="stylesheet" href="../SNCI_AVALIACOES_AUTOMATIZADAS/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css">
-  
+
+    
       <!-- DataTables -->
       <link rel="stylesheet" href="../SNCI_AVALIACOES_AUTOMATIZADAS/plugins/datatables/datatables.min.css">
           
@@ -365,6 +366,9 @@
 
     <!-- Toastr -->
     <script  src="../SNCI_AVALIACOES_AUTOMATIZADAS/plugins/toastr/toastr.min.js"></script>
+
+    <!-- Popper -->
+    <script  src="../SNCI_AVALIACOES_AUTOMATIZADAS/plugins/popper/popper.min.js"></script>
 
     <!-- DataTables  & Plugins -->
     <script  src="../SNCI_AVALIACOES_AUTOMATIZADAS/plugins/datatables/datatables.min.js"></script>

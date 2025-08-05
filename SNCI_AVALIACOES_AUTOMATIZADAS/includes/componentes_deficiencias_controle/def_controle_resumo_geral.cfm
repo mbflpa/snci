@@ -1,5 +1,6 @@
 <cfprocessingdirective pageencoding="utf-8">
 
+
 <!--- Adicionar cfparam para url.mesFiltro ANTES de usar a variável --->
 <cfparam name="url.mesFiltro" default="">
 
@@ -48,6 +49,7 @@
             icone = "fas fa-list-ul",
             titulo = "Testes Envolvidos",
             cor = "",
+            definicao = "Conjunto de testes definidos para avaliarem a efetividade operacional dos controles, ou seja, se os controles realmente impedem ou revelam a ocorrência de falhas nas atividades controladas e se eles estão funcionando da forma estabelecida;",
             ordem= 1
         },
         testesAplicados = {
@@ -55,6 +57,7 @@
             icone = "fas fa-tasks",
             titulo = "Testes Aplicados",
             cor = "",
+            definicao = "Conjunto de testes que foram efetivamente aplicados para verificar a conformidade dos controles.",
             ordem= 2
         },
         conformes = {
@@ -62,6 +65,7 @@
             icone = "fas fa-check-circle",
             titulo = "Conformes",
             cor = "decrease",
+            definicao = "Conjunto de testes que foram considerados conformes, ou seja, que atenderam aos critérios estabelecidos.",
             ordem= 3
         },
         deficienciasControle = {
@@ -69,6 +73,7 @@
             icone = "fas fa-exclamation-triangle",
             titulo = "Deficiência do Controle",
             cor = "increase",
+            definicao = "Conjunto de testes que foram considerados não conformes, ou seja, que não atenderam aos critérios estabelecidos.",
             ordem= 4
         },
         totalEventos = {
@@ -76,6 +81,7 @@
             icone = "fas fa-chart-bar",
             titulo = "Total de Eventos",
             cor = "",
+            definicao = "Total de eventos registrados durante o período.",
             ordem= 5
         },
         reincidencia= {
@@ -83,6 +89,7 @@
             icone = "fas fa-redo",
             titulo = "Reincidência",
             cor = "",
+            definicao = "Número de eventos que se repetiram durante o período.",
             ordem= 6
         },
         valorEnvolvido = {
@@ -91,6 +98,7 @@
             titulo = "Valor Envolvido",
             cor = "",
             formatacao = "moeda",
+            definicao = "Valor financeiro total envolvido nos eventos registrados.",
             ordem= 7
         }
     }>
@@ -191,13 +199,90 @@
         flex: 1;
         min-width: 0;
     }
+    
+    /* Título com ícone de informação */
     .snci-resumo-geral .kpi-card .text .title {
         font-size: 0.85rem;
         color: #64748b;
         margin-bottom: 4px;
         line-height: 1.2;
         font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 6px;
     }
+    
+    .snci-resumo-geral .info-icon {
+        color: #94a3b8;
+        font-size: 0.75rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        opacity: 0.7;
+        flex-shrink: 0;
+        padding: 2px;
+        border-radius: 50%;
+    }
+    
+    .snci-resumo-geral .info-icon:hover {
+        color: #457b9d;
+        opacity: 1;
+        transform: scale(1.1);
+        background-color: rgba(69, 123, 157, 0.1);
+    }
+    
+    /* Estilos do tooltip usando Popper */
+    .metric-tooltip {
+        background: linear-gradient(135deg, var(--azul_correios, #00416B) 55%, var(--azul_claro_correios, #0083CA)) !important;
+        color: #fff !important;
+        padding: 12px 16px;
+        border-radius: 8px;
+        font-size: 0.8rem;
+        line-height: 1.4;
+        max-width: 280px;
+        z-index: 1000;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2) !important;
+        font-weight: 400;
+        font-family: inherit;
+        border: none !important;
+        text-align: justify !important;
+        word-wrap: break-word;
+        hyphens: auto;
+    }
+    
+    .metric-tooltip[data-popper-placement^='top'] > .tooltip-arrow {
+        bottom: -4px;
+    }
+    
+    .metric-tooltip[data-popper-placement^='bottom'] > .tooltip-arrow {
+        top: -4px;
+    }
+    
+    .metric-tooltip[data-popper-placement^='left'] > .tooltip-arrow {
+        right: -4px;
+    }
+    
+    .metric-tooltip[data-popper-placement^='right'] > .tooltip-arrow {
+        left: -4px;
+    }
+    
+    .tooltip-arrow,
+    .tooltip-arrow::before {
+        position: absolute;
+        width: 8px;
+        height: 8px;
+        background: linear-gradient(135deg, var(--azul_correios, #00416B) 55%, var(--azul_claro_correios, #0083CA)) !important;
+    }
+    
+    .tooltip-arrow {
+        visibility: hidden;
+    }
+    
+    .tooltip-arrow::before {
+        visibility: visible;
+        content: '';
+        transform: rotate(45deg);
+    }
+
     .snci-resumo-geral .kpi-card .text .value {
         font-size: 1.35rem;
         font-weight: 600;
@@ -229,6 +314,10 @@
             min-width: 160px;
             max-width: 100%;
         }
+        
+        .metric-tooltip {
+            max-width: 250px;
+        }
     }
     @media (max-width: 768px) {
         .snci-resumo-geral .kpi-row {
@@ -242,6 +331,18 @@
         }
         .snci-resumo-geral .comparison-container h2 {
             font-size: 1.1rem;
+        }
+        
+        .metric-tooltip {
+            max-width: 200px;
+            font-size: 0.75rem;
+            padding: 10px 12px;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .metric-tooltip {
+            max-width: 90vw;
         }
     }
 </style>
@@ -275,7 +376,17 @@
                             <i class="<cfoutput>#item.icone#</cfoutput>"></i>
                         </div>
                         <div class="text">
-                            <div class="title"><cfoutput>#item.titulo#</cfoutput></div>
+                            <div class="title">
+                                <cfoutput>#item.titulo#</cfoutput>
+                                <cfif structKeyExists(item, 'definicao') and len(trim(item.definicao))>
+                                    <i class="fas fa-info-circle info-icon" 
+                                       data-bs-toggle="tooltip" 
+                                       data-bs-placement="auto"
+                                       data-bs-custom-class="metric-tooltip"
+                                       data-bs-title="<cfoutput>#htmlEditFormat(item.definicao)#</cfoutput>"
+                                       data-bs-html="false"></i>
+                                </cfif>
+                            </div>
                             <div class="value <cfif attributes.showAnimation eq 'true'>loading</cfif>">
                                 <cfif structKeyExists(item, 'formatacao') and item.formatacao eq 'moeda'>
                                     R$ <span class="animated-number" data-target="<cfoutput>#numberFormat(item.valor, '_.00')#</cfoutput>" data-type="money">0,00</span>
@@ -293,6 +404,166 @@
 
 <script language="JavaScript">
     $(document).ready(function() {
+        // Variável global para armazenar tooltips ativos
+        var activeTooltips = [];
+        
+        // Função para inicializar tooltips - versão simplificada sem Popper
+        function initTooltips() {
+            // Limpar tooltips existentes primeiro
+            cleanupTooltips();
+            
+            $('.info-icon[data-bs-title]').each(function() {
+                var $trigger = $(this);
+                var content = $trigger.attr('data-bs-title');
+                
+                if (!content || $trigger.data('tooltip-initialized')) {
+                    return;
+                }
+                
+                $trigger.data('tooltip-initialized', true);
+                
+                // Criar tooltip element
+                var $tooltip = $('<div class="metric-tooltip" style="position: absolute; opacity: 0; visibility: hidden; pointer-events: none; z-index: 1000;">' + 
+                                content + 
+                                '</div>');
+                
+                $('body').append($tooltip);
+                
+                // Função para calcular posição do tooltip
+                function calculateTooltipPosition() {
+                    var triggerOffset = $trigger.offset();
+                    var triggerHeight = $trigger.outerHeight();
+                    var triggerWidth = $trigger.outerWidth();
+                    var windowWidth = $(window).width();
+                    var windowHeight = $(window).height();
+                    var scrollTop = $(window).scrollTop();
+                    var scrollLeft = $(window).scrollLeft();
+                    
+                    // Forçar tooltip a aparecer para obter dimensões
+                    $tooltip.css({
+                        'position': 'absolute',
+                        'visibility': 'hidden',
+                        'opacity': '1',
+                        'top': '-9999px',
+                        'left': '-9999px'
+                    });
+                    
+                    var tooltipHeight = $tooltip.outerHeight();
+                    var tooltipWidth = $tooltip.outerWidth();
+                    
+                    // Esconder novamente
+                    $tooltip.css({
+                        'opacity': '0',
+                        'visibility': 'hidden'
+                    });
+                    
+                    // Calcular posição inicial (acima do elemento)
+                    var top = triggerOffset.top - tooltipHeight - 8;
+                    var left = triggerOffset.left - (tooltipWidth / 2) + (triggerWidth / 2);
+                    
+                    // Ajustar horizontalmente se sair da tela
+                    if (left < scrollLeft + 10) {
+                        left = scrollLeft + 10;
+                    } else if (left + tooltipWidth > scrollLeft + windowWidth - 10) {
+                        left = scrollLeft + windowWidth - tooltipWidth - 10;
+                    }
+                    
+                    // Ajustar verticalmente se sair da tela (colocar abaixo)
+                    if (top < scrollTop + 10) {
+                        top = triggerOffset.top + triggerHeight + 8;
+                    }
+                    
+                    // Verificar se ainda sai da tela na parte de baixo
+                    if (top + tooltipHeight > scrollTop + windowHeight - 10) {
+                        top = scrollTop + windowHeight - tooltipHeight - 10;
+                    }
+                    
+                    return { top: top, left: left };
+                }
+                
+                // Função para mostrar tooltip
+                function showTooltip() {
+                    var position = calculateTooltipPosition();
+                    $tooltip.css({
+                        'position': 'absolute',
+                        'top': position.top + 'px',
+                        'left': position.left + 'px',
+                        'opacity': '1',
+                        'visibility': 'visible'
+                    });
+                }
+                
+                // Função para esconder tooltip
+                function hideTooltip() {
+                    $tooltip.css({
+                        'opacity': '0',
+                        'visibility': 'hidden'
+                    });
+                }
+                
+                // Eventos
+                $trigger.on('mouseenter.tooltip', function(e) {
+                    e.stopPropagation();
+                    showTooltip();
+                });
+                
+                $trigger.on('mouseleave.tooltip', function(e) {
+                    e.stopPropagation();
+                    setTimeout(hideTooltip, 100);
+                });
+                
+                $trigger.on('focus.tooltip', function(e) {
+                    e.stopPropagation();
+                    showTooltip();
+                });
+                
+                $trigger.on('blur.tooltip', function(e) {
+                    e.stopPropagation();
+                    hideTooltip();
+                });
+                
+                // Esconder tooltip ao clicar fora
+                var clickEventName = 'click.tooltip-' + Date.now();
+                $(document).on(clickEventName, function(e) {
+                    if (!$trigger.is(e.target) && !$tooltip.is(e.target) && $tooltip.has(e.target).length === 0) {
+                        hideTooltip();
+                    }
+                });
+                
+                // Esconder tooltip ao fazer scroll
+                $(window).on('scroll.tooltip resize.tooltip', function() {
+                    hideTooltip();
+                });
+                
+                // Armazenar referências para cleanup
+                activeTooltips.push({
+                    trigger: $trigger,
+                    tooltip: $tooltip,
+                    clickEvent: clickEventName
+                });
+            });
+        }
+        
+        // Cleanup dos tooltips
+        function cleanupTooltips() {
+            activeTooltips.forEach(function(tooltip) {
+                if (tooltip.trigger) {
+                    tooltip.trigger.off('.tooltip');
+                    tooltip.trigger.removeData('tooltip-initialized');
+                }
+                if (tooltip.tooltip) {
+                    tooltip.tooltip.remove();
+                }
+                if (tooltip.clickEvent) {
+                    $(document).off(tooltip.clickEvent);
+                }
+            });
+            activeTooltips = [];
+            
+            // Remover eventos globais
+            $(window).off('.tooltip');
+        }
+
         // Função para animar números
         function animateNumbers() {
             $('.desempenho-container .animated-number').each(function() {
@@ -348,10 +619,18 @@
             // Inicia animação dos números após os cards aparecerem
             setTimeout(function() {
                 animateNumbers();
+                // Inicializar tooltips após as animações
+                setTimeout(function() {
+                    initTooltips();
+                }, 300);
             }, 600);
             <cfelse>
             $('.desempenho-container .fade-in-up').addClass('animate');
             animateNumbers();
+            // Inicializar tooltips imediatamente
+            setTimeout(function() {
+                initTooltips();
+            }, 100);
             </cfif>
         }
         
@@ -366,18 +645,28 @@
             );
         }
         
-        // Inicia animação quando o componente fica visível
+        // Observer para animar quando visível
+        var hasAnimated = false;
+        
         function checkVisibility() {
-            var container = $('.desempenho-container')[0];
-            if (container && isElementInViewport(container) && !$(container).hasClass('animated')) {
-                $(container).addClass('animated');
-                animateCards();
+            if (!hasAnimated && $('.desempenho-container').length > 0) {
+                var container = $('.desempenho-container')[0];
+                if (isElementInViewport(container)) {
+                    hasAnimated = true;
+                    animateCards();
+                    $(window).off('scroll.visibility resize.visibility');
+                }
             }
         }
         
-        // Verifica visibilidade no scroll e no carregamento
-        $(window).on('scroll resize', checkVisibility);
+        // Verificar visibilidade no carregamento e nos eventos
         checkVisibility();
+        $(window).on('scroll.visibility resize.visibility', checkVisibility);
+        
+        // Cleanup ao descarregar a página
+        $(window).on('beforeunload', function() {
+            cleanupTooltips();
+        });
     });
-
 </script>
+           
