@@ -106,6 +106,46 @@
 		  .meses-scroll::-webkit-scrollbar-thumb:hover {
 			background: #a1a1a1;
 		  }
+		  
+		  /* Estilos para o ícone de informação */
+		  #info-icon {
+			margin-left: 5px;
+			cursor: pointer;
+			font-size: 0.8rem;
+			opacity: 0.7;
+			transition: opacity 0.3s ease;
+		  }
+		  
+		  #info-icon:hover {
+			opacity: 1;
+		  }
+		  
+		  /* Estilos customizados para o popover */
+		  .popover {
+			background: linear-gradient(135deg, var(--azul_correios, #00416B) 55%, var(--azul_claro_correios, #0083CA)) !important;
+			border: none !important;
+		  }
+		  
+		  .popover .popover-body {
+			color: white !important;
+			font-weight: 500;
+			text-align: justify !important;
+		  }
+		  
+		  .popover .arrow::before,
+		  .popover .arrow::after {
+			border-bottom-color: var(--azul_correios, #00416B) !important;
+		  }
+		  
+		  .popover.bs-popover-bottom .arrow::before,
+		  .popover.bs-popover-bottom .arrow::after {
+			border-bottom-color: var(--azul_correios, #00416B) !important;
+		  }
+		  
+		  .popover.bs-popover-top .arrow::before,
+		  .popover.bs-popover-top .arrow::after {
+			border-top-color: var(--azul_claro_correios, #0083CA) !important;
+		  }
 	 </style>
 	<!-- Navbar -->
 		<link rel="stylesheet" href="../SNCI_AVALIACOES_AUTOMATIZADAS/dist/css/animate.min.css">
@@ -129,7 +169,14 @@
 						
 						<!-- Container dos botões de mês -->
 						<div class="meses-container">
-							<span class="meses-label">Mês:</span>
+							<span class="meses-label">Mês:
+							<i id="info-icon" class="fas fa-circle-info azul_claro_correios_textColor" 
+							   data-toggle="popover" 
+							   data-trigger="hover" 
+							   data-placement="bottom" 
+							   data-html="true"
+							   data-content="Refere-se ao período contemplado do processamento da avaliação automatizada."></i>
+							</span>
 							<div class="meses-scroll" id="mesesContainer">
 								<cfif structKeyExists(application, "rsUsuarioParametros") AND structKeyExists(application.rsUsuarioParametros, "Und_Descricao") AND len(trim(application.rsUsuarioParametros.Und_Descricao))>
 									<button class="btn-mes loading" id="loadingMeses">
@@ -166,8 +213,23 @@
 		</nav>
 		
 		<script language="JavaScript">
+		    
 			// Garante que o sidebar fique sempre oculto e o navbar full width
 			$(document).ready(function() {
+				// Inicializa todos os popovers
+				$('[data-toggle="popover"]').popover({
+					container: 'body',
+					html: true,
+					trigger: 'hover'
+				});
+				
+				// Inicializa tooltips se necessário
+				$('[data-toggle="tooltip"]').tooltip();
+				
+				// Popover com dismiss específico
+				$('.popover-dismiss').popover({
+					trigger: 'hover'
+				});
 				//$('body').addClass('sidebar-collapse');
 				
 				// Carregar meses disponíveis

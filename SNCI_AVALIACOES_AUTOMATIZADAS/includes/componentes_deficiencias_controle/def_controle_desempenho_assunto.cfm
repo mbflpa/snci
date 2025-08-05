@@ -659,7 +659,10 @@
         border-radius: 4px;
         border: 1px solid #e5e7eb;
         box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        margin-top: 12px;
+        margin-bottom: -8px;
     }
+
 </style>
 
 <div class="snci-desempenho-assunto">
@@ -695,7 +698,7 @@
                                         
                                         <div class="eventos-container">
                                             eventos
-                                            <cfif item.reincidencia>
+                                            <cfif item.reincidencia && item.atual GT 0>
                                                 <span class="badge-reincidente">Reincidente</span>
                                             </cfif>
                                         </div>
