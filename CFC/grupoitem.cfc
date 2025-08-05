@@ -62,9 +62,9 @@
             <cfquery name="rsModalidade" datasource="DBSNCI">
                 SELECT TUI_Modalidade,
                 CASE 
-                    WHEN TUI_Modalidade = 0 THEN 'PRESENCIAL (0)'
-                    WHEN TUI_Modalidade = 1 THEN 'A DISTÂNCIA (1)'
-                    ELSE 'TODAS (0 e 1)'
+                    WHEN TUI_Modalidade = 0 THEN 'PRESENCIAL'
+                    WHEN TUI_Modalidade = 1 THEN 'A DISTÂNCIA'
+                    ELSE 'TODAS'
                 END as nome_modalidade
                 FROM Itens_Verificacao 
                 INNER JOIN TipoUnidade_ItemVerificacao ON TUI_GrupoItem = Itn_NumGrupo and 
@@ -105,7 +105,7 @@
                 LEFT JOIN TipoUnidade_ItemVerificacao ON (Itn_Ano = TUI_Ano) AND (Itn_NumItem = TUI_ItemVerif) AND (Itn_NumGrupo = TUI_GrupoItem) AND (Itn_TipoUnidade = TUI_TipoUnid) AND (Itn_Modalidade = TUI_Modalidade)
                 GROUP BY Grp_Ano, Itn_Modalidade, Itn_TipoUnidade, Grp_Codigo, Grp_Descricao, Itn_NumGrupo
                 HAVING Grp_Ano=<cfqueryparam value="#anogrupo#" cfsqltype="cf_sql_char"> 
-                ORDER BY Grp_Descricao
+                ORDER BY Grp_Codigo,Grp_Descricao
             </cfquery>
             <cfreturn rscadgrpverif>
         </cftransaction>
@@ -120,7 +120,7 @@
                 FROM (Grupos_Verificacao INNER JOIN Itens_Verificacao ON (Grp_Codigo = Itn_NumGrupo) AND (Grp_Ano = Itn_Ano)) INNER JOIN TipoUnidade_ItemVerificacao ON (Itn_NumItem = TipoUnidade_ItemVerificacao.TUI_ItemVerif) AND (Itn_NumGrupo = TipoUnidade_ItemVerificacao.TUI_GrupoItem) AND (Itn_TipoUnidade = TipoUnidade_ItemVerificacao.TUI_TipoUnid) AND (Itn_Ano = TipoUnidade_ItemVerificacao.TUI_Ano) AND (Itn_Modalidade = TipoUnidade_ItemVerificacao.TUI_Modalidade)
                 WHERE (Grp_Ano= <cfqueryparam value="#anogrupo#" cfsqltype="cf_sql_char">) AND (Itn_Modalidade = <cfqueryparam value="#modalgrupo#" cfsqltype="cf_sql_char">)
                 GROUP BY Grp_Codigo, Grp_Descricao
-                ORDER BY Grp_Descricao
+                ORDER BY Grp_Codigo,Grp_Descricao
           </cfquery>
           <cfreturn rsgrpverif>
         </cftransaction>

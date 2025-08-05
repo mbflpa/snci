@@ -264,9 +264,9 @@
                                 <div class="col">
                                     <select name="selCadModalidade" id="selCadModalidade" class="form-select" aria-label="Default select example">
                                         <option selected="selected" value="">---</option>
-                                        <option value="0">PRESENCIAL (0)</option>
-                                        <option value="1">A DISTÁNCIA (1)</option>
-                                        <option value="2">TODAS (0 e 1)</option>
+                                        <option value="0">PRESENCIAL</option>
+                                        <option value="1">A DISTÁNCIA</option>
+                                        <option value="2">TODAS</option>
                                     </select>                                        
                                 </div>                                    
                                 <div class="col">

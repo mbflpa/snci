@@ -448,7 +448,7 @@ function valida_formCadNum(x) {
     }
     var d = new Date();
 	d.setHours(0,0,0,0);
-	if(d > gerarData(frm.dataInicioDesl.value) && x != 'incInspetor' && x != 'altcadastro' && x != 'altgestor'){
+	if(d > gerarData(frm.dataInicioDesl.value) && x != 'incInspetor' && x != 'altcadastro' && x != 'altgestor'  && mod == 0){
 		alert('A data de início do deslocamento não pode ser menor que a data de hoje.')
 		frm.dataInicioDesl.focus();
 		frm.dataInicioDesl.select();
@@ -457,7 +457,7 @@ function valida_formCadNum(x) {
 
 	var dataInicioDesl =gerarData(frm.dataInicioDesl.value) ;
 	var dataFimDesl =gerarData(frm.dataFimDesl.value) ;
-	if(dataInicioDesl > dataFimDesl){
+	if(dataInicioDesl > dataFimDesl  && mod == 0){
 		alert('A data de fim do deslocamento não pode ser menor que a data de início do deslocamento.')
 		frm.dataFimDesl.focus();
 		frm.dataFimDesl.select();
@@ -466,7 +466,7 @@ function valida_formCadNum(x) {
 
     var dataInicioInsp =gerarData(frm.dataInicioInsp.value) ;
 	var dataFimDesl =gerarData(frm.dataFimDesl.value) ;
-	if(dataFimDesl < dataInicioInsp){
+	if(dataFimDesl < dataInicioInsp  && mod == 0){
 		alert('A data de início da verificação não pode ser maior que a data de fim do deslocamento.')
 		frm.dataInicioInsp.focus();
 		frm.dataInicioInsp.select();
@@ -485,7 +485,7 @@ function valida_formCadNum(x) {
 
 	var dataFimDesl =gerarData(frm.dataFimDesl.value) ;
 	var dataFimInsp =gerarData(frm.dataFimInsp.value) ;
-	if(dataFimInsp > dataFimDesl){
+	if(dataFimInsp > dataFimDesl && mod == 0){
 		alert('A data de fim da verificação não pode ser maior que a data de fim do deslocamento.')
 		frm.dataFimInsp.focus();
 		frm.dataFimInsp.select();
@@ -494,7 +494,7 @@ function valida_formCadNum(x) {
 
 	var dataInicioInsp =gerarData(frm.dataInicioInsp.value) ;
 	var dataInicioDesl =gerarData(frm.dataInicioDesl.value) ;
-	if(dataInicioInsp < dataInicioDesl){
+	if(dataInicioInsp < dataInicioDesl && mod == 0){
 		alert('A data de inicio da verificação não pode ser menor que a data de início do deslocamento.')
 		frm.dataInicioInsp.focus();
 		frm.dataInicioInsp.select();
@@ -1062,6 +1062,24 @@ if (x == 'altcadastro') {
 </cfif>
 
 </cfif>
-
 </body>
+<script src="public/jquery-3.7.1.min.js"></script>
+<script>
+	$(function(e){
+		//alert('Dom foi iniciado!')
+		let mod =''
+		//let dtdesloc = ''
+		<cfoutput>
+			mod = '#rsInspecao.INP_Modalidade#'
+			//dtdesloc = '#dateformat(now(),"DD/MM/YYYY")#'
+		</cfoutput>
+		//alert('mod : '+mod)
+		if(mod == 1){
+			$("#dataInicioDesl").prop('readonly', true)
+			$("#dataFimDesl").prop('readonly', true)
+			$("#horasPreInspecao").prop('readonly', true)
+			$("#horasDeslocamento").prop('readonly', true)
+		}
+	})
+</script>
 </html>

@@ -1904,7 +1904,7 @@ label {
 					posavaledit = posnuminspedit
 					$('#informe01reinc01').html('<h6>O período/amostra considerados para realização das avaliações são idênticos? (Item '+posnumgrupo+'.'+posnumitem+' Avaliação '+posnuminspedit+' e Item '+posnumgrupo+'.'+posnumitem+' Avaliação '+numinspecaoedit+')</h6>')
 					let url = 'href=abrir_pdf_act.cfm?arquivo=\\\\sac0424\\SISTEMAS\\SNCI\\GUIAS\\Orientar_Reg_Reincidencia.pdf'
-					$('#informe02reinc01').html('<h6>Atenção:Antes da confirmação de uma das opções (Sim) ou (Não), ler atentamente as orientações disponibilizadas <a class="alert-link" '+url+' target="_blank">Aqui.</a></h6>')
+					$('#informe02reinc01').html('<h6>Atenção: Antes da confirmação de uma das opções (Sim) ou (Não), ler atentamente as orientações disponibilizadas <a class="alert-link" '+url+' target="_blank">Aqui.</a></h6>')
 					$('.corpoavaliacao').hide()	
 					$('#qtdreincidente').val(contreg)	
 					$('#sim01').css('box-shadow', '5px 5px 3px #fff')
@@ -1922,7 +1922,7 @@ label {
 					posavaledit = posavaledit + ' e '+posnuminspedit
 					$('#informe01reinc02').html('<h6>O período/amostra considerados para realização das avaliações são idênticos? (Item '+posnumgrupo+'.'+posnumitem+' Avaliação '+posnuminspedit+' e Item '+posnumgrupo+'.'+posnumitem+' Avaliação '+numinspecaoedit+')</h6>')
 					let url = 'href=abrir_pdf_act.cfm?arquivo=\\\\sac0424\\SISTEMAS\\SNCI\\GUIAS\\Orientar_Reg_Reincidencia.pdf'
-					$('#informe02reinc02').html('<h6>Atenção:Antes da confirmação de uma das opções (Sim) ou (Não), ler atentamente as orientações disponibilizadas <a class="alert-link" '+url+' target="_blank">Aqui.</a></h6>')							
+					$('#informe02reinc02').html('<h6>Atenção: Antes da confirmação de uma das opções (Sim) ou (Não), ler atentamente as orientações disponibilizadas <a class="alert-link" '+url+' target="_blank">Aqui.</a></h6>')							
 					$('#qtdreincidente').val(contreg)	
 					$('#sim02').css('box-shadow', '5px 5px 3px #fff')
 					$('#nao02').css('box-shadow', '5px 5px 3px #fff')	
