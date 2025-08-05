@@ -65,7 +65,7 @@
             icone = "fas fa-check-circle",
             titulo = "Conformes",
             cor = "decrease",
-            definicao = "Conjunto de testes que foram considerados conformes, ou seja, que atenderam aos critérios estabelecidos.",
+            definicao = "Tratam-se de situações identificadas nas avaliações realizadas nas unidades operacionais, por meio da aplicação de testes de controle (Plano de Testes), que estão de acordo com o previsto em normas internas dos Correios, documentos de orientações vigentes (ofícios) e legislações.",
             ordem= 3
         },
         deficienciasControle = {
@@ -73,7 +73,7 @@
             icone = "fas fa-exclamation-triangle",
             titulo = "Deficiência do Controle",
             cor = "increase",
-            definicao = "Conjunto de testes que foram considerados não conformes, ou seja, que não atenderam aos critérios estabelecidos.",
+            definicao = "Tratam-se de situações identificadas nas avaliações realizadas nas unidades operacionais, por meio da aplicação de testes de controle (Plano de Testes), que não condizem com o previsto em normas internas dos Correios, documentos de orientações vigentes (ofícios) e legislações.",
             ordem= 4
         },
         totalEventos = {
@@ -81,7 +81,7 @@
             icone = "fas fa-chart-bar",
             titulo = "Total de Eventos",
             cor = "",
-            definicao = "Total de eventos registrados durante o período.",
+            definicao = "Contempla os registros das deficiências dos controles identificados no sistemas/bases. Os registros identificados são aplicados conforme o objetivo de cada teste.",
             ordem= 5
         },
         reincidencia= {
