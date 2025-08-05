@@ -120,32 +120,11 @@
 			opacity: 1;
 		  }
 		  
-		  /* Estilos customizados para o popover */
-		  .popover {
-			background: linear-gradient(135deg, var(--azul_correios, #00416B) 55%, var(--azul_claro_correios, #0083CA)) !important;
-			border: none !important;
-		  }
-		  
+		 
 		  .popover .popover-body {
-			color: white !important;
-			font-weight: 500;
 			text-align: justify !important;
 		  }
 		  
-		  .popover .arrow::before,
-		  .popover .arrow::after {
-			border-bottom-color: var(--azul_correios, #00416B) !important;
-		  }
-		  
-		  .popover.bs-popover-bottom .arrow::before,
-		  .popover.bs-popover-bottom .arrow::after {
-			border-bottom-color: var(--azul_correios, #00416B) !important;
-		  }
-		  
-		  .popover.bs-popover-top .arrow::before,
-		  .popover.bs-popover-top .arrow::after {
-			border-top-color: var(--azul_claro_correios, #0083CA) !important;
-		  }
 	 </style>
 	<!-- Navbar -->
 		<link rel="stylesheet" href="../SNCI_AVALIACOES_AUTOMATIZADAS/dist/css/animate.min.css">
@@ -175,7 +154,7 @@
 							   data-trigger="hover" 
 							   data-placement="bottom" 
 							   data-html="true"
-							   data-content="Refere-se ao período contemplado do processamento da avaliação automatizada."></i>
+							   data-content="Refere-se ao período contemplado no processamento da avaliação automatizada."></i>
 							</span>
 							<div class="meses-scroll" id="mesesContainer">
 								<cfif structKeyExists(application, "rsUsuarioParametros") AND structKeyExists(application.rsUsuarioParametros, "Und_Descricao") AND len(trim(application.rsUsuarioParametros.Und_Descricao))>

@@ -87,7 +87,12 @@
     <cfset anterior = registro.anterior>
     <cfset atual = registro.atual>
     <cfset delta = atual - anterior>
-    <cfset percentual = (anterior GT 0 ? round((delta/anterior)*100) : (atual GT 0 ? 100 : 0))>
+    <!--- Se anterior for zero, percentual sempre será zero --->
+    <cfif anterior EQ 0>
+        <cfset percentual = 0>
+    <cfelse>
+        <cfset percentual = round((delta/anterior)*100)>
+    </cfif>
     <cfset tipo = (delta GTE 0 ? "increase" : "decrease")>
     <cfset registro.percentual = percentual>
     <cfset registro.tipo = tipo>
@@ -726,13 +731,13 @@
                                 </div>
 
                                 <!-- Indicador de tendência aprimorado -->
-                                <div class="trend-indicator <cfoutput>#(isJaneiro ? 'stable' : (item.atual eq item.anterior ? 'stable' : item.tipo))#</cfoutput>">
+                                <div class="trend-indicator <cfoutput>#(isJaneiro ? 'stable' : (item.atual eq item.anterior OR item.percentual eq 0 ? 'stable' : item.tipo))#</cfoutput>">
                                     <div class="trend-icon">
                                         <cfif isJaneiro>
                                             <i class="fas fa-info-circle"></i>
                                         </cfif>
                                         <cfif NOT isJaneiro>
-                                            <cfif item.atual eq item.anterior>
+                                            <cfif item.atual eq item.anterior OR item.percentual eq 0>
                                                 <i class="fas fa-minus"></i>
                                             <cfelseif item.tipo eq "increase">
                                                 <i class="fas fa-arrow-up"></i>
@@ -746,12 +751,12 @@
                                             <cfif isJaneiro>
                                                 
                                             <cfelse>
-                                                <cfif item.atual eq item.anterior>
-                                                    0%
+                                                <cfif item.atual eq item.anterior OR item.percentual eq 0>
+                                                
                                                 <cfelseif item.anterior GT 0>
                                                     <cfoutput>#abs(item.percentual)#%</cfoutput>
                                                 <cfelse>
-                                                    <cfoutput>#(item.atual GT 0 ? 100 : 0)#%</cfoutput>
+                                                    -
                                                 </cfif>
                                             </cfif>
                                         </div>
@@ -759,8 +764,8 @@
                                             <cfif isJaneiro>
                                                 sem dados do mês anterior para comparação
                                             <cfelse>
-                                                <cfif item.atual eq item.anterior>
-                                                    estável
+                                                <cfif item.atual eq item.anterior OR item.percentual eq 0>
+                                                   
                                                 <cfelseif item.tipo eq "increase">
                                                     aumento
                                                 <cfelse>

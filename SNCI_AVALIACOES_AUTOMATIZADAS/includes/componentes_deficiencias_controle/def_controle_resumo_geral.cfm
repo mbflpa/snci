@@ -230,44 +230,7 @@
         background-color: rgba(69, 123, 157, 0.1);
     }
     
-    /* Estilos customizados para o popover com cores dos Correios */
-    .popover {
-        background: linear-gradient(135deg, var(--azul_correios, #00416B) 55%, var(--azul_claro_correios, #0083CA)) !important;
-        border: none !important;
-        max-width: 280px;
-    }
     
-    .popover .popover-body {
-        color: white !important;
-        text-align: justify !important;
-       
-    }
-    
-    /* Setas do popover para todas as direções */
-    .popover .arrow::before,
-    .popover .arrow::after {
-        border-color: transparent;
-    }
-    
-    .popover.bs-popover-bottom .arrow::before,
-    .popover.bs-popover-bottom .arrow::after {
-        border-bottom-color: var(--azul_correios, #00416B) !important;
-    }
-    
-    .popover.bs-popover-top .arrow::before,
-    .popover.bs-popover-top .arrow::after {
-        border-top-color: var(--azul_correios, #00416B) !important;
-    }
-    
-    .popover.bs-popover-left .arrow::before,
-    .popover.bs-popover-left .arrow::after {
-        border-left-color: var(--azul_correios, #00416B) !important;
-    }
-    
-    .popover.bs-popover-right .arrow::before,
-    .popover.bs-popover-right .arrow::after {
-        border-right-color: var(--azul_correios, #00416B) !important;
-    }
     
     .snci-resumo-geral .kpi-card .text .value {
         font-size: 1.35rem;
@@ -330,6 +293,10 @@
         .metric-tooltip {
             max-width: 90vw;
         }
+    }
+
+    .popover .popover-body {
+        text-align: justify !important;
     }
 </style>
 
