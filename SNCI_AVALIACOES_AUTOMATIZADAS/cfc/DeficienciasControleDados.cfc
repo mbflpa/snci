@@ -43,7 +43,7 @@
                         ,SUM(CASE WHEN sigla_apontamento = 'N' THEN nr_reincidente ELSE 0 END) AS reincidencia
                 FROM fato_verificacao f
                 WHERE f.sk_mcu = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.sk_mcu#">
-                     AND sk_grupo_item <> 12
+                     AND sk_grupo_item <> 12 AND f.sigla_apontamento <> 'E'
                 <cfif len(trim(arguments.mesAnoFiltro))>
                     AND f.data_encerramento BETWEEN <cfqueryparam cfsqltype="cf_sql_date" value="#inicioMes#">
                                                AND <cfqueryparam cfsqltype="cf_sql_date" value="#fimMes#">
@@ -70,7 +70,7 @@
                     FROM fato_verificacao f
                     WHERE f.sk_mcu = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.sk_mcu#">
                         AND f.data_encerramento <= <cfqueryparam cfsqltype="cf_sql_date" value="#fimMes#">
-                        AND sk_grupo_item <> 12
+                        AND F.sk_grupo_item <> 12 AND f.sigla_apontamento <> 'E'
                 </cfquery>
                 
                 <!--- Armazenar dados históricos acumulados --->
@@ -86,7 +86,7 @@
                     FROM fato_verificacao
                     WHERE data_encerramento IS NOT NULL
                       AND sk_mcu = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.sk_mcu#">
-                      AND sk_grupo_item <> 12
+                      AND sk_grupo_item <> 12 and sigla_apontamento <> 'E'
                     GROUP BY FORMAT(data_encerramento, 'yyyy-MM')
                     ORDER BY mes_ano DESC
                 </cfif>
@@ -113,7 +113,7 @@
                     FROM fato_verificacao f
                     INNER JOIN dim_teste_processos p ON f.sk_grupo_item = p.sk_grupo_item
                     WHERE f.sk_mcu = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.sk_mcu#">
-                      AND f.sk_grupo_item <> 12 
+                      AND f.sk_grupo_item <> 12 and f.sigla_apontamento <> 'E'
                       AND (
                         (f.data_encerramento BETWEEN <cfqueryparam cfsqltype="cf_sql_date" value="#inicioMes#">
                                                  AND <cfqueryparam cfsqltype="cf_sql_date" value="#fimMes#">)
@@ -153,7 +153,7 @@
                     FROM fato_verificacao f
                     INNER JOIN dim_teste_processos p ON f.sk_grupo_item = p.sk_grupo_item
                     WHERE f.sk_mcu = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.sk_mcu#">
-                      AND f.sk_grupo_item <> 12 
+                      AND f.sk_grupo_item <> 12 and f.sigla_apontamento <> 'E'
                       AND FORMAT(f.data_encerramento, 'yyyy-MM') IN (SELECT mes_ano FROM UltimosMeses)
                     GROUP BY p.MANCHETE, p.sk_grupo_item, p.TESTE, 
                              CASE WHEN f.sigla_apontamento = 'N' THEN f.nr_reincidente ELSE 0 END,
