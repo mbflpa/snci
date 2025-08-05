@@ -191,6 +191,11 @@
 						if (typeof setActiveLink === 'function') {
 							setActiveLink();
 						}
+						
+						// Atualizar links do sidebar com filtro de mês
+						if (typeof atualizarLinksComFiltroMes === 'function') {
+							atualizarLinksComFiltroMes();
+						}
 					}, 200);
 				}
 			}
@@ -210,6 +215,10 @@
 								verificarMesSelecionadoURL();
 								if (typeof setActiveLink === 'function') {
 									setActiveLink();
+								}
+								// Atualizar links do sidebar com filtro de mês
+								if (typeof atualizarLinksComFiltroMes === 'function') {
+									atualizarLinksComFiltroMes();
 								}
 							}, 100);
 						} else {

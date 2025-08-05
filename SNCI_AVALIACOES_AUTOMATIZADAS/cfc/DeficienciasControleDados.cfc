@@ -27,7 +27,7 @@
             
             <!--- Consulta principal: dados históricos do período específico --->
             <cfquery name="rsDadosHistoricos" datasource="#application.dsn_avaliacoes_automatizadas#">
-                SELECT   COUNT(DISTINCT CASE WHEN sigla_apontamento in('C','N') and f.suspenso<>1 THEN sk_grupo_item END) AS testesEnvolvidos
+                SELECT   COUNT(DISTINCT CASE WHEN sigla_apontamento in('C','N') THEN sk_grupo_item END) AS testesEnvolvidos
                         ,SUM(CASE WHEN sigla_apontamento = 'N' THEN NC_Eventos ELSE 0 END) AS totalEventos
                         ,COUNT(CASE WHEN sigla_apontamento in('C','N') THEN sigla_apontamento END) AS testesAplicados
                         ,COUNT(CASE WHEN sigla_apontamento = 'C' THEN sigla_apontamento END) AS conformes
@@ -113,7 +113,7 @@
                     FROM fato_verificacao f
                     INNER JOIN dim_teste_processos p ON f.sk_grupo_item = p.sk_grupo_item
                     WHERE f.sk_mcu = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.sk_mcu#">
-                      AND f.sk_grupo_item <> 12 and f.sigla_apontamento <> 'E'
+                      AND f.sigla_apontamento IN ('C', 'N') 
                       AND (
                         (f.data_encerramento BETWEEN <cfqueryparam cfsqltype="cf_sql_date" value="#inicioMes#">
                                                  AND <cfqueryparam cfsqltype="cf_sql_date" value="#fimMes#">)
@@ -153,7 +153,7 @@
                     FROM fato_verificacao f
                     INNER JOIN dim_teste_processos p ON f.sk_grupo_item = p.sk_grupo_item
                     WHERE f.sk_mcu = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.sk_mcu#">
-                      AND f.sk_grupo_item <> 12 and f.sigla_apontamento <> 'E'
+                      AND f.sigla_apontamento IN ('C', 'N') 
                       AND FORMAT(f.data_encerramento, 'yyyy-MM') IN (SELECT mes_ano FROM UltimosMeses)
                     GROUP BY p.MANCHETE, p.sk_grupo_item, p.TESTE, 
                              CASE WHEN f.sigla_apontamento = 'N' THEN f.nr_reincidente ELSE 0 END,

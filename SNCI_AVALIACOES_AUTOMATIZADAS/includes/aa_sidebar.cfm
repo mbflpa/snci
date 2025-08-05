@@ -423,6 +423,25 @@
         });
       }
 
+      // Função para atualizar links do sidebar com filtro de mês
+      function atualizarLinksComFiltroMes() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const mesFiltro = urlParams.get('mesFiltro');
+        
+        if (mesFiltro) {
+          const navLinks = document.querySelectorAll('.modern-nav-link');
+          
+          navLinks.forEach(link => {
+            const url = new URL(link.href);
+            // Apenas adicionar o filtro se não existir
+            if (!url.searchParams.has('mesFiltro')) {
+              url.searchParams.set('mesFiltro', mesFiltro);
+              link.href = url.toString();
+            }
+          });
+        }
+      }
+
       // Efeito de hover melhorado
       $(document).ready(function() {
         $('.modern-nav-link').hover(
@@ -437,6 +456,7 @@
         // Aguardar um pouco antes de definir link ativo para dar tempo dos filtros carregarem
         setTimeout(function() {
           setActiveLink();
+          atualizarLinksComFiltroMes();
         }, 500);
       });
 
