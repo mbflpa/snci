@@ -230,59 +230,45 @@
         background-color: rgba(69, 123, 157, 0.1);
     }
     
-    /* Estilos do tooltip usando Popper */
-    .metric-tooltip {
+    /* Estilos customizados para o popover com cores dos Correios */
+    .popover {
         background: linear-gradient(135deg, var(--azul_correios, #00416B) 55%, var(--azul_claro_correios, #0083CA)) !important;
-        color: #fff !important;
-        padding: 12px 16px;
-        border-radius: 8px;
-        font-size: 0.8rem;
-        line-height: 1.4;
-        max-width: 280px;
-        z-index: 1000;
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2) !important;
-        font-weight: 400;
-        font-family: inherit;
         border: none !important;
+        max-width: 280px;
+    }
+    
+    .popover .popover-body {
+        color: white !important;
         text-align: justify !important;
-        word-wrap: break-word;
-        hyphens: auto;
+       
     }
     
-    .metric-tooltip[data-popper-placement^='top'] > .tooltip-arrow {
-        bottom: -4px;
+    /* Setas do popover para todas as direções */
+    .popover .arrow::before,
+    .popover .arrow::after {
+        border-color: transparent;
     }
     
-    .metric-tooltip[data-popper-placement^='bottom'] > .tooltip-arrow {
-        top: -4px;
+    .popover.bs-popover-bottom .arrow::before,
+    .popover.bs-popover-bottom .arrow::after {
+        border-bottom-color: var(--azul_correios, #00416B) !important;
     }
     
-    .metric-tooltip[data-popper-placement^='left'] > .tooltip-arrow {
-        right: -4px;
+    .popover.bs-popover-top .arrow::before,
+    .popover.bs-popover-top .arrow::after {
+        border-top-color: var(--azul_correios, #00416B) !important;
     }
     
-    .metric-tooltip[data-popper-placement^='right'] > .tooltip-arrow {
-        left: -4px;
+    .popover.bs-popover-left .arrow::before,
+    .popover.bs-popover-left .arrow::after {
+        border-left-color: var(--azul_correios, #00416B) !important;
     }
     
-    .tooltip-arrow,
-    .tooltip-arrow::before {
-        position: absolute;
-        width: 8px;
-        height: 8px;
-        background: linear-gradient(135deg, var(--azul_correios, #00416B) 55%, var(--azul_claro_correios, #0083CA)) !important;
+    .popover.bs-popover-right .arrow::before,
+    .popover.bs-popover-right .arrow::after {
+        border-right-color: var(--azul_correios, #00416B) !important;
     }
     
-    .tooltip-arrow {
-        visibility: hidden;
-    }
-    
-    .tooltip-arrow::before {
-        visibility: visible;
-        content: '';
-        transform: rotate(45deg);
-    }
-
     .snci-resumo-geral .kpi-card .text .value {
         font-size: 1.35rem;
         font-weight: 600;
@@ -380,11 +366,11 @@
                                 <cfoutput>#item.titulo#</cfoutput>
                                 <cfif structKeyExists(item, 'definicao') and len(trim(item.definicao))>
                                     <i class="fas fa-info-circle info-icon" 
-                                       data-bs-toggle="tooltip" 
-                                       data-bs-placement="auto"
-                                       data-bs-custom-class="metric-tooltip"
-                                       data-bs-title="<cfoutput>#htmlEditFormat(item.definicao)#</cfoutput>"
-                                       data-bs-html="false"></i>
+                                       data-toggle="popover" 
+                                       data-trigger="hover" 
+                                       data-placement="right"
+                                       data-html="false"
+                                       data-content="<cfoutput>#htmlEditFormat(item.definicao)#</cfoutput>"></i>
                                 </cfif>
                             </div>
                             <div class="value <cfif attributes.showAnimation eq 'true'>loading</cfif>">
@@ -404,165 +390,12 @@
 
 <script language="JavaScript">
     $(document).ready(function() {
-        // Variável global para armazenar tooltips ativos
-        var activeTooltips = [];
-        
-        // Função para inicializar tooltips - versão simplificada sem Popper
-        function initTooltips() {
-            // Limpar tooltips existentes primeiro
-            cleanupTooltips();
-            
-            $('.info-icon[data-bs-title]').each(function() {
-                var $trigger = $(this);
-                var content = $trigger.attr('data-bs-title');
-                
-                if (!content || $trigger.data('tooltip-initialized')) {
-                    return;
-                }
-                
-                $trigger.data('tooltip-initialized', true);
-                
-                // Criar tooltip element
-                var $tooltip = $('<div class="metric-tooltip" style="position: absolute; opacity: 0; visibility: hidden; pointer-events: none; z-index: 1000;">' + 
-                                content + 
-                                '</div>');
-                
-                $('body').append($tooltip);
-                
-                // Função para calcular posição do tooltip
-                function calculateTooltipPosition() {
-                    var triggerOffset = $trigger.offset();
-                    var triggerHeight = $trigger.outerHeight();
-                    var triggerWidth = $trigger.outerWidth();
-                    var windowWidth = $(window).width();
-                    var windowHeight = $(window).height();
-                    var scrollTop = $(window).scrollTop();
-                    var scrollLeft = $(window).scrollLeft();
-                    
-                    // Forçar tooltip a aparecer para obter dimensões
-                    $tooltip.css({
-                        'position': 'absolute',
-                        'visibility': 'hidden',
-                        'opacity': '1',
-                        'top': '-9999px',
-                        'left': '-9999px'
-                    });
-                    
-                    var tooltipHeight = $tooltip.outerHeight();
-                    var tooltipWidth = $tooltip.outerWidth();
-                    
-                    // Esconder novamente
-                    $tooltip.css({
-                        'opacity': '0',
-                        'visibility': 'hidden'
-                    });
-                    
-                    // Calcular posição inicial (acima do elemento)
-                    var top = triggerOffset.top - tooltipHeight - 8;
-                    var left = triggerOffset.left - (tooltipWidth / 2) + (triggerWidth / 2);
-                    
-                    // Ajustar horizontalmente se sair da tela
-                    if (left < scrollLeft + 10) {
-                        left = scrollLeft + 10;
-                    } else if (left + tooltipWidth > scrollLeft + windowWidth - 10) {
-                        left = scrollLeft + windowWidth - tooltipWidth - 10;
-                    }
-                    
-                    // Ajustar verticalmente se sair da tela (colocar abaixo)
-                    if (top < scrollTop + 10) {
-                        top = triggerOffset.top + triggerHeight + 8;
-                    }
-                    
-                    // Verificar se ainda sai da tela na parte de baixo
-                    if (top + tooltipHeight > scrollTop + windowHeight - 10) {
-                        top = scrollTop + windowHeight - tooltipHeight - 10;
-                    }
-                    
-                    return { top: top, left: left };
-                }
-                
-                // Função para mostrar tooltip
-                function showTooltip() {
-                    var position = calculateTooltipPosition();
-                    $tooltip.css({
-                        'position': 'absolute',
-                        'top': position.top + 'px',
-                        'left': position.left + 'px',
-                        'opacity': '1',
-                        'visibility': 'visible'
-                    });
-                }
-                
-                // Função para esconder tooltip
-                function hideTooltip() {
-                    $tooltip.css({
-                        'opacity': '0',
-                        'visibility': 'hidden'
-                    });
-                }
-                
-                // Eventos
-                $trigger.on('mouseenter.tooltip', function(e) {
-                    e.stopPropagation();
-                    showTooltip();
-                });
-                
-                $trigger.on('mouseleave.tooltip', function(e) {
-                    e.stopPropagation();
-                    setTimeout(hideTooltip, 100);
-                });
-                
-                $trigger.on('focus.tooltip', function(e) {
-                    e.stopPropagation();
-                    showTooltip();
-                });
-                
-                $trigger.on('blur.tooltip', function(e) {
-                    e.stopPropagation();
-                    hideTooltip();
-                });
-                
-                // Esconder tooltip ao clicar fora
-                var clickEventName = 'click.tooltip-' + Date.now();
-                $(document).on(clickEventName, function(e) {
-                    if (!$trigger.is(e.target) && !$tooltip.is(e.target) && $tooltip.has(e.target).length === 0) {
-                        hideTooltip();
-                    }
-                });
-                
-                // Esconder tooltip ao fazer scroll
-                $(window).on('scroll.tooltip resize.tooltip', function() {
-                    hideTooltip();
-                });
-                
-                // Armazenar referências para cleanup
-                activeTooltips.push({
-                    trigger: $trigger,
-                    tooltip: $tooltip,
-                    clickEvent: clickEventName
-                });
-            });
-        }
-        
-        // Cleanup dos tooltips
-        function cleanupTooltips() {
-            activeTooltips.forEach(function(tooltip) {
-                if (tooltip.trigger) {
-                    tooltip.trigger.off('.tooltip');
-                    tooltip.trigger.removeData('tooltip-initialized');
-                }
-                if (tooltip.tooltip) {
-                    tooltip.tooltip.remove();
-                }
-                if (tooltip.clickEvent) {
-                    $(document).off(tooltip.clickEvent);
-                }
-            });
-            activeTooltips = [];
-            
-            // Remover eventos globais
-            $(window).off('.tooltip');
-        }
+        // Inicializar popovers usando Bootstrap nativo
+        $('[data-toggle="popover"]').popover({
+            container: 'body',
+            html: false,
+            trigger: 'hover'
+        });
 
         // Função para animar números
         function animateNumbers() {
@@ -619,18 +452,10 @@
             // Inicia animação dos números após os cards aparecerem
             setTimeout(function() {
                 animateNumbers();
-                // Inicializar tooltips após as animações
-                setTimeout(function() {
-                    initTooltips();
-                }, 300);
             }, 600);
             <cfelse>
             $('.desempenho-container .fade-in-up').addClass('animate');
             animateNumbers();
-            // Inicializar tooltips imediatamente
-            setTimeout(function() {
-                initTooltips();
-            }, 100);
             </cfif>
         }
         
@@ -662,11 +487,6 @@
         // Verificar visibilidade no carregamento e nos eventos
         checkVisibility();
         $(window).on('scroll.visibility resize.visibility', checkVisibility);
-        
-        // Cleanup ao descarregar a página
-        $(window).on('beforeunload', function() {
-            cleanupTooltips();
-        });
     });
 </script>
-           
+
