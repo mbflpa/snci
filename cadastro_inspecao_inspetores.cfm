@@ -35,8 +35,6 @@
 <cfset nInsp = ''>
 <cfset color =''>
 
-
-
 <!--- Rotina para exclusão de inspetores --->
 <cfif isdefined('url.acao')>
 				
@@ -315,8 +313,6 @@ function excluirInspetor(){
 					}
 }
 
-	
-
 function Mascara_Data(data)
 {
 	switch (data.value.length)
@@ -345,7 +341,7 @@ function Mascara_Data(data)
 }	
 //================
 function numericos() {
-var tecla = window.event.keyCode;
+	var tecla = window.event.keyCode;
 		if ((tecla != 46) && ((tecla < 48) || (tecla > 57))) {
 		event.returnValue = false;
 	}
@@ -400,7 +396,7 @@ function valida_formCadNum() {
     }
     var d = new Date();
 	d.setHours(0,0,0,0);
-	if(d > gerarData(frm.dataInicioDesl.value) ){
+	if(d > gerarData(frm.dataInicioDesl.value) && mod == 0){
 		alert('A data de início do deslocamento não pode ser menor que a data de hoje.')
 		frm.dataInicioDesl.focus();
 		frm.dataInicioDesl.select();
@@ -409,7 +405,7 @@ function valida_formCadNum() {
 
 	var dataInicioDesl =gerarData(frm.dataInicioDesl.value) ;
 	var dataFimDesl =gerarData(frm.dataFimDesl.value) ;
-	if(dataInicioDesl > dataFimDesl){
+	if(dataInicioDesl > dataFimDesl && mod == 0){
 		alert('A data de fim do deslocamento não pode ser menor que a data de início do deslocamento.')
 		frm.dataFimDesl.focus();
 		frm.dataFimDesl.select();
@@ -418,7 +414,7 @@ function valida_formCadNum() {
 
     var dataInicioInsp =gerarData(frm.dataInicioInsp.value) ;
 	var dataFimDesl =gerarData(frm.dataFimDesl.value) ;
-	if(dataFimDesl < dataInicioInsp){
+	if(dataFimDesl < dataInicioInsp && mod == 0){
 		alert('A data de início da verificação não pode ser maior que a data de fim do deslocamento.')
 		frm.dataInicioInsp.focus();
 		frm.dataInicioInsp.select();
@@ -427,7 +423,7 @@ function valida_formCadNum() {
 
 	var dataInicioInsp =gerarData(frm.dataInicioInsp.value) ;
 	var dataFimInsp =gerarData(frm.dataFimInsp.value) ;
-	if(dataInicioInsp > dataFimInsp){
+	if(dataInicioInsp > dataFimInsp && mod == 0){
 		alert('A data de fim da verificação não pode ser menor que a data de início da verificação.')
 		frm.dataFimInsp.focus();
 		frm.dataFimInsp.select();
@@ -437,7 +433,7 @@ function valida_formCadNum() {
 
 	var dataFimDesl =gerarData(frm.dataFimDesl.value) ;
 	var dataFimInsp =gerarData(frm.dataFimInsp.value) ;
-	if(dataFimInsp > dataFimDesl){
+	if(dataFimInsp > dataFimDesl && mod == 0){
 		alert('A data de fim da verificação não pode ser maior que a data de fim do deslocamento.')
 		frm.dataFimInsp.focus();
 		frm.dataFimInsp.select();
@@ -448,7 +444,7 @@ function valida_formCadNum() {
 
 	var dataInicioInsp =gerarData(frm.dataInicioInsp.value) ;
 	var dataInicioDesl =gerarData(frm.dataInicioDesl.value) ;
-	if(dataInicioInsp < dataInicioDesl){
+	if(dataInicioInsp < dataInicioDesl && mod == 0){
 		alert('A data de inicio da verificação não pode ser menor que a data de início do deslocamento.')
 		frm.dataInicioInsp.focus();
 		frm.dataInicioInsp.select();
@@ -509,10 +505,7 @@ function valida_formCadNum() {
 			frm.horasDeslocamento.select();
 			return false;
 		}
-
-
-	}else{
-        
+	}else{  
 		if (frm.dataInicioDesl.value == '' && frm.horasDeslocamento.value > '0') {	
            alert('O campo "Horas Deslocamento" foi definido com valor maior que zero porém, a data de deslocamento está vazia.\nDefina o campo "Horas Deslocamento" como zero ou informe o período de deslocamento.') ;
 		   frm.horasDeslocamento.focus();
@@ -567,7 +560,6 @@ function valida_formCadNum() {
 	}
     
  }
-
 
 	</script>
 
@@ -1203,10 +1195,29 @@ function valida_formCadNum() {
         <br>
 		<div align="center"><img src="figuras/checkVerde.png" width="55"  border="0" style="position:relative;top:-8px"></img></div>
 	<div>
-		
-		
 </cfif>
-
-
 </body>
+<script src="public/jquery-3.7.1.min.js"></script>
+<script>
+	$(function(e){
+		//alert('Dom foi iniciado!')
+		let mod =''
+		let dtdesloc = ''
+		<cfoutput>
+			mod = '#rsInspecao.INP_Modalidade#'
+			dtdesloc = '#dateformat(now(),"DD/MM/YYYY")#'
+		</cfoutput>
+		//alert('mod : '+mod)
+		if(mod == 1){
+			$('#dataInicioDesl').val(dtdesloc)
+			$('#dataFimDesl').val(dtdesloc)
+			$("#dataInicioDesl").prop('readonly', true)
+			$("#dataFimDesl").prop('readonly', true)
+			$('#horasPreInspecao').val(1)
+			$("#horasPreInspecao").prop('readonly', true)
+			$('#horasDeslocamento').val(1)
+			$("#horasDeslocamento").prop('readonly', true)
+		}
+	})
+</script>
 </html>

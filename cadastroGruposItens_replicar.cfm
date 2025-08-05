@@ -81,7 +81,7 @@
   </cfquery>
 	
   <cfif isDefined("form.acao") and "#form.acao#" eq 'replicar'>
-   <cftransaction>
+   <cftransaction>	
 		<!--- Insere os grupos selecionados na tabela Grupos_Verificacao---> 
 		<cfquery name="qGruposSelecionados" dbtype = "query">
 			SELECT DISTINCT TUI_GrupoItem, TUI_Ano FROM qGruposItensSelecionados
@@ -117,36 +117,6 @@
 				Itn_TipoUnidade =#TUI_TipoUnid# and
 				Itn_Modalidade = '#TUI_Modalidade#'
 			</cfquery>
-			<cfif '#qItensReplicar.recordcount#' lte 0>
-<!--- 				<cfquery name="qItensReplicar"datasource="#dsn_inspecao#">
-					SELECT * FROM Itens_Verificacao 
-					WHERE Itn_NumGrupo = #TUI_GrupoItem# and 
-					Itn_NumItem =#TUI_ItemVerif # and 
-					Itn_Ano =#form.selAnoDe# and
-					Itn_TipoUnidade =#TUI_TipoUnid#
-				</cfquery> --->
-
-<!--- 				<cfquery datasource="#dsn_inspecao#">
-					INSERT INTO Itens_Verificacao (Itn_TipoUnidade,Itn_Ano,Itn_NumGrupo,Itn_NumItem,Itn_Descricao,Itn_Orientacao,Itn_Situacao,Itn_DtUltAtu,Itn_UserName,Itn_ValorDeclarado,Itn_TipoUnidade,Itn_Amostra,Itn_Norma,Itn_ValidacaoObrigatoria,Itn_PreRelato,Itn_OrientacaoRelato)
-VALUES(#qItensReplicar.Itn_TipoUnidade#,
-#form.selAnoPara#,
-#qItensReplicar.Itn_NumGrupo#,
-#qItensReplicar.Itn_NumItem#,
-'#qItensReplicar.Itn_Descricao#',
-'#qItensReplicar.Itn_Orientacao#',
-'D',
-CONVERT(DATETIME,getdate(),103),
-'#qAcesso.Usu_Matricula#',
-'#qItensReplicar.Itn_ValorDeclarado#',
-#qItensReplicar.Itn_TipoUnidade#,
-'#qItensReplicar.Itn_Amostra#',
-'#qItensReplicar.Itn_Norma#',
-'#qItensReplicar.Itn_ValidacaoObrigatoria#',
-'#qItensReplicar.Itn_PreRelato#',
-'#qItensReplicar.Itn_OrientacaoRelato#') 
-				</cfquery>  --->
-
-            </cfif>
 		</cfoutput>
 		<!--- FIM Insere os itens selecionados na tabela Itens_Verificacao --->
         
@@ -191,7 +161,6 @@ CONVERT(DATETIME,getdate(),103),
 		</cfquery>
 
         <cfoutput query="qGruposItensSelecionados">
-<!---  --->
 				<cfquery name="qItensReplicar"datasource="#dsn_inspecao#">
 					SELECT * FROM Itens_Verificacao 
 					WHERE Itn_NumGrupo = #TUI_GrupoItem# and 
@@ -199,28 +168,59 @@ CONVERT(DATETIME,getdate(),103),
 					Itn_Ano =#form.selAnoDe# and
 					Itn_TipoUnidade =#TUI_TipoUnid# and
 					Itn_Modalidade = '#TUI_Modalidade#'
-				</cfquery>
+				</cfquery>	
+			
 				<cfquery datasource="#dsn_inspecao#">
-					INSERT INTO Itens_Verificacao (Itn_Modalidade,Itn_TipoUnidade,Itn_Ano,Itn_NumGrupo,Itn_NumItem,Itn_Descricao,Itn_Orientacao,Itn_Situacao,Itn_DtUltAtu,Itn_UserName,Itn_ValorDeclarado,Itn_Amostra,Itn_Norma,Itn_ValidacaoObrigatoria,Itn_PreRelato,Itn_OrientacaoRelato,Itn_Pontuacao,Itn_Classificacao,Itn_PTC_Seq)
-VALUES('#TUI_Modalidade#',
-#TUI_TipoUnid#,
-#form.selAnoPara#,
-#TUI_GrupoItem#,
-#TUI_ItemVerif#,
-'#qItensReplicar.Itn_Descricao#',
-'#qItensReplicar.Itn_Orientacao#',
-'D',
-CONVERT(DATETIME,getdate(),103),
-'#qAcesso.Usu_Matricula#',
-'#qItensReplicar.Itn_ValorDeclarado#',
-'#qItensReplicar.Itn_Amostra#',
-'#qItensReplicar.Itn_Norma#',
-'#qItensReplicar.Itn_ValidacaoObrigatoria#',
-'#qItensReplicar.Itn_PreRelato#',
-'#qItensReplicar.Itn_OrientacaoRelato#',
-#qItensReplicar.Itn_Pontuacao#,
-'#qItensReplicar.Itn_Classificacao#',
-'#qItensReplicar.Itn_PTC_Seq#') 
+					INSERT INTO Itens_Verificacao (Itn_Modalidade,Itn_TipoUnidade,Itn_Ano,Itn_NumGrupo,Itn_NumItem,Itn_Descricao,Itn_Orientacao,Itn_Situacao,Itn_DtUltAtu,Itn_UserName,Itn_ValorDeclarado,Itn_Amostra,Itn_Norma,Itn_ValidacaoObrigatoria,Itn_PreRelato,Itn_OrientacaoRelato,Itn_Pontuacao,Itn_Classificacao,Itn_PTC_Seq,Itn_Reincidentes,Itn_ImpactarTipos,Itn_CodArea,Itn_CodAtividade,Itn_AvisoAlteracao,Itn_DataAvisoAlteracao,Itn_Tolerancia,Itn_FatorValor,Itn_ModoAvaliar,Itn_Manchete,Itn_ClassificacaoControle,Itn_ControleTestado,Itn_CategoriaControle,Itn_RiscoIdentificadoOutros,Itn_MacroProcesso,Itn_ProcessoN1NaoAplicar,Itn_ProcessoN3Outros,Itn_ObjetivoEstrategico,Itn_RiscoEstrategico,Itn_IndicadorEstrategico,Itn_Coso2013Componente,Itn_Coso2013Principios,Itn_GestorProcessoDir,Itn_GestorProcessoDepto,Itn_RiscoIdentificado,Itn_ProcessoN1,Itn_ProcessoN2,Itn_ProcessoN3)
+					VALUES (
+					'#TUI_Modalidade#',
+					#TUI_TipoUnid#,
+					#form.selAnoPara#,
+					#TUI_GrupoItem#,
+					#TUI_ItemVerif#,
+					'#qItensReplicar.Itn_Descricao#',
+					'#qItensReplicar.Itn_Orientacao#',
+					'D',
+					CONVERT(DATETIME,getdate(),103),
+					'#qAcesso.Usu_Matricula#',
+					'#qItensReplicar.Itn_ValorDeclarado#',
+					'#qItensReplicar.Itn_Amostra#',
+					'#qItensReplicar.Itn_Norma#',
+					'#qItensReplicar.Itn_ValidacaoObrigatoria#',
+					'#qItensReplicar.Itn_PreRelato#',
+					'#qItensReplicar.Itn_OrientacaoRelato#',
+					#qItensReplicar.Itn_Pontuacao#,
+					'#qItensReplicar.Itn_Classificacao#',
+					'#qItensReplicar.Itn_PTC_Seq#',
+					'#qItensReplicar.Itn_Reincidentes#',
+					'#qItensReplicar.Itn_ImpactarTipos#',
+					'#qItensReplicar.Itn_CodArea#',
+					'#qItensReplicar.Itn_CodAtividade#',
+					'#qItensReplicar.Itn_AvisoAlteracao#',
+					'#qItensReplicar.Itn_DataAvisoAlteracao#',
+					'#qItensReplicar.Itn_Tolerancia#',
+					'#qItensReplicar.Itn_FatorValor#',
+					'#qItensReplicar.Itn_ModoAvaliar#',
+					'#qItensReplicar.Itn_Manchete#',
+					'#qItensReplicar.Itn_ClassificacaoControle#',
+					'#qItensReplicar.Itn_ControleTestado#',
+					'#qItensReplicar.Itn_CategoriaControle#',
+					'#qItensReplicar.Itn_RiscoIdentificadoOutros#',
+					'#qItensReplicar.Itn_MacroProcesso#',
+					'#qItensReplicar.Itn_ProcessoN1NaoAplicar#',
+					'#qItensReplicar.Itn_ProcessoN3Outros#',
+					'#qItensReplicar.Itn_ObjetivoEstrategico#',
+					'#qItensReplicar.Itn_RiscoEstrategico#',
+					'#qItensReplicar.Itn_IndicadorEstrategico#',
+					'#qItensReplicar.Itn_Coso2013Componente#',
+					'#qItensReplicar.Itn_Coso2013Principios#',
+					'#qItensReplicar.Itn_GestorProcessoDir#',
+					'#qItensReplicar.Itn_GestorProcessoDepto#',
+					'#qItensReplicar.Itn_RiscoIdentificado#',
+					'#qItensReplicar.Itn_ProcessoN1#',
+					'#qItensReplicar.Itn_ProcessoN2#',
+					'#qItensReplicar.Itn_ProcessoN3#'																																
+					) 			
 				</cfquery> 
 <!---  --->
 	    <cfquery datasource="#dsn_inspecao#"> 
