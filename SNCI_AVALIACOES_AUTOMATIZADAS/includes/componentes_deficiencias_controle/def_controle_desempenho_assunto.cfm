@@ -664,10 +664,7 @@
 
     /* Estilo para centralizar o badge reincidente */
     .snci-desempenho-assunto .badge-reincidente {
-        position: absolute;
-        bottom: -12px;
-        left: 50%;
-        transform: translateX(-50%);
+        position: relative;
         font-size: 0.65rem;
         color: #dc3545;
         font-weight: 700;
@@ -681,14 +678,11 @@
         font-size: 0.6rem;
         color: #6b7280;
         font-weight: 600;
-        margin-top: 10px;
         text-align: center;
         background: rgba(255, 255, 255, 0.95);
         border-radius: 4px;
         border: 1px solid #e5e7eb;
         box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-        margin-top: 12px;
-        margin-bottom: -8px;
     }
 
 
@@ -757,7 +751,10 @@
                                         </div>
                                         
                                         <div class="eventos-container">
-                                            eventos <cfif item.atual GT 0>(<cfoutput>#item.percentualAtual#%</cfoutput>)</cfif>
+                                            eventos 
+                                            <cfif item.atual GT 0>
+                                                (<cfoutput>#item.percentualAtual#%</cfoutput>)
+                                            </cfif>
                                             <cfif item.reincidencia && item.atual GT 0>
                                                 <span class="badge-reincidente">Reincidente</span>
                                             </cfif>
