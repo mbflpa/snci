@@ -848,8 +848,8 @@
                                         <!-- Será clicável: #(len(trim(tabelaEvidencia)) GT 0 ? "SIM" : "NÃO")# -->
                                     </cfoutput>
                                     
-                                    <div class="period-card current<cfif len(trim(tabelaEvidencia))> evidencias-clickable</cfif>" 
-                                         <cfif len(trim(tabelaEvidencia))>
+                                    <div class="period-card current<cfif len(trim(tabelaEvidencia)) AND item.atual GT 0> evidencias-clickable</cfif>" 
+                                         <cfif len(trim(tabelaEvidencia)) AND item.atual GT 0>
                                          data-tabela="<cfoutput>#HTMLEditFormat(tabelaEvidencia)#</cfoutput>" 
                                          data-titulo="<cfoutput>#HTMLEditFormat(tituloEvidencia)#</cfoutput>"
                                          title="Clique para ver evidências - <cfoutput>#HTMLEditFormat(tabelaEvidencia)#</cfoutput>"
