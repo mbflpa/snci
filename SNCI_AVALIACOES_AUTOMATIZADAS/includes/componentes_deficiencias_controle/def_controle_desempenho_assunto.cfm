@@ -348,13 +348,12 @@
         background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
         border-radius: 16px;
         padding: 10px;
-        padding-top:0;
         border: 1px solid #e2e8f0;
         box-shadow: 0 4px 12px rgba(0,0,0,0.08);
         transition: all 0.3s ease;
         position: relative;
         overflow: hidden;
-        min-height: 210px;
+        min-height: 200px;
         margin-bottom: 10px;
     }
 
@@ -391,6 +390,7 @@
         background-clip: text;
         text-shadow: 0 1px 2px rgba(0,0,0,0.1);
     }
+    
 
     .snci-desempenho-assunto .card-subtitle {
         font-size: 0.7rem;
@@ -691,23 +691,6 @@
         margin-bottom: -8px;
     }
 
-    .info-icon-assunto {
-        color: #94a3b8;
-        font-size: 0.75rem;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        opacity: 0.7;
-        flex-shrink: 0;
-        padding: 2px;
-        border-radius: 50%;
-    }
-    
-    .info-icon-assunto:hover {
-        color: #457b9d;
-        opacity: 1;
-        transform: scale(1.1);
-        background-color: rgba(69, 123, 157, 0.1);
-    }
 
 </style>
 
@@ -715,7 +698,7 @@
     <div class="desempenho-container" style="position:relative;">
         <div class="container-header">
             <h2>Desempenho por Assunto 
-             <i class="fas fa-info-circle info-icon-assunto" style="position: relative;bottom: 12px;right: 8px;" 
+             <i class=" info-icon-automatizadas" style="position: relative;bottom: 12px;" 
                 data-toggle="popover" 
                 data-trigger="hover" 
                 data-placement="right"
@@ -737,10 +720,24 @@
                     <cfloop array="#dadosOrdenados#" index="item">
                         <div class="performance-card<cfif item.atual GT 0> has-current-value<cfelseif item.tipo eq 'decrease'> has-reduction</cfif>">
                             <div class="card-header">
-                                <h3 class="card-title"><cfoutput>#trim(item.titulo)#</cfoutput></h3>    
+                                <h3 class="card-title"><cfoutput>#trim(item.titulo)#</cfoutput>
+                                    <i class=" info-icon-automatizadas" style="position: relative;" 
+                                        data-toggle="popover" 
+                                        data-trigger="hover" 
+                                        data-placement="right"
+                                        data-html="false"
+                                        data-content=
+                                        "<cfoutput>
+                                            <strong>Descrição:</strong> #HTMLEditFormat(item.descricao)#<br>
+                                            <strong>Fonte de dados:</strong> #HTMLEditFormat(item.fonte_dados)#<br>
+                                            <strong>Critério:</strong> #HTMLEditFormat(item.criterio)#
+                                        </cfoutput>">
+                                    </i>
+                                </h3> 
+                                  
                                 
                                 <p class="card-subtitle"><cfoutput>(#item.teste#)</cfoutput>
-                                    <i class="fas fa-info-circle info-icon-assunto" style="position: relative;right: 3px;" 
+                                    <i class=" info-icon-automatizadas" style="position: relative;" 
                                         data-toggle="popover" 
                                         data-trigger="hover" 
                                         data-placement="right"
@@ -788,52 +785,6 @@
                                     </div>
                                 </div>
 
-                                <!-- Indicador de tendência aprimorado -->
-                                <div class="trend-indicator <cfoutput>#(isJaneiro ? 'stable' : (item.atual eq item.anterior OR item.percentual eq 0 ? 'stable' : item.tipo))#</cfoutput>">
-                                    <div class="trend-icon">
-                                        <cfif isJaneiro>
-                                            <i class="fas fa-info-circle"></i>
-                                        </cfif>
-                                        <cfif NOT isJaneiro>
-                                            <cfif item.atual eq item.anterior OR item.percentual eq 0>
-                                                <i class="fas fa-minus"></i>
-                                            <cfelseif item.tipo eq "increase">
-                                                <i class="fas fa-arrow-up"></i>
-                                            <cfelse>
-                                                <i class="fas fa-arrow-down"></i>
-                                            </cfif>
-                                        </cfif>
-                                    </div>
-                                    <div class="trend-text">
-                                        <div class="trend-percentage">
-                                            <cfif isJaneiro>
-                                                
-                                            <cfelse>
-                                                <cfif item.atual eq item.anterior OR item.percentual eq 0>
-                                                
-                                                <cfelseif item.anterior GT 0>
-                                                    <cfoutput>#abs(item.percentual)#%</cfoutput>
-                                                <cfelse>
-                                                    -
-                                                </cfif>
-                                            </cfif>
-                                        </div>
-                                        <div class="trend-label">
-                                            <cfif isJaneiro>
-                                                sem dados do mês anterior para comparação
-                                            <cfelse>
-                                                <cfif item.atual eq item.anterior OR item.percentual eq 0>
-                                                   
-                                                <cfelseif item.tipo eq "increase">
-                                                    aumento
-                                                <cfelse>
-                                                    redução
-                                                </cfif>
-                                            </cfif>
-                                            
-                                        </div>
-                                    </div>
-                                </div>
                             </div>
                         </div>
                     </cfloop>

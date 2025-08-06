@@ -212,24 +212,6 @@
         gap: 6px;
     }
     
-    .snci-resumo-geral .info-icon-resumo-geral {
-        color: #94a3b8;
-        font-size: 0.75rem;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        opacity: 0.7;
-        flex-shrink: 0;
-        padding: 2px;
-        border-radius: 50%;
-    }
-    
-    .snci-resumo-geral .info-icon-resumo-geral:hover {
-        color: #457b9d;
-        opacity: 1;
-        transform: scale(1.1);
-        background-color: rgba(69, 123, 157, 0.1);
-    }
-    
     
     
     .snci-resumo-geral .kpi-card .text .value {
@@ -332,7 +314,7 @@
                             <div class="title">
                                 <cfoutput>#item.titulo#</cfoutput>
                                 <cfif structKeyExists(item, 'definicao') and len(trim(item.definicao))>
-                                    <i class="fas fa-info-circle info-icon-resumo-geral" 
+                                    <i class=" info-icon-automatizadas" 
                                        data-toggle="popover" 
                                        data-trigger="hover" 
                                        data-placement="right"

@@ -99,6 +99,9 @@
                         p.MANCHETE,
                         p.sk_grupo_item,
                         p.TESTE AS teste,
+                        p.DESCRIÇÃO AS descricao,
+                        p.fonte_dados,
+                        p.criterio,
                         CASE WHEN f.sigla_apontamento = 'N' THEN f.nr_reincidente ELSE 0 END as reincidencia,
                         SUM(
                             COALESCE(f.valor_falta, 0) + 
@@ -121,7 +124,7 @@
                         (f.data_encerramento BETWEEN <cfqueryparam cfsqltype="cf_sql_date" value="#inicioMesAnterior#">
                                                  AND <cfqueryparam cfsqltype="cf_sql_date" value="#fimMesAnterior#">)
                       )
-                    GROUP BY p.MANCHETE, p.sk_grupo_item, p.TESTE, 
+                    GROUP BY p.MANCHETE, p.sk_grupo_item, p.TESTE, p.DESCRIÇÃO, p.fonte_dados, p.criterio,
                              CASE WHEN f.sigla_apontamento = 'N' THEN f.nr_reincidente ELSE 0 END,
                              FORMAT(f.data_encerramento, 'yyyy-MM')
                     ORDER BY mes_ano DESC, p.MANCHETE
@@ -139,6 +142,9 @@
                         p.MANCHETE,
                         p.sk_grupo_item,
                         p.TESTE AS teste,
+                        p.DESCRIÇÃO AS descricao,
+                        p.fonte_dados,
+                        p.criterio,
                         CASE WHEN f.sigla_apontamento = 'N' THEN f.nr_reincidente ELSE 0 END as reincidencia,
                         SUM(
                             COALESCE(f.valor_falta, 0) + 
@@ -155,7 +161,7 @@
                     WHERE f.sk_mcu = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.sk_mcu#">
                       AND f.sigla_apontamento IN ('C', 'N') 
                       AND FORMAT(f.data_encerramento, 'yyyy-MM') IN (SELECT mes_ano FROM UltimosMeses)
-                    GROUP BY p.MANCHETE, p.sk_grupo_item, p.TESTE, 
+                    GROUP BY p.MANCHETE, p.sk_grupo_item, p.TESTE, p.DESCRIÇÃO, p.fonte_dados, p.criterio,
                              CASE WHEN f.sigla_apontamento = 'N' THEN f.nr_reincidente ELSE 0 END,
                              FORMAT(f.data_encerramento, 'yyyy-MM')
                     ORDER BY mes_ano DESC, p.MANCHETE
@@ -277,6 +283,9 @@
                 <cfset dadosAssunto[chave].sk_grupo_item = sk_grupo_item>
                 <cfset dadosAssunto[chave].teste = teste>
                 <cfset dadosAssunto[chave].reincidencia = reincidencia>
+                <cfset dadosAssunto[chave].descricao = descricao>
+                <cfset dadosAssunto[chave].fonte_dados = fonte_dados>
+                <cfset dadosAssunto[chave].criterio = criterio>
             </cfif>
             <cfif mes_ano EQ mesAnteriorId>
                 <cfset dadosAssunto[chave].anterior = total_eventos>

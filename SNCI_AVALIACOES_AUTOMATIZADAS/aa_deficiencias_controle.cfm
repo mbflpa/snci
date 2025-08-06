@@ -70,23 +70,6 @@
             }
         }
 
-        .info-icon-defControle {
-            color: #94a3b8;
-            font-size: 0.75rem;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            opacity: 0.7;
-            flex-shrink: 0;
-            padding: 2px;
-            border-radius: 50%;
-        }
-        
-        .info-icon-defControle:hover {
-            color: #457b9d;
-            opacity: 1;
-            transform: scale(1.1);
-            background-color: rgba(69, 123, 157, 0.1);
-        }
     </style>
 </head>
 <body class="hold-transition layout-fixed layout-navbar-fixed layout-footer-fixed" data-panel-auto-height-mode="height" >
@@ -102,7 +85,7 @@
                         <div class="col-12">
                             <h3 class="m-3">Avaliação Geral - Deficiência do Controle
                             
-                                <i class="fas fa-info-circle info-icon-defControle" style="position: relative;right: 3px;bottom: 13px;font-size: 1rem;" 
+                                <i class="fas fa-info-circle info-icon-automatizadas" style="position: relative;right: 3px;bottom: 13px;font-size: 1rem;" 
                                     data-toggle="popover" 
                                     data-trigger="hover" 
                                     data-placement="right"
