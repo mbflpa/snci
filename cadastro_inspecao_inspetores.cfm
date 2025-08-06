@@ -505,7 +505,8 @@ function valida_formCadNum() {
 			frm.horasDeslocamento.select();
 			return false;
 		}
-	}else{  
+	}else{ 
+		/* 
 		if (frm.dataInicioDesl.value == '' && frm.horasDeslocamento.value > '0') {	
            alert('O campo "Horas Deslocamento" foi definido com valor maior que zero porém, a data de deslocamento está vazia.\nDefina o campo "Horas Deslocamento" como zero ou informe o período de deslocamento.') ;
 		   frm.horasDeslocamento.focus();
@@ -528,6 +529,7 @@ function valida_formCadNum() {
 				return false;
 			}
 		}
+		*/
 	}
 
 	
