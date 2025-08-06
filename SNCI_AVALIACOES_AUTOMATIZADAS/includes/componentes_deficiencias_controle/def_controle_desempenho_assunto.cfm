@@ -691,12 +691,38 @@
         margin-bottom: -8px;
     }
 
+    .info-icon-assunto {
+        color: #94a3b8;
+        font-size: 0.75rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        opacity: 0.7;
+        flex-shrink: 0;
+        padding: 2px;
+        border-radius: 50%;
+    }
+    
+    .info-icon-assunto:hover {
+        color: #457b9d;
+        opacity: 1;
+        transform: scale(1.1);
+        background-color: rgba(69, 123, 157, 0.1);
+    }
+
 </style>
 
 <div class="snci-desempenho-assunto">
     <div class="desempenho-container" style="position:relative;">
         <div class="container-header">
-            <h2>Desempenho por Assunto <span class="subtitle"><cfoutput>(#nomeMesAtual# x #nomeMesAnterior#)</cfoutput></span></h2>
+            <h2>Desempenho por Assunto 
+             <i class="fas fa-info-circle info-icon-assunto" style="position: relative;bottom: 12px;right: 8px;" 
+                data-toggle="popover" 
+                data-trigger="hover" 
+                data-placement="right"
+                data-html="false"
+                data-content="Agrupamento realizado de acordo com a temática do teste. Ex.: Financeiro, Abastecimento, Carga Postal...">
+            </i>
+            <span class="subtitle"><cfoutput>(#nomeMesAtual# x #nomeMesAnterior#)</cfoutput></span></h2>
         </div>
         <!-- Botões alinhados horizontalmente, ambos fora do container rolável -->
         <div style="position: relative;">
@@ -711,8 +737,17 @@
                     <cfloop array="#dadosOrdenados#" index="item">
                         <div class="performance-card<cfif item.atual GT 0> has-current-value<cfelseif item.tipo eq 'decrease'> has-reduction</cfif>">
                             <div class="card-header">
-                                <h3 class="card-title"><cfoutput>#trim(item.titulo)#</cfoutput></h3>
-                                <p class="card-subtitle"><cfoutput>(#item.teste#)</cfoutput></p>
+                                <h3 class="card-title"><cfoutput>#trim(item.titulo)#</cfoutput></h3>    
+                                
+                                <p class="card-subtitle"><cfoutput>(#item.teste#)</cfoutput>
+                                    <i class="fas fa-info-circle info-icon-assunto" style="position: relative;right: 3px;" 
+                                        data-toggle="popover" 
+                                        data-trigger="hover" 
+                                        data-placement="right"
+                                        data-html="false"
+                                        data-content="<strong>Grupo-Item:</strong> numeração atribuída a cada teste de controle interno.">
+                                    </i>
+                                </p>
                             </div>
 
                             <div class="comparison-section">

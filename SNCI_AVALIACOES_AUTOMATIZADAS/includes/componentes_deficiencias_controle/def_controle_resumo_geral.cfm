@@ -212,7 +212,7 @@
         gap: 6px;
     }
     
-    .snci-resumo-geral .info-icon {
+    .snci-resumo-geral .info-icon-resumo-geral {
         color: #94a3b8;
         font-size: 0.75rem;
         cursor: pointer;
@@ -223,7 +223,7 @@
         border-radius: 50%;
     }
     
-    .snci-resumo-geral .info-icon:hover {
+    .snci-resumo-geral .info-icon-resumo-geral:hover {
         color: #457b9d;
         opacity: 1;
         transform: scale(1.1);
@@ -332,7 +332,7 @@
                             <div class="title">
                                 <cfoutput>#item.titulo#</cfoutput>
                                 <cfif structKeyExists(item, 'definicao') and len(trim(item.definicao))>
-                                    <i class="fas fa-info-circle info-icon" 
+                                    <i class="fas fa-info-circle info-icon-resumo-geral" 
                                        data-toggle="popover" 
                                        data-trigger="hover" 
                                        data-placement="right"

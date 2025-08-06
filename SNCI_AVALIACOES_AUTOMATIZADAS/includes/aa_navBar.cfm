@@ -124,6 +124,23 @@
 		  .popover .popover-body {
 			text-align: justify !important;
 		  }
+		   .info-icon-navBar {
+            color: #94a3b8;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            opacity: 0.7;
+            flex-shrink: 0;
+            padding: 2px;
+            border-radius: 50%;
+        }
+        
+        .info-icon-navBar:hover {
+            color: #457b9d;
+            opacity: 1;
+            transform: scale(1.1);
+            background-color: rgba(69, 123, 157, 0.1);
+        }
 		  
 	 </style>
 	<!-- Navbar -->
@@ -138,6 +155,13 @@
 				<li class="nav-item d-none d-sm-inline-block " style="overflow:hidden;">
 					<div style="display: flex; flex-direction: column;">
 						<span class="tituloPagina">
+							<i id="info-icon" class="fas fa-circle-info info-icon-navBar" style="position: relative;right:-3px;bottom: 6px;text-shadow:none!important;"
+								data-toggle="popover" 
+								data-trigger="hover" 
+								data-placement="bottom" 
+								data-html="true"
+								data-content="Processo de avaliação automatizada dos testes de controles internos realizados no âmbito de unidades operacionais das Superintendências Estaduais.">
+							</i>
 							Avaliação Automatizada - 
 							<cfif structKeyExists(application, "rsUsuarioParametros") AND structKeyExists(application.rsUsuarioParametros, "Und_Descricao") AND len(trim(application.rsUsuarioParametros.Und_Descricao))>
 								<cfoutput>#application.rsUsuarioParametros.Und_Descricao# - #application.rsUsuarioParametros.Dir_Sigla#<span style="font-weight:400;font-size:0.8rem;margin-left:10px">(MCU: #application.rsUsuarioParametros.Und_MCU# / STO: #application.rsUsuarioParametros.Und_Codigo#)</span></cfoutput>
@@ -148,13 +172,14 @@
 						
 						<!-- Container dos botões de mês -->
 						<div class="meses-container">
-							<span class="meses-label">Mês:
-							<i id="info-icon" class="fas fa-circle-info azul_claro_correios_textColor" 
+							<span class="meses-label">
+							<i id="info-icon" class="fas fa-circle-info info-icon-navBar" style="position: relative;right: -3px;bottom: 6px;"
 							   data-toggle="popover" 
 							   data-trigger="hover" 
 							   data-placement="bottom" 
 							   data-html="true"
 							   data-content="Refere-se ao período contemplado no processamento da avaliação automatizada."></i>
+							   Mês:
 							</span>
 							<div class="meses-scroll" id="mesesContainer">
 								<cfif structKeyExists(application, "rsUsuarioParametros") AND structKeyExists(application.rsUsuarioParametros, "Und_Descricao") AND len(trim(application.rsUsuarioParametros.Und_Descricao))>
