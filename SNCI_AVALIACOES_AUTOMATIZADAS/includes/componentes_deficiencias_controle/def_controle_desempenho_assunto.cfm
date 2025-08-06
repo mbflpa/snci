@@ -100,6 +100,33 @@
     <!-- DEBUG: isJaneiro = "#isJaneiro#" -->
 </cfoutput>
 
+<!--- Obter o maior mês disponível para verificar se é o atual --->
+<cfset maiorMesDisponivel = "">
+<cftry>
+    <cfset objDadosMeses = createObject("component", "cfc.DeficienciasControleDados")>
+    <cfset resultadoMeses = objDadosMeses.obterMesesDisponiveis()>
+    
+    <cfif resultadoMeses.success AND arrayLen(resultadoMeses.data) GT 0>
+        <!--- O primeiro item do array já é o maior mês (mais recente) --->
+        <cfset maiorMesDisponivel = resultadoMeses.data[1].id>
+    </cfif>
+    
+    <cfcatch type="any">
+        <cflog file="evidencias_erro" text="Erro ao obter maior mês disponível: #cfcatch.message#">
+        <cfset maiorMesDisponivel = "">
+    </cfcatch>
+</cftry>
+
+<!--- Verificar se o mês atual corresponde ao maior mês disponível --->
+<cfset mesAtualEhMaiorDisponivel = (len(trim(maiorMesDisponivel)) GT 0 AND mesAtualId EQ maiorMesDisponivel)>
+
+<!--- Debug da verificação --->
+<cfoutput>
+    <!-- DEBUG: maiorMesDisponivel = "#maiorMesDisponivel#" -->
+    <!-- DEBUG: mesAtualId = "#mesAtualId#" -->
+    <!-- DEBUG: mesAtualEhMaiorDisponivel = "#mesAtualEhMaiorDisponivel#" -->
+</cfoutput>
+
 <!--- Usar dados já processados do CFC --->
 <cfset dados = dadosDesempenho.dadosAssunto>
 
@@ -848,11 +875,15 @@
                                         <!-- Será clicável: #(len(trim(tabelaEvidencia)) GT 0 ? "SIM" : "NÃO")# -->
                                     </cfoutput>
                                     
-                                    <div class="period-card current<cfif len(trim(tabelaEvidencia)) AND item.atual GT 0> evidencias-clickable</cfif>" 
-                                         <cfif len(trim(tabelaEvidencia)) AND item.atual GT 0>
+                                    <div class="period-card current<cfif len(trim(tabelaEvidencia)) AND item.atual GT 0 AND mesAtualEhMaiorDisponivel> evidencias-clickable</cfif>" 
+                                         <cfif len(trim(tabelaEvidencia)) AND item.atual GT 0 AND mesAtualEhMaiorDisponivel>
                                          data-tabela="<cfoutput>#HTMLEditFormat(tabelaEvidencia)#</cfoutput>" 
                                          data-titulo="<cfoutput>#HTMLEditFormat(tituloEvidencia)#</cfoutput>"
                                          title="Clique para ver evidências - <cfoutput>#HTMLEditFormat(tabelaEvidencia)#</cfoutput>"
+                                         <cfelse>
+                                         <cfif len(trim(tabelaEvidencia)) AND item.atual GT 0 AND NOT mesAtualEhMaiorDisponivel>
+                                         title="Evidências disponíveis apenas para o período mais recente"
+                                         </cfif>
                                          </cfif>>
                                         <div class="period-label"><cfoutput>#abreviarMes(nomeMesAtual)#</cfoutput></div>
                                         <div class="period-value">
