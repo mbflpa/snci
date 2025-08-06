@@ -721,7 +721,7 @@
                         <div class="performance-card<cfif item.atual GT 0> has-current-value<cfelseif item.tipo eq 'decrease'> has-reduction</cfif>">
                             <div class="card-header">
                                 <h3 class="card-title"><cfoutput>#trim(item.titulo)#</cfoutput>
-                                    <i class=" info-icon-automatizadas" style="position: relative;" 
+                                    <i class=" info-icon-automatizadas" 
                                         data-toggle="popover" 
                                         data-trigger="hover" 
                                         data-placement="right"
@@ -737,7 +737,7 @@
                                   
                                 
                                 <p class="card-subtitle"><cfoutput>(#item.teste#)</cfoutput>
-                                    <i class=" info-icon-automatizadas" style="position: relative;" 
+                                    <i class=" info-icon-automatizadas" 
                                         data-toggle="popover" 
                                         data-trigger="hover" 
                                         data-placement="right"

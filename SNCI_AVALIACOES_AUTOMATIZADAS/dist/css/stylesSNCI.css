@@ -695,25 +695,27 @@ tr .small-box:hover {
 }
 
  .info-icon-automatizadas {
-    color: #000;
+    color: #000!important;
     -webkit-text-fill-color: #000!important;
-    font-size: 0.75rem;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    opacity: 0.5;
+    font-size: 0.75rem!important;
+    cursor: pointer!important;
+    transition: all 0.2s ease!important;
+    opacity: 0.5!important;
+    margin-bottom: 11px!important;
+    margin-left: -2px!important;
 
 }
 
 .info-icon-automatizadas:hover {
-    color: #457b9d;
+    color: #457b9d!important;
     -webkit-text-fill-color: #457b9d!important;
-    opacity: 1;
-    transform: scale(1.1);
-    background-color: rgba(69, 123, 157, 0.1);
+    opacity: 1!important;
+    transform: scale(1.1)!important;
+    background-color: rgba(69, 123, 157, 0.1)!important;
 }
 .info-icon-automatizadas::before {
-  content: "\f059"; /* código unicode do ícone desejado */
-  font-family: "Font Awesome 6 Free"; /* ou 5 Free, depende da versão */
-  font-weight: 400; /* 400 = regular, 900 = solid */
-  font-style: normal;
+  content: "\f059"!important; /* código unicode do ícone desejado */
+  font-family: "Font Awesome 6 Free"!important; /* ou 5 Free, depende da versão */
+  font-weight: 400!important; /* 400 = regular, 900 = solid */
+  font-style: normal!important;
 }
