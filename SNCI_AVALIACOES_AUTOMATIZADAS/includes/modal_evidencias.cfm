@@ -5,7 +5,7 @@
     <div class="modal-dialog modal-xl" role="document" style="max-width: 95%; width: 95%;">
         <div class="modal-content">
             <div class="modal-header bg-primary text-white">
-                <h5 class="modal-title" id="modalEvidenciasLabel">
+                <h5 class="modal-title" id="modalEvidenciasLabel" style="font-size: 1rem;">
                     <i class="fas fa-table mr-2"></i>Evidências
                 </h5>
                 <button type="button" class="close text-white" data-dismiss="modal" aria-label="Fechar">
@@ -34,15 +34,6 @@
                     <p id="evidenciasErrorMessage"></p>
                 </div>
             </div>
-            
-            <div class="modal-footer bg-light">
-                <div class="w-100 d-flex justify-content-between align-items-center">
-                    <small id="evidenciasInfo" class="text-muted"></small>
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">
-                        <i class="fas fa-times mr-1"></i>Fechar
-                    </button>
-                </div>
-            </div>
         </div>
     </div>
 </div>
@@ -53,8 +44,13 @@
     margin: 1rem;
 }
 
+#modalEvidencias .modal-header {
+    padding: 12px 20px; /* Reduzir altura do cabeçalho */
+    min-height: auto;
+}
+
 #modalEvidencias .table-container {
-    max-height: 70vh;
+    max-height: 75vh; /* Aumentar altura disponível para a tabela */
     overflow: auto;
     width: 100%;
 }
@@ -118,16 +114,60 @@
     margin-bottom: 10px;
 }
 
-#modalEvidencias .dataTables_wrapper .dataTables_info {
-    clear: both;
-    float: left;
-    padding-top: 0.755em;
+/* Centralizar controles de paginação */
+#modalEvidencias .dataTables_wrapper .dataTables_paginate {
+    text-align: center !important;
+    float: none !important;
+    display: block;
+    margin: 10px auto;
+    padding-top: 0.25em;
 }
 
-#modalEvidencias .dataTables_wrapper .dataTables_paginate {
-    float: right;
-    text-align: right;
-    padding-top: 0.25em;
+/* Estilo para botão de exportação Excel */
+#modalEvidencias .dt-buttons {
+    text-align: center;
+    margin: 10px 0;
+}
+
+#modalEvidencias .dt-button.excel-btn {
+    background: #1f7a1f !important;
+    border: 1px solid #1f7a1f !important;
+    color: white !important;
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+#modalEvidencias .dt-button.excel-btn:hover {
+    background: #155d15 !important;
+    border-color: #155d15 !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(31, 122, 31, 0.3);
+}
+
+#modalEvidencias .dt-button.excel-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(31, 122, 31, 0.3);
+}
+
+/* Ícone Excel personalizado */
+#modalEvidencias .excel-icon {
+    font-size: 1rem;
+    color: white;
+}
+
+/* Ajustar layout dos controles */
+#modalEvidencias .dataTables_wrapper .dataTables_info {
+    clear: both;
+    float: none;
+    text-align: center;
+    padding-top: 0.755em;
+    margin: 5px 0;
 }
 
 /* Responsividade para telas menores */
@@ -138,8 +178,16 @@
         width: 98%;
     }
     
+    #modalEvidencias .modal-header {
+        padding: 10px 15px; /* Reduzir ainda mais em telas pequenas */
+    }
+    
+    #modalEvidencias .modal-title {
+        font-size: 0.9rem; /* Fonte menor em mobile */
+    }
+    
     #modalEvidencias .table-container {
-        max-height: 60vh;
+        max-height: 65vh; /* Ajustar altura em mobile */
     }
     
     #modalEvidencias table.dataTable tbody td {

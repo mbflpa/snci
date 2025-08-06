@@ -255,6 +255,7 @@
         <cfargument name="searchValue" type="string" required="false" default="">
         <cfargument name="orderColumn" type="numeric" required="false" default="0">
         <cfargument name="orderDirection" type="string" required="false" default="asc">
+        <cfargument name="exportAll" type="boolean" required="false" default="false">
         
         <cfset var local = {}>
         <cfset local.resultado = {
@@ -386,8 +387,10 @@
                         #PreserveSingleQuotes(local.whereClause)#
                     </cfif>
                     #PreserveSingleQuotes(local.orderClause)#
-                    OFFSET #arguments.start# ROWS
-                    FETCH NEXT #arguments.length# ROWS ONLY
+                    <cfif NOT arguments.exportAll>
+                        OFFSET #arguments.start# ROWS
+                        FETCH NEXT #arguments.length# ROWS ONLY
+                    </cfif>
                 </cfquery>
                 
                 <cflog file="evidencias_debug" text="Query de dados executada. Registros retornados: #local.qryDados.recordCount#">
