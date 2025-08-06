@@ -87,9 +87,20 @@
             <section class="content">
    
                 <div style="width: 100%; padding: 0 16px; margin-bottom: 16px;">
-                    <cfinclude template="includes/componentes_deficiencias_controle/def_controle_mensagem_card.cfm">
+                    <!--<cfinclude template="includes/componentes_deficiencias_controle/def_controle_mensagem_card.cfm">-->
                 </div>
- 
+               
+                    <div class="alert alert-info shadow-lg rounded d-flex align-items-start p-4" role="alert" style="background-color: #e9f7fd; border-left: 5px solid #17a2b8;margin-top:120px">
+                        <i class="fas fa-lightbulb mr-3" style="font-size: 1.8rem; color: #17a2b8;margin-top: 10px;"></i>
+                        <div>
+                        <h5 class="mb-1 font-weight-bold" style="color: #0c5460;">Interpretação Simplificada</h5>
+                        <p class="mb-0" style="font-size: 1rem;color: #0c5460;">
+                            Esta página transformará dados complexos dos dashboards em explicações claras e acessíveis para as unidades.
+                        </p>
+                        </div>
+                    </div>
+              
+
             </section>
         </div>
 
