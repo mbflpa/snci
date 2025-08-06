@@ -28,6 +28,29 @@
 <cfset objDados = createObject("component", "cfc.DeficienciasControleDados")>
 <cfset dadosDesempenho = objDados.obterDadosDesempenhoAssunto(application.rsUsuarioParametros.Und_MCU, url.mesFiltro)>
 
+<!--- Obter lista de tabelas de evidências --->
+<cftry>
+    <cfif NOT isDefined("objEvidencias")>
+        <cfset objEvidencias = createObject("component", "cfc.EvidenciasManager")>
+    </cfif>
+    <cfset tabelasEvidencias = objEvidencias.listarTabelasEvidencias()>
+    
+    <!--- Debug: mostrar resultado imediatamente --->
+    <cflog file="evidencias_debug" text="Página principal: objEvidencias criado com sucesso">
+    <cflog file="evidencias_debug" text="Página principal: tabelasEvidencias retornou #arrayLen(tabelasEvidencias)# tabelas">
+    
+    <!--- REMOVER a criação de tabelas fictícias - usar apenas as reais --->
+    <cfloop from="1" to="#arrayLen(tabelasEvidencias)#" index="i">
+        <cflog file="evidencias_debug" text="Tabela #i#: #tabelasEvidencias[i].nome# (código: #tabelasEvidencias[i].codigo#)">
+    </cfloop>
+    
+    <cfcatch type="any">
+        <cfset tabelasEvidencias = arrayNew(1)>
+        <cflog file="evidencias_erro" text="Erro ao carregar tabelas de evidências: #cfcatch.message#">
+        <cflog file="evidencias_debug" text="ERRO na página principal: #cfcatch.message#">
+    </cfcatch>
+</cftry>
+
 <cfset dadosMeses = dadosDesempenho.meses>
 <cfset nomeMesAtual = dadosMeses.nomeMesAtual>
 <cfset nomeMesAnterior = dadosMeses.nomeMesAnterior>
@@ -685,6 +708,32 @@
         box-shadow: 0 1px 2px rgba(0,0,0,0.1);
     }
 
+    /* Estilo para cards clicáveis com evidências */
+    .snci-desempenho-assunto .period-card.evidencias-clickable {
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+    }
+
+    .snci-desempenho-assunto .period-card.evidencias-clickable:hover {
+        transform: translateY(-3px) scale(1.02);
+        box-shadow: 0 8px 20px rgba(69, 123, 157, 0.25);
+        border-color: rgba(69, 123, 157, 0.4);
+    }
+
+    .snci-desempenho-assunto .period-card.evidencias-clickable::after {
+        content: '📊';
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        font-size: 0.8rem;
+        opacity: 0.6;
+        transition: opacity 0.3s ease;
+    }
+
+    .snci-desempenho-assunto .period-card.evidencias-clickable:hover::after {
+        opacity: 1;
+    }
 
 </style>
 
@@ -744,7 +793,67 @@
                             <div class="comparison-section">
                                 <!-- Grid de comparação lado a lado -->
                                 <div class="comparison-grid">
-                                    <div class="period-card current">
+                                    <!--- Debug: listar todas as tabelas disponíveis PRIMEIRO --->
+                                    <cfoutput>
+                                        <!-- TABELAS DISPONÍVEIS NO BANCO: -->
+                                        <cfloop array="#tabelasEvidencias#" index="tab">
+                                            <!-- Tabela: "#tab.nome#" | Código: "#tab.codigo#" -->
+                                        </cfloop>
+                                        <!-- FIM LISTA TABELAS -->
+                                    </cfoutput>
+                                    
+                                    <!--- Buscar tabela de evidências correspondente usando o código do teste --->
+                                    <cfset tabelaEvidencia = "">
+                                    <cfset tituloEvidencia = "">
+                                    
+                                    <!--- Debug melhorado: mostrar todas as tentativas de match --->
+                                    <cfoutput>
+                                        <!-- DEBUG DETALHADO: -->
+                                        <!-- item.chave = "#item.chave#" -->
+                                        <!-- item.teste = "#item.teste#" -->
+                                        <!-- arrayLen(tabelasEvidencias) = "#arrayLen(tabelasEvidencias)#" -->
+                                    </cfoutput>
+                                    
+                                    <!--- Garantir que objEvidencias existe --->
+                                    <cfif NOT isDefined("objEvidencias")>
+                                        <cfset objEvidencias = createObject("component", "cfc.EvidenciasManager")>
+                                    </cfif>
+                                    
+                                    <!--- Usar função do CFC para buscar tabela --->
+                                    <cfif len(trim(item.teste))>
+                                        <cfset tabelaEvidencia = objEvidencias.buscarTabelaPorCodigo(item.teste, tabelasEvidencias)>
+                                        <cfif len(trim(tabelaEvidencia))>
+                                            <cfset tituloEvidencia = item.titulo & " - Evidências (" & item.teste & ")">
+                                        </cfif>
+                                        <cfoutput>
+                                            <!-- RESULTADO BUSCA POR TESTE "#item.teste#": "#tabelaEvidencia#" -->
+                                        </cfoutput>
+                                    </cfif>
+                                    
+                                    <!--- Fallback: buscar usando a chave se não encontrou pelo teste --->
+                                    <cfif len(trim(tabelaEvidencia)) EQ 0 AND len(trim(item.chave))>
+                                        <cfset tabelaEvidencia = objEvidencias.buscarTabelaPorCodigo(item.chave, tabelasEvidencias)>
+                                        <cfif len(trim(tabelaEvidencia))>
+                                            <cfset tituloEvidencia = item.titulo & " - Evidências (" & item.chave & ")">
+                                        </cfif>
+                                        <cfoutput>
+                                            <!-- RESULTADO BUSCA POR CHAVE "#item.chave#": "#tabelaEvidencia#" -->
+                                        </cfoutput>
+                                    </cfif>
+                                    
+                                    <!--- Debug: resultado final --->
+                                    <cfoutput>
+                                        <!-- RESULTADO FINAL: tabelaEvidencia = "#tabelaEvidencia#" -->
+                                        <!-- len(trim(tabelaEvidencia)) = "#len(trim(tabelaEvidencia))#" -->
+                                        <!-- Será clicável: #(len(trim(tabelaEvidencia)) GT 0 ? "SIM" : "NÃO")# -->
+                                    </cfoutput>
+                                    
+                                    <div class="period-card current<cfif len(trim(tabelaEvidencia))> evidencias-clickable</cfif>" 
+                                         <cfif len(trim(tabelaEvidencia))>
+                                         data-tabela="<cfoutput>#HTMLEditFormat(tabelaEvidencia)#</cfoutput>" 
+                                         data-titulo="<cfoutput>#HTMLEditFormat(tituloEvidencia)#</cfoutput>"
+                                         title="Clique para ver evidências - <cfoutput>#HTMLEditFormat(tabelaEvidencia)#</cfoutput>"
+                                         </cfif>>
                                         <div class="period-label"><cfoutput>#abreviarMes(nomeMesAtual)#</cfoutput></div>
                                         <div class="period-value">
                                             <cfoutput>#item.atual#</cfoutput>
@@ -789,11 +898,9 @@
                 </div>
             </div>
         </div>
-        <div class="carousel-indicators" id="carouselIndicators">
-            <!-- Indicadores serão gerados pelo JavaScript -->
-        </div>
     </div>
 </div>
+
 <script>
     $(document).ready(function() {
         // Animar barras de progresso
@@ -810,186 +917,6 @@
                 $(this).addClass('visible');
             });
         }, 500);
-
-        // Configuração do carrossel
-        const track = $('#carouselTrack');
-        const cards = track.find('.performance-card');
-        const prevBtn = $('.carousel-prev');
-        const nextBtn = $('.carousel-next');
-        const indicators = $('#carouselIndicators');
-        
-        let currentSlide = 0;
-        let itemsToShow = getItemsToShow();
-        let totalSlides = Math.max(0, cards.length - itemsToShow + 1);
-
-        // Variáveis para drag
-        let isDragging = false;
-        let startPos = 0;
-        let currentTranslate = 0;
-        let prevTranslate = 0;
-        let animationId = 0;
-
-        // Função para calcular quantos itens mostrar
-        function getItemsToShow() {
-            const containerWidth = $('.carousel-container').width() - 120;
-            const singleCardWidth = $('.performance-card').first().outerWidth(true);
-            
-            if (singleCardWidth === 0) return 1;
-            
-            const itemsPossible = Math.floor(containerWidth / singleCardWidth);
-            return Math.max(1, itemsPossible);
-        }
-
-        // Função para calcular largura exata de um card
-        function getCardWidth() {
-            return $('.performance-card').first().outerWidth(true) || 274;
-        }
-
-        // Atualizar carrossel
-        function updateCarousel() {
-            const cardWidth = getCardWidth();
-            const translateX = -currentSlide * cardWidth;
-            
-            track.css('transform', `translateX(${translateX}px)`);
-            
-            // Atualizar controles
-            prevBtn.toggleClass('disabled', currentSlide === 0);
-            nextBtn.toggleClass('disabled', currentSlide >= totalSlides - 1);
-            
-            // Atualizar indicadores
-            updateIndicators();
-        }
-
-        // Criar indicadores
-        function createIndicators() {
-            indicators.empty();
-            
-            if (totalSlides <= 1) return;
-            
-            const totalPages = Math.ceil(totalSlides / itemsToShow);
-            
-            for (let i = 0; i < totalPages; i++) {
-                const dot = $('<div class="indicator-dot"></div>');
-                if (i === 0) dot.addClass('active');
-                
-                dot.click(function() {
-                    currentSlide = i * itemsToShow;
-                    currentSlide = Math.min(currentSlide, totalSlides - 1);
-                    updateCarousel();
-                });
-                
-                indicators.append(dot);
-            }
-        }
-
-        // Atualizar indicadores
-        function updateIndicators() {
-            const currentPage = Math.floor(currentSlide / itemsToShow);
-            indicators.find('.indicator-dot').removeClass('active').eq(currentPage).addClass('active');
-        }
-
-        // Navegação próximo item
-        function slideNext() {
-            if (currentSlide < totalSlides - 1) {
-                currentSlide++;
-                updateCarousel();
-            }
-        }
-
-        // Navegação item anterior
-        function slidePrev() {
-            if (currentSlide > 0) {
-                currentSlide--;
-                updateCarousel();
-            }
-        }
-
-        // Redimensionar
-        function handleResize() {
-            const newItemsToShow = getItemsToShow();
-            
-            if (newItemsToShow !== itemsToShow) {
-                itemsToShow = newItemsToShow;
-                totalSlides = Math.max(0, cards.length - itemsToShow + 1);
-                
-                currentSlide = Math.min(currentSlide, totalSlides - 1);
-                currentSlide = Math.max(0, currentSlide);
-                
-                createIndicators();
-                updateCarousel();
-            }
-        }
-
-        // Função para obter posição X do evento
-        function getPositionX(event) {
-            return event.type.includes('mouse') ? event.clientX : event.touches[0].clientX;
-        }
-
-        // Função para definir posição do slider
-        function setSliderPosition() {
-            const cardWidth = getCardWidth();
-            currentTranslate = currentSlide * -cardWidth;
-            prevTranslate = currentTranslate;
-            track.css('transform', `translateX(${currentTranslate}px)`);
-        }
-
-        // Função de animação durante o drag
-        function animation() {
-            track.css('transform', `translateX(${currentTranslate}px)`);
-            if (isDragging) requestAnimationFrame(animation);
-        }
-
-        // Início do drag/touch
-        function dragStart(event) {
-            if (event.type === 'mousedown') {
-                event.preventDefault();
-            }
-            
-            isDragging = true;
-            startPos = getPositionX(event);
-            
-            track.addClass('dragging');
-            track.css('transition', 'none');
-            
-            animationId = requestAnimationFrame(animation);
-        }
-
-        // Movimento durante drag/touch
-        function dragMove(event) {
-            if (isDragging) {
-                event.preventDefault();
-                const currentPosition = getPositionX(event);
-                currentTranslate = prevTranslate + currentPosition - startPos;
-            }
-        }
-
-        // Fim do drag/touch
-        function dragEnd() {
-            isDragging = false;
-            cancelAnimationFrame(animationId);
-            
-            track.removeClass('dragging');
-            track.css('transition', 'transform 0.5s ease-in-out');
-            
-            const movedBy = currentTranslate - prevTranslate;
-            const cardWidth = getCardWidth();
-            
-            // Se moveu mais que 100px, mudar slide
-            if (movedBy < -100 && currentSlide < totalSlides - 1) {
-                currentSlide++;
-            }
-            
-            if (movedBy > 100 && currentSlide > 0) {
-                currentSlide--;
-            }
-            
-            setSliderPosition();
-            updateIndicators();
-            
-            // Atualizar controles
-            prevBtn.toggleClass('disabled', currentSlide === 0);
-            nextBtn.toggleClass('disabled', currentSlide >= totalSlides - 1);
-        }
 
         // Habilita barra de rolagem horizontal manual
         // E permite que os controles avancem/voltem via scroll
@@ -1014,5 +941,442 @@
                 }));
             }
         });
+
+        // Inicializar popovers
+        $('[data-toggle="popover"]').popover();
+
+        // Função para abrir modal de evidências com DataTables real
+        window.abrirModalEvidencias = function(nomeTabela, titulo) {
+            console.log('abrirModalEvidencias chamada:', nomeTabela, titulo);
+            
+            if (!nomeTabela) {
+                console.error('Nome da tabela não informado');
+                return;
+            }
+            
+            // Verificar se o modal existe
+            if ($('#modalEvidencias').length === 0) {
+                alert('Modal de evidências não encontrado. Verifique se o modal_evidencias.cfm foi incluído.');
+                return;
+            }
+            
+            // Atualizar título do modal
+            $('#modalEvidenciasLabel').html('<i class="fas fa-table mr-2"></i>' + (titulo || 'Evidências'));
+            
+            // Mostrar loading
+            $('#evidenciasLoading').show();
+            $('#evidenciasContent').hide();
+            $('#evidenciasError').hide();
+            
+            // Abrir modal
+            $('#modalEvidencias').modal('show');
+            
+            // Carregar dados reais via DataTables
+            carregarEvidenciasDataTable(nomeTabela, titulo);
+        };
+
+        // Função para carregar evidências com DataTables
+        function carregarEvidenciasDataTable(nomeTabela, titulo) {
+            console.log('Iniciando carregamento de evidências para:', nomeTabela);
+            
+            // Verificar e destruir DataTable existente de forma mais robusta
+            if ($.fn.DataTable.isDataTable('#tabelaEvidencias')) {
+                console.log('Destruindo DataTable existente...');
+                try {
+                    $('#tabelaEvidencias').DataTable().clear();
+                    $('#tabelaEvidencias').DataTable().destroy(true);
+                } catch (e) {
+                    console.warn('Erro ao destruir DataTable:', e);
+                }
+            }
+            
+            // Remover completamente a instância do DOM
+            $('#tabelaEvidencias').remove();
+            
+            // Recriar elemento da tabela do zero
+            const novaTabela = '<table id="tabelaEvidencias" class="table table-striped table-bordered table-hover compact nowrap" style="width: 100%;"></table>';
+            $('.table-container').html(novaTabela);
+            
+            try {
+                // Obter estrutura da tabela para configurar DataTables
+                $.ajax({
+                    url: 'cfc/EvidenciasManager.cfc?method=obterEstruturasTabela&returnformat=json',
+                    type: 'GET',
+                    data: { 
+                        nomeTabela: nomeTabela
+                    },
+                    dataType: 'json',
+                    timeout: 30000,
+                    success: function(response) {
+                        console.log('Estrutura da tabela recebida:', response);
+                        if (response && response.length > 0) {
+                            inicializarDataTable(nomeTabela, response, titulo);
+                        } else {
+                            mostrarErroEvidencias('Nenhuma coluna encontrada para esta tabela.');
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Erro ao obter estrutura:', error);
+                        console.error('Status:', status);
+                        console.error('Response:', xhr.responseText);
+                        mostrarErroEvidencias('Erro ao carregar estrutura da tabela: ' + error);
+                    }
+                });
+                
+            } catch (error) {
+                console.error('Erro ao carregar evidências:', error);
+                mostrarErroEvidencias('Erro ao inicializar: ' + error.message);
+            }
+        }
+        
+        // Função para inicializar DataTable
+        function inicializarDataTable(nomeTabela, colunas, titulo) {
+            console.log('Inicializando DataTable para:', nomeTabela, 'com', colunas.length, 'colunas');
+            
+            // Verificar se o elemento existe
+            if ($('#tabelaEvidencias').length === 0) {
+                console.error('Elemento tabelaEvidencias não encontrado');
+                mostrarErroEvidencias('Erro: Elemento da tabela não encontrado');
+                return;
+            }
+            
+            try {
+                // Criar estrutura HTML da tabela antes de inicializar DataTables
+                let tableHTML = '<thead class="thead-dark"><tr>';
+                colunas.forEach(function(coluna) {
+                    tableHTML += '<th>' + coluna.nome + '</th>';
+                });
+                tableHTML += '</tr></thead><tbody></tbody>';
+                
+                // Inserir HTML na tabela
+                $('#tabelaEvidencias').html(tableHTML);
+                
+                // Aguardar um pouco para garantir que o DOM foi atualizado
+                setTimeout(function() {
+                    criarDataTableInstance(nomeTabela, colunas, titulo);
+                }, 100);
+                
+            } catch (error) {
+                console.error('Erro ao criar estrutura da tabela:', error);
+                mostrarErroEvidencias('Erro ao criar estrutura da tabela: ' + error.message);
+            }
+        }
+        
+        // Função separada para criar a instância do DataTable
+        function criarDataTableInstance(nomeTabela, colunas, titulo) {
+            try {
+                // Configurar colunas para DataTables com larguras mais flexíveis
+                const columnDefs = colunas.map(function(coluna, index) {
+                    let config = {
+                        targets: index,
+                        className: 'text-center'
+                        // Remover width fixo para permitir largura automática
+                    };
+                    
+                    // Configurações específicas por tipo de dados sem larguras fixas
+                    if (coluna.tipo === 'datetime' || coluna.tipo === 'date') {
+                        config.className = 'text-center';
+                        config.minWidth = '140px'; /* Usar minWidth ao invés de width */
+                    } else if (coluna.tipo === 'money' || coluna.tipo === 'decimal' || coluna.tipo === 'numeric') {
+                        config.className = 'text-right';
+                        config.minWidth = '100px';
+                    } else if (coluna.tipo === 'bit') {
+                        config.className = 'text-center';
+                        config.minWidth = '60px';
+                    } else if (coluna.tipo === 'int' || coluna.tipo === 'bigint') {
+                        config.className = 'text-center';
+                        config.minWidth = '80px';
+                    } else if (coluna.tipo === 'varchar' || coluna.tipo === 'nvarchar') {
+                        config.className = 'text-left';
+                        config.minWidth = coluna.tamanho > 100 ? '200px' : '120px';
+                    } else {
+                        config.className = 'text-left';
+                        config.minWidth = '120px';
+                    }
+                    
+                    return config;
+                });
+                
+                // Configurar colunas com dados corretos
+                const columns = colunas.map(function(coluna, index) {
+                    return { 
+                        data: index,
+                        name: coluna.nome,
+                        title: coluna.nome,
+                        searchable: true,
+                        orderable: true
+                    };
+                });
+                
+                console.log('Criando instância do DataTable...');
+                
+                // Inicializar DataTable com configurações otimizadas
+                const dataTable = $('#tabelaEvidencias').DataTable({
+                    processing: true,
+                    serverSide: true,
+                    destroy: true,
+                    ajax: {
+                        url: 'cfc/EvidenciasManager.cfc?method=obterDadosTabela&returnformat=json',
+                        type: 'GET',
+                        timeout: 30000,
+                        data: function(d) {
+                            return {
+                                nomeTabela: nomeTabela,
+                                start: d.start,
+                                length: d.length,
+                                searchValue: d.search.value,
+                                orderColumn: d.order[0].column,
+                                orderDirection: d.order[0].dir,
+                                draw: d.draw
+                            };
+                        },
+                        dataSrc: function(json) {
+                            console.log('Dados recebidos do servidor:', json);
+                            if (json.error) {
+                                mostrarErroEvidencias(json.error);
+                                return [];
+                            }
+                            // Verificar se os dados estão no formato correto
+                            if (json.data && Array.isArray(json.data)) {
+                                console.log('Total de registros:', json.recordsTotal);
+                                console.log('Primeira linha de dados:', json.data[0]);
+                                return json.data;
+                            }
+                            return [];
+                        },
+                        error: function(xhr, error, thrown) {
+                            console.error('Erro AJAX completo:', {
+                                error: error,
+                                thrown: thrown,
+                                status: xhr.status,
+                                statusText: xhr.statusText,
+                                responseText: xhr.responseText
+                            });
+                            mostrarErroEvidencias('Erro ao carregar dados: ' + error);
+                        }
+                    },
+                    columns: columns,
+                    columnDefs: columnDefs,
+                    
+                    // Configurações de layout e responsividade
+                    dom: '<"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>>' +
+                         '<"row"<"col-sm-12"tr>>' +
+                         '<"row"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>',
+                    
+                    // Habilitar rolagem horizontal e vertical
+                    scrollX: true,
+                    scrollY: '50vh',
+                    scrollCollapse: true,
+                    
+                    // Habilitar autoWidth para permitir larguras automáticas
+                    autoWidth: true, /* Mudado para true */
+                    
+                    // Configurações de exibição
+                    pageLength: 25,
+                    lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "Todos"]],
+                    
+                    // Classes CSS para estilo compacto sem nowrap excessivo
+                    className: 'compact',
+                    
+                    // Configurar ordenação padrão
+                    order: [[0, 'asc']],
+                    
+                    // Configurar busca
+                    search: {
+                        smart: true,
+                        regex: false,
+                        caseInsensitive: true
+                    },
+                    
+                    // Idioma em português
+                    language: {
+                        "decimal": "",
+                        "emptyTable": "Nenhum dado disponível na tabela",
+                        "info": "Mostrando _START_ a _END_ de _TOTAL_ entradas",
+                        "infoEmpty": "Mostrando 0 a 0 de 0 entradas",
+                        "infoFiltered": "(filtrado de _MAX_ entradas totais)",
+                        "infoPostFix": "",
+                        "thousands": ".",
+                        "lengthMenu": "Mostrar _MENU_ entradas",
+                        "loadingRecords": "Carregando...",
+                        "processing": "Processando...",
+                        "search": "Buscar:",
+                        "zeroRecords": "Nenhum registro correspondente encontrado",
+                        "paginate": {
+                            "first": "Primeiro",
+                            "last": "Último",
+                            "next": "Próximo",
+                            "previous": "Anterior"
+                        },
+                        "aria": {
+                            "sortAscending": ": ativar para classificar a coluna em ordem crescente",
+                            "sortDescending": ": ativar para classificar a coluna em ordem decrescente"
+                        }
+                    },
+                    
+                    // Callbacks
+                    drawCallback: function(settings) {
+                        // Esconder loading e mostrar conteúdo quando dados carregarem
+                        $('#evidenciasLoading').hide();
+                        $('#evidenciasContent').show();
+                        
+                        // Atualizar informações no footer com verificações de segurança
+                        try {
+                            const api = this.api();
+                            const info = api.page.info();
+                            
+                            // Verificar se info existe e tem as propriedades necessárias
+                            if (info && typeof info.recordsTotal !== 'undefined' && typeof info.recordsFiltered !== 'undefined') {
+                                $('#evidenciasInfo').html(
+                                    `<strong>Tabela:</strong> ${nomeTabela} | ` +
+                                    `<strong>Registros:</strong> ${info.recordsTotal.toLocaleString('pt-BR')} | ` +
+                                    `<strong>Colunas:</strong> ${colunas.length} | ` +
+                                    `<strong>Filtrados:</strong> ${info.recordsFiltered.toLocaleString('pt-BR')}`
+                                );
+                            } else {
+                                $('#evidenciasInfo').html(
+                                    `<strong>Tabela:</strong> ${nomeTabela} | ` +
+                                    `<strong>Colunas:</strong> ${colunas.length} | ` +
+                                    `<strong>Status:</strong> Carregando...`
+                                );
+                            }
+                        } catch (error) {
+                            console.error('Erro no drawCallback:', error);
+                            $('#evidenciasInfo').html(
+                                `<strong>Tabela:</strong> ${nomeTabela} | ` +
+                                `<strong>Colunas:</strong> ${colunas.length}`
+                            );
+                        }
+                    },
+                    
+                    initComplete: function(settings, json) {
+                        console.log('DataTable inicializado com sucesso');
+                        if (json && json.error) {
+                            mostrarErroEvidencias(json.error);
+                        } else {
+                            // Forçar ajuste de colunas e habilitar rolagem horizontal
+                            setTimeout(() => {
+                                this.api().columns.adjust();
+                                // Garantir que o scrollX está funcionando
+                                $('.dataTables_scrollBody').css('overflow-x', 'auto');
+                            }, 200);
+                        }
+                    }
+                });
+                
+                // Adicionar evento de redimensionamento
+                $(window).off('resize.evidencias').on('resize.evidencias', function() {
+                    if (dataTable && typeof dataTable.columns !== 'undefined') {
+                        dataTable.columns.adjust();
+                    }
+                });
+                
+            } catch (error) {
+                console.error('Erro ao inicializar DataTable:', error);
+                mostrarErroEvidencias('Erro ao inicializar tabela: ' + error.message);
+            }
+        }
+
+        // Função para mostrar erro
+        function mostrarErroEvidencias(mensagem) {
+            $('#evidenciasLoading').hide();
+            $('#evidenciasContent').hide();
+            $('#evidenciasErrorMessage').text(mensagem);
+            $('#evidenciasError').show();
+        }
+
+        // Event listener para period-cards clicáveis (ÚNICO - remover duplicação)
+        $(document).off('click', '.period-card.evidencias-clickable').on('click', '.period-card.evidencias-clickable', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            console.log('Card clicado!'); // Debug
+            
+            const nomeTabela = $(this).data('tabela');
+            const titulo = $(this).data('titulo');
+            
+            console.log('Tabela:', nomeTabela, 'Título:', titulo); // Debug
+            
+            if (nomeTabela) {
+                // Chamar a função global
+                if (typeof window.abrirModalEvidencias === 'function') {
+                    window.abrirModalEvidencias(nomeTabela, titulo);
+                } else {
+                    console.error('Função abrirModalEvidencias não encontrada');
+                    alert('Erro: Função abrirModalEvidencias não está disponível');
+                }
+            } else {
+                console.log('Nome da tabela não encontrado');
+                alert('Erro: Nome da tabela não foi encontrado nos dados do card');
+            }
+        });
+
+        // Event listener de debug para TODOS os cards current
+        $(document).on('click', '.period-card.current', function(e) {
+            console.log('=== DEBUG CARD CLICK ===');
+            console.log('Card current clicado');
+            console.log('Tem classe evidencias-clickable:', $(this).hasClass('evidencias-clickable'));
+            console.log('Classes do elemento:', $(this).attr('class'));
+            console.log('Data tabela:', $(this).data('tabela'));
+            console.log('Data título:', $(this).data('titulo'));
+            console.log('HTML do card:', $(this).prop('outerHTML').substring(0, 200) + '...');
+            console.log('========================');
+        });
+
+        // Limpar modal quando fechar - versão mais robusta
+        $('#modalEvidencias').on('hidden.bs.modal', function() {
+            console.log('Modal fechado - limpando DataTable');
+            
+            // Remover event listeners
+            $(window).off('resize.evidencias');
+            
+            // Destruir DataTable de forma mais completa
+            if ($.fn.DataTable.isDataTable('#tabelaEvidencias')) {
+                try {
+                    $('#tabelaEvidencias').DataTable().clear();
+                    $('#tabelaEvidencias').DataTable().destroy(true);
+                } catch (e) {
+                    console.warn('Erro ao destruir DataTable no fechamento:', e);
+                }
+            }
+            
+            // Limpar completamente o container
+            $('#tabelaEvidencias').remove();
+            $('.table-container').html('<table id="tabelaEvidencias" class="table table-striped table-bordered table-hover compact nowrap" style="width: 100%;"></table>');
+            $('#evidenciasInfo').empty();
+            
+            // Reset do estado do modal
+            $('#evidenciasLoading').show();
+            $('#evidenciasContent').hide();
+            $('#evidenciasError').hide();
+        });
+
+        // Debug: verificar se existem cards clicáveis ao carregar a página
+        setTimeout(function() {
+            const cardsClicaveis = $('.period-card.evidencias-clickable');
+            const cardsTotal = $('.period-card.current');
+            console.log('=== DEBUG INICIAL ===');
+            console.log('Total de cards current:', cardsTotal.length);
+            console.log('Total de cards clicáveis encontrados:', cardsClicaveis.length);
+            
+            // Verificar se as tabelas de evidências foram carregadas
+            console.log('Verificando se objEvidencias existe:', typeof objEvidencias !== 'undefined');
+            
+            // Mostrar informações de cada card
+            cardsTotal.each(function(index) {
+                const $card = $(this);
+                console.log('Card ' + (index + 1) + ':', {
+                    tabela: $card.data('tabela'),
+                    titulo: $card.data('titulo'),
+                    classes: $card.attr('class'),
+                    temDados: $card.closest('.performance-card').find('.period-value').text().trim() !== '0'
+                });
+            });
+            
+            console.log('====================');
+        }, 2000);
     });
 </script>
+
+<!--- Incluir modal primeiro --->
+<cfinclude template="../modal_evidencias.cfm">
