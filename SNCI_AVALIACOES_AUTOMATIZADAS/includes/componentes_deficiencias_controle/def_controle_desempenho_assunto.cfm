@@ -749,7 +749,9 @@
     }
 
     .snci-desempenho-assunto .period-card.evidencias-clickable::after {
-        content: '📊';
+        content: '\f0ce';
+        font-family: 'Font Awesome 5 Free';
+        font-weight: 900;
         position: absolute;
         top: 5px;
         right: 5px;
@@ -760,6 +762,35 @@
 
     .snci-desempenho-assunto .period-card.evidencias-clickable:hover::after {
         opacity: 1;
+    }
+
+    /* Estilo para o rodapé informativo */
+    .snci-desempenho-assunto .info-footer {
+        margin-top: 5px;
+        padding: 5px;
+        background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        font-size: 0.85rem;
+        color: #64748b;
+        text-align: center;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+
+    .snci-desempenho-assunto .info-footer .icon-demo {
+        display: inline-block;
+        margin: 0 4px;
+        padding: 2px 6px;
+        background: rgba(69, 123, 157, 0.1);
+        border-radius: 4px;
+        font-family: 'Font Awesome 5 Free';
+        font-weight: 900;
+        color: #457b9d;
+    }
+
+    .snci-desempenho-assunto .info-footer .highlight {
+        font-weight: 600;
+        color: #457b9d;
     }
 
 </style>
@@ -928,6 +959,16 @@
                     <div class="performance-card empty-card" style="background:transparent; border:none; box-shadow:none; pointer-events:none;"></div>
                 </div>
             </div>
+        </div>
+        
+        <!-- Rodapé informativo sobre evidências -->
+        <div class="info-footer">
+            <i class="fas fa-info-circle mr-2" style="color: #457b9d;"></i>
+            <strong class="highlight">Evidências:</strong> Os meses que possuem o ícone 
+            <span class="icon-demo">&#xf0ce;</span> 
+            têm tabela de evidências disponível para consulta detalhada, bastando clicar onde aparece a informação da quantidade de eventos.
+            <br>
+            <small><strong>Observação:</strong> Atualmente, as evidências estão disponíveis apenas para o último mês.</small>
         </div>
     </div>
 </div>
