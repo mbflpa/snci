@@ -738,25 +738,21 @@
     /* Estilo para cards clicáveis com evidências */
     .snci-desempenho-assunto .period-card.evidencias-clickable {
         cursor: pointer;
-        transition: all 0.3s ease;
+     
         position: relative;
     }
 
-    .snci-desempenho-assunto .period-card.evidencias-clickable:hover {
-        transform: translateY(-3px) scale(1.02);
-        box-shadow: 0 8px 20px rgba(69, 123, 157, 0.25);
-        border-color: rgba(69, 123, 157, 0.4);
-    }
+    
 
     .snci-desempenho-assunto .period-card.evidencias-clickable::after {
-        content: '\f0ce';
-        font-family: 'Font Awesome 5 Free';
+        content: "\f06e";               /* Unicode do fa-eye */
+        font-family: "Font Awesome 6 Free";
         font-weight: 900;
+        color: #457b9d;
         position: absolute;
         top: 5px;
         right: 5px;
         font-size: 0.8rem;
-        opacity: 0.6;
         transition: opacity 0.3s ease;
     }
 
@@ -910,7 +906,7 @@
                                          <cfif len(trim(tabelaEvidencia)) AND item.atual GT 0 AND mesAtualEhMaiorDisponivel>
                                          data-tabela="<cfoutput>#HTMLEditFormat(tabelaEvidencia)#</cfoutput>" 
                                          data-titulo="<cfoutput>#HTMLEditFormat(tituloEvidencia)#</cfoutput>"
-                                         title="Clique para ver evidências - <cfoutput>#HTMLEditFormat(tabelaEvidencia)#</cfoutput>"
+                                         title="Clique para visualizar as evidências."
                                          <cfelse>
                                          <cfif len(trim(tabelaEvidencia)) AND item.atual GT 0 AND NOT mesAtualEhMaiorDisponivel>
                                          title="Evidências disponíveis apenas para o período mais recente"
@@ -965,7 +961,7 @@
         <div class="info-footer">
             <i class="fas fa-info-circle mr-2" style="color: #457b9d;"></i>
             <strong class="highlight">Evidências:</strong> Os meses que possuem o ícone 
-            <span class="icon-demo">&#xf0ce;</span> 
+            <span><i class="fas fa-eye" style="color: #457b9d;"></i></span> 
             têm tabela de evidências disponível para consulta detalhada, bastando clicar onde aparece a informação da quantidade de eventos.
             <br>
             <small><strong>Observação:</strong> Atualmente, as evidências estão disponíveis apenas para o último mês.</small>
