@@ -185,9 +185,10 @@ pre{
     color:green;
 } 
 .btExcel:hover{
-    color:rgb(12, 87, 12);
-    background-color: transparent!important;
+    color: rgb(12, 87, 12)!important;
+    background-color: transparent !important;
 }
+
 
 .btFiltro {
     background: none;
