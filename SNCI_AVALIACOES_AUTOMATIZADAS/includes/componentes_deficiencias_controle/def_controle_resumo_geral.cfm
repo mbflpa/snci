@@ -215,24 +215,20 @@
     
     
     .snci-resumo-geral .kpi-card .text .value {
-        font-size: 1.1rem;
+        font-size: 1.2rem;
         font-weight: 600;
         color: #1e293b;
         line-height: 1.2;
     }
-    .snci-resumo-geral .kpi-card .text .value.loading {
-        color: #64748b;
-    }
-
-    /* Animações */
+    /* Remover animações */
     .snci-resumo-geral .fade-in-up {
-        opacity: 0;
-        transform: translateY(20px);
-        transition: all 0.6s ease;
+        /* removido */
     }
     .snci-resumo-geral .fade-in-up.animate {
-        opacity: 1;
-        transform: translateY(0);
+        /* removido */
+    }
+    .snci-resumo-geral .kpi-card .text .value.loading {
+        /* removido */
     }
 
     /* Responsividade */
@@ -306,7 +302,7 @@
                 </cfloop>
                 <!--- Loop pelos dados ordenados --->
                 <cfloop array="#dadosOrdenados#" index="item">
-                    <div class="kpi-card <cfif attributes.showAnimation eq 'true'>fade-in-up</cfif>" data-delay="<cfoutput>#item.ordem * 100#</cfoutput>">
+                    <div class="kpi-card">
                         <div class="icon <cfif structKeyExists(item, 'cor') and len(item.cor)><cfoutput>#item.cor#</cfoutput></cfif>">
                             <i class="<cfoutput>#item.icone#</cfoutput>"></i>
                         </div>
@@ -322,11 +318,15 @@
                                        data-content="<cfoutput>#htmlEditFormat(item.definicao)#</cfoutput>"></i>
                                 </cfif>
                             </div>
-                            <div class="value <cfif attributes.showAnimation eq 'true'>loading</cfif>">
+                            <div class="value">
                                 <cfif structKeyExists(item, 'formatacao') and item.formatacao eq 'moeda'>
-                                    R$ <span class="animated-number" data-target="<cfoutput>#numberFormat(item.valor, '_.00')#</cfoutput>" data-type="money">0,00</span>
+                                    <span class="valor-moeda"><cfoutput>#item.valor#</cfoutput></span>
                                 <cfelse>
-                                    <span class="animated-number" data-target="<cfoutput>#item.valor#</cfoutput>">0</span>
+                                    <cfif isNumeric(item.valor)>
+                                        <span class="valor-numero"><cfoutput>#item.valor#</cfoutput></span>
+                                    <cfelse>
+                                        <cfoutput>#item.valor#</cfoutput>
+                                    </cfif>
                                 </cfif>
                             </div>
                         </div>
@@ -346,96 +346,20 @@
             trigger: 'hover'
         });
 
-        // Função para animar números
-        function animateNumbers() {
-            $('.desempenho-container .animated-number').each(function() {
-                var $this = $(this);
-                var target = parseFloat($this.data('target'));
-                var isMoney = $this.data('type') === 'money';
-                
-                if (target && !$this.hasClass('animated')) {
-                    $this.addClass('animated');
-                    $({ countNum: 0 }).animate({
-                        countNum: target
-                    }, {
-                        duration: 1500,
-                        easing: 'swing',
-                        step: function() {
-                            if (isMoney) {
-                                $this.text(this.countNum.toLocaleString('pt-BR', {
-                                    minimumFractionDigits: 2,
-                                    maximumFractionDigits: 2
-                                }));
-                            } else {
-                                $this.text(Math.floor(this.countNum).toLocaleString('pt-BR'));
-                            }
-                        },
-                        complete: function() {
-                            if (isMoney) {
-                                $this.text(this.countNum.toLocaleString('pt-BR', {
-                                    minimumFractionDigits: 2,
-                                    maximumFractionDigits: 2
-                                }));
-                            } else {
-                                $this.text(this.countNum.toLocaleString('pt-BR'));
-                            }
-                            $this.closest('.value').removeClass('loading');
-                        }
-                    });
-                }
-            });
-        }
-        
-        // Função para animar entrada dos cards
-        function animateCards() {
-            <cfif attributes.showAnimation eq 'true'>
-            $('.desempenho-container .fade-in-up').each(function(i) {
-                var $this = $(this);
-                var delay = $this.data('delay') || (i * 100);
-                
-                setTimeout(function() {
-                    $this.addClass('animate');
-                }, delay);
-            });
-            
-            // Inicia animação dos números após os cards aparecerem
-            setTimeout(function() {
-                animateNumbers();
-            }, 600);
-            <cfelse>
-            $('.desempenho-container .fade-in-up').addClass('animate');
-            animateNumbers();
-            </cfif>
-        }
-        
-        // Verifica se o componente está visível na tela
-        function isElementInViewport(el) {
-            var rect = el.getBoundingClientRect();
-            return (
-                rect.top >= 0 &&
-                rect.left >= 0 &&
-                rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
-                rect.right <= (window.innerWidth || document.documentElement.clientWidth)
-            );
-        }
-        
-        // Observer para animar quando visível
-        var hasAnimated = false;
-        
-        function checkVisibility() {
-            if (!hasAnimated && $('.desempenho-container').length > 0) {
-                var container = $('.desempenho-container')[0];
-                if (isElementInViewport(container)) {
-                    hasAnimated = true;
-                    animateCards();
-                    $(window).off('scroll.visibility resize.visibility');
-                }
+        // Formatar valores monetários pt-br
+        $('.valor-moeda').each(function() {
+            var valor = parseFloat($(this).text().replace(',', '.'));
+            if (!isNaN(valor)) {
+                $(this).text('R$ ' + valor.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2}));
             }
-        }
-        
-        // Verificar visibilidade no carregamento e nos eventos
-        checkVisibility();
-        $(window).on('scroll.visibility resize.visibility', checkVisibility);
+        });
+
+        // Formatar valores inteiros pt-br
+        $('.valor-numero').each(function() {
+            var valor = parseInt($(this).text());
+            if (!isNaN(valor)) {
+                $(this).text(valor.toLocaleString('pt-BR'));
+            }
+        });
     });
 </script>
-
