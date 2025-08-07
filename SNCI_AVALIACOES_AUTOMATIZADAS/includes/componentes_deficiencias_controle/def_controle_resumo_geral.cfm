@@ -215,7 +215,7 @@
     
     
     .snci-resumo-geral .kpi-card .text .value {
-        font-size: 1.35rem;
+        font-size: 1.1rem;
         font-weight: 600;
         color: #1e293b;
         line-height: 1.2;

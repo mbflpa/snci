@@ -1249,7 +1249,7 @@
                     autoWidth: true,
                     
                     // Configurações de exibição
-                    pageLength: 25,
+                    pageLength: 10,
                     lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "Todos"]],
                     
                     // Classes CSS para estilo compacto
