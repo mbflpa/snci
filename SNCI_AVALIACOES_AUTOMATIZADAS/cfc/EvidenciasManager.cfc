@@ -248,7 +248,7 @@
         <cfreturn local.colunas>
     </cffunction>
 
-    <cffunction name="obterDadosTabela" access="remote" returnformat="json" returntype="struct" hint="Obtém dados paginados de uma tabela">
+    <cffunction name="obterDadosTabelaSeverSide" access="remote" returnformat="json" returntype="struct" hint="Obtém dados paginados de uma tabela">
         <cfargument name="nomeTabela" type="string" required="true">
         <cfargument name="start" type="numeric" required="false" default="0">
         <cfargument name="length" type="numeric" required="false" default="10">
@@ -431,6 +431,138 @@
             </cfif>
             
             <cflog file="evidencias_debug" text="Processamento concluído. Linhas de dados: #arrayLen(local.resultado.data)#">
+            
+            <cfcatch type="any">
+                <cflog file="evidencias_erro" text="Erro ao obter dados da tabela #arguments.nomeTabela#: #cfcatch.message# - #cfcatch.detail#">
+                <cfset local.resultado.error = "Erro ao consultar dados: " & cfcatch.message>
+            </cfcatch>
+        </cftry>
+        
+        <cfreturn local.resultado>
+    </cffunction>
+
+    <cffunction name="obterDadosTabela" access="remote" returnformat="json" returntype="struct" hint="Obtém dados de uma tabela para client-side processing">
+        <cfargument name="nomeTabela" type="string" required="true">
+        
+        <cfset var local = {}>
+        <cfset local.resultado = {
+            "data" = arrayNew(1),
+            "recordsTotal" = 0,
+            "recordsFiltered" = 0,
+            "columns" = arrayNew(1)
+        }>
+        
+        <cflog file="evidencias_debug" text="obterDadosTabela chamado para: #arguments.nomeTabela# (client-side mode)">
+        
+        <!--- Verificar se a tabela existe e é válida --->
+        <cfif NOT validarNomeTabela(arguments.nomeTabela)>
+            <cflog file="evidencias_debug" text="Tabela não encontrada: #arguments.nomeTabela#">
+            <cfset local.resultado.error = "Tabela não encontrada ou não válida: " & arguments.nomeTabela>
+            <cfreturn local.resultado>
+        </cfif>
+        
+        <cftry>
+            <!--- Obter estrutura das colunas --->
+            <cflog file="evidencias_debug" text="Obtendo estrutura da tabela: #arguments.nomeTabela#">
+            <cfset local.colunas = obterEstruturasTabela(arguments.nomeTabela)>
+            <cfset local.resultado.columns = local.colunas>
+            
+            <cflog file="evidencias_debug" text="Colunas obtidas: #arrayLen(local.colunas)#">
+            
+            <cfif arrayLen(local.colunas) EQ 0>
+                <cfset local.resultado.error = "Nenhuma coluna encontrada para a tabela: " & arguments.nomeTabela>
+                <cflog file="evidencias_debug" text="Nenhuma coluna encontrada para: #arguments.nomeTabela#">
+                <cfreturn local.resultado>
+            </cfif>
+            
+            <!--- Obter MCU da sessão/application --->
+            <cfset local.sk_mcu = 0>
+            <cfif structKeyExists(application, "rsUsuarioParametros") AND structKeyExists(application.rsUsuarioParametros, "Und_MCU")>
+                <cfset local.sk_mcu = val(application.rsUsuarioParametros.Und_MCU)>
+            </cfif>
+            <cflog file="evidencias_debug" text="MCU da unidade: #local.sk_mcu#">
+            
+            <!--- Construir WHERE clause para filtro por MCU --->
+            <cfset local.mcuClause = "">
+            <cfif local.sk_mcu GT 0>
+                <!--- Verificar se a tabela tem coluna sk_mcu --->
+                <cfset local.temColunaMCU = false>
+                <cfloop array="#local.colunas#" index="coluna">
+                    <cfif lcase(coluna.nome) EQ "sk_mcu">
+                        <cfset local.temColunaMCU = true>
+                        <cfbreak>
+                    </cfif>
+                </cfloop>
+                
+                <cfif local.temColunaMCU>
+                    <cfset local.mcuClause = " WHERE sk_mcu = #local.sk_mcu#">
+                    <cflog file="evidencias_debug" text="Aplicando filtro MCU: #local.sk_mcu#">
+                <cfelse>
+                    <cflog file="evidencias_debug" text="Tabela não possui coluna sk_mcu - sem filtro">
+                </cfif>
+            </cfif>
+            
+            <!--- Construir query principal - RETORNAR TODOS OS DADOS para client-side --->
+            <cfset local.sqlSelect = "SELECT ">
+            <cfloop from="1" to="#arrayLen(local.colunas)#" index="i">
+                <cfif i GT 1><cfset local.sqlSelect &= ", "></cfif>
+                <cfset local.sqlSelect &= "[#local.colunas[i].nome#]">
+            </cfloop>
+            <cfset local.sqlSelect &= " FROM [#arguments.nomeTabela#]">
+            
+            <!--- Adicionar ordenação básica apenas --->
+            <cfset local.orderClause = " ORDER BY [#local.colunas[1].nome#] ASC">
+            
+            <!--- Query final SEM PAGINAÇÃO - buscar todos os dados --->
+            <cfquery name="local.qryDados" datasource="#application.dsn_avaliacoes_automatizadas#">
+                #PreserveSingleQuotes(local.sqlSelect)#
+                <cfif len(trim(local.mcuClause))>
+                    #PreserveSingleQuotes(local.mcuClause)#
+                </cfif>
+                #PreserveSingleQuotes(local.orderClause)#
+            </cfquery>
+            
+            <cflog file="evidencias_debug" text="Query de dados executada. Registros retornados: #local.qryDados.recordCount#">
+            
+            <!--- Definir totais baseados nos dados retornados --->
+            <cfset local.resultado.recordsTotal = local.qryDados.recordCount>
+            <cfset local.resultado.recordsFiltered = local.qryDados.recordCount>
+            
+            <!--- Converter dados para array --->
+            <cfloop query="local.qryDados">
+                <cfset local.linha = arrayNew(1)>
+                <cfloop from="1" to="#arrayLen(local.colunas)#" index="i">
+                    <cfset local.nomeColuna = local.colunas[i].nome>
+                    
+                    <!--- Acessar o valor correto da coluna --->
+                    <cftry>
+                        <cfset local.valor = evaluate("local.qryDados.#local.nomeColuna#")>
+                        
+                        <!--- Formatação especial para tipos de dados --->
+                        <cfif isDate(local.valor)>
+                            <cfset local.valor = dateFormat(local.valor, "dd/mm/yyyy") & " " & timeFormat(local.valor, "HH:mm:ss")>
+                        <cfelseif isNumeric(local.valor) AND local.colunas[i].tipo EQ "money">
+                            <cfset local.valor = "R$ " & numberFormat(local.valor, "999,999,999.00")>
+                        <cfelseif isNumeric(local.valor) AND listFind("decimal,numeric,float,real", local.colunas[i].tipo)>
+                            <cfset local.valor = numberFormat(local.valor, "999,999,999.00")>
+                        <cfelseif isNull(local.valor) OR local.valor EQ "">
+                            <cfset local.valor = "">
+                        <cfelse>
+                            <cfset local.valor = toString(local.valor)>
+                        </cfif>
+                        
+                        <cfcatch type="any">
+                            <cflog file="evidencias_erro" text="Erro ao acessar coluna #local.nomeColuna#: #cfcatch.message#">
+                            <cfset local.valor = "Erro">
+                        </cfcatch>
+                    </cftry>
+                    
+                    <cfset arrayAppend(local.linha, local.valor)>
+                </cfloop>
+                <cfset arrayAppend(local.resultado.data, local.linha)>
+            </cfloop>
+            
+            <cflog file="evidencias_debug" text="Processamento concluído. Total de linhas: #arrayLen(local.resultado.data)#">
             
             <cfcatch type="any">
                 <cflog file="evidencias_erro" text="Erro ao obter dados da tabela #arguments.nomeTabela#: #cfcatch.message# - #cfcatch.detail#">

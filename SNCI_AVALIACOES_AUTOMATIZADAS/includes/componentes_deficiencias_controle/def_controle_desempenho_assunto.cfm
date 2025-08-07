@@ -1015,7 +1015,7 @@
 
         // Função para abrir modal de evidências com DataTables real
         window.abrirModalEvidencias = function(nomeTabela, titulo) {
-            console.log('abrirModalEvidencias chamada:', nomeTabela, titulo);
+         
             
             if (!nomeTabela) {
                 console.error('Nome da tabela não informado');
@@ -1045,11 +1045,11 @@
 
         // Função para carregar evidências com DataTables
         function carregarEvidenciasDataTable(nomeTabela, titulo) {
-            console.log('Iniciando carregamento de evidências para:', nomeTabela);
+           
             
             // Verificar e destruir DataTable existente de forma mais robusta
             if ($.fn.DataTable.isDataTable('#tabelaEvidencias')) {
-                console.log('Destruindo DataTable existente...');
+                
                 try {
                     $('#tabelaEvidencias').DataTable().clear();
                     $('#tabelaEvidencias').DataTable().destroy(true);
@@ -1076,7 +1076,7 @@
                     dataType: 'json',
                     timeout: 30000,
                     success: function(response) {
-                        console.log('Estrutura da tabela recebida:', response);
+                        
                         if (response && response.length > 0) {
                             inicializarDataTable(nomeTabela, response, titulo);
                         } else {
@@ -1099,7 +1099,7 @@
         
         // Função para inicializar DataTable
         function inicializarDataTable(nomeTabela, colunas, titulo) {
-            console.log('Inicializando DataTable para:', nomeTabela, 'com', colunas.length, 'colunas');
+           
             
             // Verificar se o elemento existe
             if ($('#tabelaEvidencias').length === 0) {
@@ -1176,38 +1176,32 @@
                     };
                 });
                 
-                console.log('Criando instância do DataTable...');
+               var currentDate = new Date()
+                var day = currentDate.getDate()
+                var month = currentDate.getMonth() + 1
+                var year = currentDate.getFullYear()
+
+                var d = day + "-" + month + "-" + year;	
                 
                 // Inicializar DataTable com configurações otimizadas
                 const dataTable = $('#tabelaEvidencias').DataTable({
                     processing: true,
-                    serverSide: true,
+                    serverSide: false,
                     destroy: true,
                     ajax: {
                         url: 'cfc/EvidenciasManager.cfc?method=obterDadosTabela&returnformat=json',
                         type: 'GET',
                         timeout: 30000,
-                        data: function(d) {
-                            return {
-                                nomeTabela: nomeTabela,
-                                start: d.start,
-                                length: d.length,
-                                searchValue: d.search.value,
-                                orderColumn: d.order[0].column,
-                                orderDirection: d.order[0].dir,
-                                draw: d.draw
-                            };
+                        data: {
+                            nomeTabela: nomeTabela
                         },
                         dataSrc: function(json) {
-                            console.log('Dados recebidos do servidor:', json);
                             if (json.error) {
                                 mostrarErroEvidencias(json.error);
                                 return [];
                             }
-                            // Verificar se os dados estão no formato correto
+
                             if (json.data && Array.isArray(json.data)) {
-                                console.log('Total de registros:', json.recordsTotal);
-                                console.log('Primeira linha de dados:', json.data[0]);
                                 return json.data;
                             }
                             return [];
@@ -1227,23 +1221,38 @@
                     columnDefs: columnDefs,
                     
                     // Configurações de layout e responsividade
-                    dom: '<"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>>' +
-                         '<"row"<"col-sm-12"tr>>' +
-                         '<"row"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>',
-                    
+                   dom: '<"row align-items-center"' +
+        '<"col-md-12 d-flex justify-content-between flex-wrap"' +
+            '<"me-auto"l>' +
+            '<"mx-auto"f>' +
+            '<"ms-auto me-2"B>' +   // 👈 margem à direita aqui
+        '>' +
+     '>' +
+     '<"row"<"col-sm-12"tr>>' +
+     '<"row"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>',
+
+
+
+                    buttons: [{
+								extend: 'excelHtml5',
+								text: '<i class="fas fa-file-excel fa-2x" ></i>',
+								title : "Evidencias_" + d,
+								className: 'btExcel'
+                            }
+						],
                     // Habilitar rolagem horizontal e vertical
                     scrollX: true,
                     scrollY: '50vh',
                     scrollCollapse: true,
                     
                     // Habilitar autoWidth para permitir larguras automáticas
-                    autoWidth: true, /* Mudado para true */
+                    autoWidth: true,
                     
                     // Configurações de exibição
                     pageLength: 25,
                     lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "Todos"]],
                     
-                    // Classes CSS para estilo compacto sem nowrap excessivo
+                    // Classes CSS para estilo compacto
                     className: 'compact',
                     
                     // Configurar ordenação padrão
@@ -1257,30 +1266,9 @@
                     },
                     
                     // Idioma em português
-                    language: {
-                        "decimal": "",
-                        "emptyTable": "Nenhum dado disponível na tabela",
-                        "info": "Mostrando _START_ a _END_ de _TOTAL_ entradas",
-                        "infoEmpty": "Mostrando 0 a 0 de 0 entradas",
-                        "infoFiltered": "(filtrado de _MAX_ entradas totais)",
-                        "infoPostFix": "",
-                        "thousands": ".",
-                        "lengthMenu": "Mostrar _MENU_ entradas",
-                        "loadingRecords": "Carregando...",
-                        "processing": "Processando...",
-                        "search": "Buscar:",
-                        "zeroRecords": "Nenhum registro correspondente encontrado",
-                        "paginate": {
-                            "first": "Primeiro",
-                            "last": "Último",
-                            "next": "Próximo",
-                            "previous": "Anterior"
-                        },
-                        "aria": {
-                            "sortAscending": ": ativar para classificar a coluna em ordem crescente",
-                            "sortDescending": ": ativar para classificar a coluna em ordem decrescente"
-                        }
-                    },
+                   language: {
+							url: "../SNCI_AVALIACOES_AUTOMATIZADAS/plugins/datatables/traducao.json"
+						},
                     
                     // Callbacks
                     drawCallback: function(settings) {
@@ -1288,24 +1276,21 @@
                         $('#evidenciasLoading').hide();
                         $('#evidenciasContent').show();
                         
-                        // Atualizar informações no footer com verificações de segurança
+                        // Atualizar informações no footer
                         try {
                             const api = this.api();
                             const info = api.page.info();
                             
-                            // Verificar se info existe e tem as propriedades necessárias
-                            if (info && typeof info.recordsTotal !== 'undefined' && typeof info.recordsFiltered !== 'undefined') {
+                            // Para client-side, usar dados da própria API
+                            if (info) {
+                                const totalRecords = api.data().length;
+                                const filteredRecords = api.rows({ search: 'applied' }).count();
+                                
                                 $('#evidenciasInfo').html(
                                     `<strong>Tabela:</strong> ${nomeTabela} | ` +
-                                    `<strong>Registros:</strong> ${info.recordsTotal.toLocaleString('pt-BR')} | ` +
+                                    `<strong>Registros:</strong> ${totalRecords.toLocaleString('pt-BR')} | ` +
                                     `<strong>Colunas:</strong> ${colunas.length} | ` +
-                                    `<strong>Filtrados:</strong> ${info.recordsFiltered.toLocaleString('pt-BR')}`
-                                );
-                            } else {
-                                $('#evidenciasInfo').html(
-                                    `<strong>Tabela:</strong> ${nomeTabela} | ` +
-                                    `<strong>Colunas:</strong> ${colunas.length} | ` +
-                                    `<strong>Status:</strong> Carregando...`
+                                    `<strong>Filtrados:</strong> ${filteredRecords.toLocaleString('pt-BR')}`
                                 );
                             }
                         } catch (error) {
@@ -1318,15 +1303,18 @@
                     },
                     
                     initComplete: function(settings, json) {
-                        console.log('DataTable inicializado com sucesso');
+                      
                         if (json && json.error) {
                             mostrarErroEvidencias(json.error);
                         } else {
-                            // Forçar ajuste de colunas e habilitar rolagem horizontal
+                            // Forçar ajuste de colunas
                             setTimeout(() => {
                                 this.api().columns.adjust();
-                                // Garantir que o scrollX está funcionando
                                 $('.dataTables_scrollBody').css('overflow-x', 'auto');
+                                
+                                // Mostrar total de registros carregados
+                                const totalRecords = this.api().data().length;
+                                
                             }, 200);
                         }
                     }
@@ -1358,12 +1346,11 @@
             e.preventDefault();
             e.stopPropagation();
             
-            console.log('Card clicado!'); // Debug
+         
             
             const nomeTabela = $(this).data('tabela');
             const titulo = $(this).data('titulo');
-            
-            console.log('Tabela:', nomeTabela, 'Título:', titulo); // Debug
+          
             
             if (nomeTabela) {
                 // Chamar a função global
@@ -1379,21 +1366,11 @@
             }
         });
 
-        // Event listener de debug para TODOS os cards current
-        $(document).on('click', '.period-card.current', function(e) {
-            console.log('=== DEBUG CARD CLICK ===');
-            console.log('Card current clicado');
-            console.log('Tem classe evidencias-clickable:', $(this).hasClass('evidencias-clickable'));
-            console.log('Classes do elemento:', $(this).attr('class'));
-            console.log('Data tabela:', $(this).data('tabela'));
-            console.log('Data título:', $(this).data('titulo'));
-            console.log('HTML do card:', $(this).prop('outerHTML').substring(0, 200) + '...');
-            console.log('========================');
-        });
+       
 
         // Limpar modal quando fechar - versão mais robusta
         $('#modalEvidencias').on('hidden.bs.modal', function() {
-            console.log('Modal fechado - limpando DataTable');
+           
             
             // Remover event listeners
             $(window).off('resize.evidencias');
@@ -1423,22 +1400,10 @@
         setTimeout(function() {
             const cardsClicaveis = $('.period-card.evidencias-clickable');
             const cardsTotal = $('.period-card.current');
-            console.log('=== DEBUG INICIAL ===');
-            console.log('Total de cards current:', cardsTotal.length);
-            console.log('Total de cards clicáveis encontrados:', cardsClicaveis.length);
-            
-            // Verificar se as tabelas de evidências foram carregadas
-            console.log('Verificando se objEvidencias existe:', typeof objEvidencias !== 'undefined');
-            
+
             // Mostrar informações de cada card
             cardsTotal.each(function(index) {
                 const $card = $(this);
-                console.log('Card ' + (index + 1) + ':', {
-                    tabela: $card.data('tabela'),
-                    titulo: $card.data('titulo'),
-                    classes: $card.attr('class'),
-                    temDados: $card.closest('.performance-card').find('.period-value').text().trim() !== '0'
-                });
             });
             
             console.log('====================');
