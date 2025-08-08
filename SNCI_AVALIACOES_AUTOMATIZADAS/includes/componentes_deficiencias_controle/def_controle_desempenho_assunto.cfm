@@ -36,18 +36,18 @@
     <cfset tabelasEvidencias = objEvidencias.listarTabelasEvidencias()>
     
     <!--- Debug: mostrar resultado imediatamente --->
-    <cflog file="evidencias_debug" text="Página principal: objEvidencias criado com sucesso">
-    <cflog file="evidencias_debug" text="Página principal: tabelasEvidencias retornou #arrayLen(tabelasEvidencias)# tabelas">
+    <cflog file="aa_evidencias_debug" text="Página principal: objEvidencias criado com sucesso">
+    <cflog file="aa_evidencias_debug" text="Página principal: tabelasEvidencias retornou #arrayLen(tabelasEvidencias)# tabelas">
     
     <!--- REMOVER a criação de tabelas fictícias - usar apenas as reais --->
     <cfloop from="1" to="#arrayLen(tabelasEvidencias)#" index="i">
-        <cflog file="evidencias_debug" text="Tabela #i#: #tabelasEvidencias[i].nome# (código: #tabelasEvidencias[i].codigo#)">
+        <cflog file="aa_evidencias_debug" text="Tabela #i#: #tabelasEvidencias[i].nome# (código: #tabelasEvidencias[i].codigo#)">
     </cfloop>
     
     <cfcatch type="any">
         <cfset tabelasEvidencias = arrayNew(1)>
-        <cflog file="evidencias_erro" text="Erro ao carregar tabelas de evidências: #cfcatch.message#">
-        <cflog file="evidencias_debug" text="ERRO na página principal: #cfcatch.message#">
+        <cflog file="aa_evidencias_erro" text="Erro ao carregar tabelas de evidências: #cfcatch.message#">
+        <cflog file="aa_evidencias_debug" text="ERRO na página principal: #cfcatch.message#">
     </cfcatch>
 </cftry>
 
@@ -112,7 +112,7 @@
     </cfif>
     
     <cfcatch type="any">
-        <cflog file="evidencias_erro" text="Erro ao obter maior mês disponível: #cfcatch.message#">
+        <cflog file="aa_evidencias_erro" text="Erro ao obter maior mês disponível: #cfcatch.message#">
         <cfset maiorMesDisponivel = "">
     </cfcatch>
 </cftry>
@@ -827,7 +827,9 @@
                                         "<cfoutput>
                                             <strong>Descrição:</strong> #HTMLEditFormat(item.descricao)#<br>
                                             <strong>Fonte de dados:</strong> #HTMLEditFormat(item.fonte_dados)#<br>
-                                            <strong>Critério:</strong> #HTMLEditFormat(item.criterio)#
+                                            <strong>Critério:</strong> #HTMLEditFormat(item.criterio)#<br>
+                                            <strong>Proposta de Melhoria:</strong> #HTMLEditFormat(item.propostaMelhoria)#<br>
+                                            <strong>Critérios de Referência Normativa:</strong> #HTMLEditFormat(item.criteriosReferenciaNormativa)#
                                         </cfoutput>">
                                     </i>
                                 </h3> 
@@ -1230,7 +1232,7 @@
                     buttons: [{
 								extend: 'excelHtml5',
 								text: '<i class="fas fa-file-excel fa-2x" ></i>',
-								title : "Evidencias_" + d,
+								title : "aa_evidencias_" + d,
 								className: 'btExcel'
                             }
 						],

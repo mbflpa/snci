@@ -39,7 +39,7 @@
     
     <cfcatch type="any">
         <cfset local.resultado.error = "Erro ao carregar dados: " & cfcatch.message>
-        <cflog file="evidencias_erro" text="Erro na API: #cfcatch.message# - #cfcatch.detail#">
+        <cflog file="aa_evidencias_erro" text="Erro na API: #cfcatch.message# - #cfcatch.detail#">
     </cfcatch>
 </cftry>
 

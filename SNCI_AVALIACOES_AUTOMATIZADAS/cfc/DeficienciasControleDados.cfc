@@ -41,7 +41,7 @@
                                 END
                             ) AS valorEnvolvido
                         ,SUM(CASE WHEN sigla_apontamento = 'N' THEN nr_reincidente ELSE 0 END) AS reincidencia
-                FROM fato_verificacao f
+                FROM aa_fato_verificacao f
                 WHERE f.sk_mcu = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.sk_mcu#">
                      AND sk_grupo_item <> 12 AND f.sigla_apontamento <> 'E'
                 <cfif len(trim(arguments.mesAnoFiltro))>
@@ -67,7 +67,7 @@
                                     END
                                 ) AS valorEnvolvido
                             ,SUM(CASE WHEN sigla_apontamento = 'N' THEN nr_reincidente ELSE 0 END) AS reincidencia
-                    FROM fato_verificacao f
+                    FROM aa_fato_verificacao f
                     WHERE f.sk_mcu = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.sk_mcu#">
                         AND f.data_encerramento <= <cfqueryparam cfsqltype="cf_sql_date" value="#fimMes#">
                         AND F.sk_grupo_item <> 12 AND f.sigla_apontamento <> 'E'
@@ -83,7 +83,7 @@
                     SELECT '<cfoutput>#arguments.mesAnoFiltro#</cfoutput>' AS mes_ano
                 <cfelse>
                     SELECT TOP 2 FORMAT(data_encerramento, 'yyyy-MM') AS mes_ano
-                    FROM fato_verificacao
+                    FROM aa_fato_verificacao
                     WHERE data_encerramento IS NOT NULL
                       AND sk_mcu = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.sk_mcu#">
                       AND sk_grupo_item <> 12 and sigla_apontamento <> 'E'
@@ -102,6 +102,8 @@
                         p.DESCRIÇÃO AS descricao,
                         p.fonte_dados,
                         p.criterio,
+                        p.PROPOSTA_DE_MELHORIA as propostaMelhoria,
+                        p.CRITÉRIOS_REFERÊNCIA_NORMATIVA as criteriosReferenciaNormativa,
                         CASE WHEN f.sigla_apontamento = 'N' THEN f.nr_reincidente ELSE 0 END as reincidencia,
                         SUM(
                             COALESCE(f.valor_falta, 0) + 
@@ -113,8 +115,8 @@
                          ) AS valorEnvolvido,
                         FORMAT(f.data_encerramento, 'yyyy-MM') AS mes_ano,
                         SUM(COALESCE(f.NC_Eventos, 0)) AS total_eventos
-                    FROM fato_verificacao f
-                    INNER JOIN dim_teste_processos p ON f.sk_grupo_item = p.sk_grupo_item
+                    FROM aa_fato_verificacao f
+                    INNER JOIN aa_dim_teste_processos p ON f.sk_grupo_item = p.sk_grupo_item
                     WHERE f.sk_mcu = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.sk_mcu#">
                       AND f.sigla_apontamento IN ('C', 'N') 
                       AND (
@@ -124,14 +126,14 @@
                         (f.data_encerramento BETWEEN <cfqueryparam cfsqltype="cf_sql_date" value="#inicioMesAnterior#">
                                                  AND <cfqueryparam cfsqltype="cf_sql_date" value="#fimMesAnterior#">)
                       )
-                    GROUP BY p.MANCHETE, p.sk_grupo_item, p.TESTE, p.DESCRIÇÃO, p.fonte_dados, p.criterio,
+                    GROUP BY p.MANCHETE, p.sk_grupo_item, p.TESTE, p.DESCRIÇÃO, p.fonte_dados, p.criterio, p.PROPOSTA_DE_MELHORIA, p.CRITÉRIOS_REFERÊNCIA_NORMATIVA,
                              CASE WHEN f.sigla_apontamento = 'N' THEN f.nr_reincidente ELSE 0 END,
                              FORMAT(f.data_encerramento, 'yyyy-MM')
                     ORDER BY mes_ano DESC, p.MANCHETE
                 <cfelse>
                     WITH UltimosMeses AS (
                         SELECT TOP 2 FORMAT(data_encerramento, 'yyyy-MM') AS mes_ano
-                        FROM fato_verificacao
+                        FROM aa_fato_verificacao
                         WHERE data_encerramento IS NOT NULL
                           AND sk_mcu = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.sk_mcu#">
                           AND sk_grupo_item <> 12
@@ -145,6 +147,8 @@
                         p.DESCRIÇÃO AS descricao,
                         p.fonte_dados,
                         p.criterio,
+                        p.PROPOSTA_DE_MELHORIA as propostaMelhoria,
+                        p.CRITÉRIOS_REFERÊNCIA_NORMATIVA as criteriosReferenciaNormativa,
                         CASE WHEN f.sigla_apontamento = 'N' THEN f.nr_reincidente ELSE 0 END as reincidencia,
                         SUM(
                             COALESCE(f.valor_falta, 0) + 
@@ -156,12 +160,12 @@
                          ) AS valorEnvolvido,
                         FORMAT(f.data_encerramento, 'yyyy-MM') AS mes_ano,
                         SUM(COALESCE(f.NC_Eventos, 0)) AS total_eventos
-                    FROM fato_verificacao f
-                    INNER JOIN dim_teste_processos p ON f.sk_grupo_item = p.sk_grupo_item
+                    FROM aa_fato_verificacao f
+                    INNER JOIN aa_dim_teste_processos p ON f.sk_grupo_item = p.sk_grupo_item
                     WHERE f.sk_mcu = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.sk_mcu#">
                       AND f.sigla_apontamento IN ('C', 'N') 
                       AND FORMAT(f.data_encerramento, 'yyyy-MM') IN (SELECT mes_ano FROM UltimosMeses)
-                    GROUP BY p.MANCHETE, p.sk_grupo_item, p.TESTE, p.DESCRIÇÃO, p.fonte_dados, p.criterio,
+                    GROUP BY p.MANCHETE, p.sk_grupo_item, p.TESTE, p.DESCRIÇÃO, p.fonte_dados, p.criterio, p.PROPOSTA_DE_MELHORIA, p.CRITÉRIOS_REFERÊNCIA_NORMATIVA,
                              CASE WHEN f.sigla_apontamento = 'N' THEN f.nr_reincidente ELSE 0 END,
                              FORMAT(f.data_encerramento, 'yyyy-MM')
                     ORDER BY mes_ano DESC, p.MANCHETE
@@ -286,6 +290,8 @@
                 <cfset dadosAssunto[chave].descricao = descricao>
                 <cfset dadosAssunto[chave].fonte_dados = fonte_dados>
                 <cfset dadosAssunto[chave].criterio = criterio>
+                <cfset dadosAssunto[chave].propostaMelhoria = propostaMelhoria>
+                <cfset dadosAssunto[chave].criteriosReferenciaNormativa = criteriosReferenciaNormativa>
             </cfif>
             <cfif mes_ano EQ mesAnteriorId>
                 <cfset dadosAssunto[chave].anterior = total_eventos>
@@ -570,7 +576,7 @@
                 SELECT TOP 1 
                     YEAR(data_encerramento) AS ano_mais_recente,
                     MONTH(data_encerramento) AS mes_mais_recente
-                FROM fato_verificacao
+                FROM aa_fato_verificacao
                 WHERE data_encerramento IS NOT NULL             
                   AND sk_grupo_item <> 12
                 ORDER BY data_encerramento DESC

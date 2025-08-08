@@ -1,10 +1,10 @@
 <cfcomponent displayname="EvidenciasManager" hint="Gerencia dados de tabelas de evidências">
 
-    <cffunction name="listarTabelasEvidencias" access="public" returntype="array" hint="Lista todas as tabelas que contêm 'evidencias_' no nome">
+    <cffunction name="listarTabelasEvidencias" access="public" returntype="array" hint="Lista todas as tabelas que contêm 'aa_evidencias_' no nome">
         <cfset var local = {}>
         <cfset local.tabelas = arrayNew(1)>
         
-        <cflog file="evidencias_debug" text="=== INICIANDO listarTabelasEvidencias ===">
+        <cflog file="aa_evidencias_debug" text="=== INICIANDO listarTabelasEvidencias ===">
         
         <cftry>
             <cfquery name="local.qryTabelas" datasource="#application.dsn_avaliacoes_automatizadas#">
@@ -13,12 +13,12 @@
                     TABLE_SCHEMA
                 FROM INFORMATION_SCHEMA.TABLES 
                 WHERE TABLE_TYPE = 'BASE TABLE'
-                    AND LOWER(TABLE_NAME) LIKE 'evidencias_%'
+                    AND LOWER(TABLE_NAME) LIKE 'aa_evidencias_%'
                     AND TABLE_SCHEMA = 'dbo'
                 ORDER BY TABLE_NAME
             </cfquery>
             
-            <cflog file="evidencias_debug" text="Query executada. Tabelas encontradas: #local.qryTabelas.recordCount#">
+            <cflog file="aa_evidencias_debug" text="Query executada. Tabelas encontradas: #local.qryTabelas.recordCount#">
             
             <cfloop query="local.qryTabelas">
                 <cfset local.tabela = {
@@ -28,20 +28,20 @@
                     "titulo" = "Evidências " & extrairCodigoAssunto(TABLE_NAME)
                 }>
                 <cfset arrayAppend(local.tabelas, local.tabela)>
-                <cflog file="evidencias_debug" text="Tabela adicionada: #TABLE_NAME# -> código: #local.tabela.codigo#">
+                <cflog file="aa_evidencias_debug" text="Tabela adicionada: #TABLE_NAME# -> código: #local.tabela.codigo#">
             </cfloop>
             
-            <cflog file="evidencias_debug" text="Total de tabelas processadas: #arrayLen(local.tabelas)#">
+            <cflog file="aa_evidencias_debug" text="Total de tabelas processadas: #arrayLen(local.tabelas)#">
             
             <cfcatch type="any">
-                <cflog file="evidencias_erro" text="Erro ao listar tabelas: #cfcatch.message# - #cfcatch.detail#">
-                <cflog file="evidencias_debug" text="ERRO em listarTabelasEvidencias: #cfcatch.message#">
+                <cflog file="aa_evidencias_erro" text="Erro ao listar tabelas: #cfcatch.message# - #cfcatch.detail#">
+                <cflog file="aa_evidencias_debug" text="ERRO em listarTabelasEvidencias: #cfcatch.message#">
                 <!--- Retornar array vazio em caso de erro --->
                 <cfset local.tabelas = arrayNew(1)>
             </cfcatch>
         </cftry>
         
-        <cflog file="evidencias_debug" text="=== FIM listarTabelasEvidencias - retornando #arrayLen(local.tabelas)# tabelas ===">
+        <cflog file="aa_evidencias_debug" text="=== FIM listarTabelasEvidencias - retornando #arrayLen(local.tabelas)# tabelas ===">
         
         <cfreturn local.tabelas>
     </cffunction>
@@ -52,9 +52,9 @@
         <cfset var codigo = "">
         
         <cftry>
-            <!--- Remove o prefixo "evidencias_" e converte underscores para pontos --->
-            <cfif lcase(arguments.nomeTabela) CONTAINS "evidencias_">
-                <cfset codigo = replace(lcase(arguments.nomeTabela), "evidencias_", "", "one")>
+            <!--- Remove o prefixo "aa_evidencias_" e converte underscores para pontos --->
+            <cfif lcase(arguments.nomeTabela) CONTAINS "aa_evidencias_">
+                <cfset codigo = replace(lcase(arguments.nomeTabela), "aa_evidencias_", "", "one")>
                 <cfset codigo = replace(codigo, "_", ".", "all")>
             </cfif>
             
@@ -74,10 +74,10 @@
         <cftry>
             <!--- Converte pontos e hífens para underscores e adiciona o prefixo --->
             <cfset var codigoLimpo = replace(replace(trim(arguments.codigoAssunto), ".", "_", "all"), "-", "_", "all")>
-            <cfset nomeTabela = "evidencias_" & lcase(codigoLimpo)>
+            <cfset nomeTabela = "aa_evidencias_" & lcase(codigoLimpo)>
             
             <cfcatch type="any">
-                <cfset nomeTabela = "evidencias_" & lcase(arguments.codigoAssunto)>
+                <cfset nomeTabela = "aa_evidencias_" & lcase(arguments.codigoAssunto)>
             </cfcatch>
         </cftry>
         
@@ -91,25 +91,25 @@
         <cfset var nomeEncontrado = "">
         
         <cftry>
-            <cflog file="evidencias_debug" text="Buscando tabela para código: '#arguments.codigoTeste#'">
-            <cflog file="evidencias_debug" text="Total de tabelas disponíveis: #arrayLen(arguments.tabelasDisponiveis)#">
+            <cflog file="aa_evidencias_debug" text="Buscando tabela para código: '#arguments.codigoTeste#'">
+            <cflog file="aa_evidencias_debug" text="Total de tabelas disponíveis: #arrayLen(arguments.tabelasDisponiveis)#">
             
             <!--- Primeiro: tentar match direto --->
             <cfset var nomeEsperado = gerarNomeTabela(arguments.codigoTeste)>
-            <cflog file="evidencias_debug" text="Nome esperado gerado: '#nomeEsperado#'">
+            <cflog file="aa_evidencias_debug" text="Nome esperado gerado: '#nomeEsperado#'">
             
             <cfloop array="#arguments.tabelasDisponiveis#" index="tabela">
-                <cflog file="evidencias_debug" text="Comparando com tabela: '#tabela.nome#' (código: '#tabela.codigo#')">
+                <cflog file="aa_evidencias_debug" text="Comparando com tabela: '#tabela.nome#' (código: '#tabela.codigo#')">
                 <cfif lcase(tabela.nome) EQ lcase(nomeEsperado)>
                     <cfset nomeEncontrado = tabela.nome>
-                    <cflog file="evidencias_debug" text="MATCH DIRETO encontrado: '#nomeEncontrado#'">
+                    <cflog file="aa_evidencias_debug" text="MATCH DIRETO encontrado: '#nomeEncontrado#'">
                     <cfbreak>
                 </cfif>
             </cfloop>
             
             <!--- Segundo: tentar match por código extraído --->
             <cfif len(trim(nomeEncontrado)) EQ 0>
-                <cflog file="evidencias_debug" text="Tentando match por código extraído...">
+                <cflog file="aa_evidencias_debug" text="Tentando match por código extraído...">
                 <cfloop array="#arguments.tabelasDisponiveis#" index="tabela">
                     <cfif len(trim(tabela.codigo)) AND (
                           lcase(tabela.codigo) EQ lcase(arguments.codigoTeste) OR
@@ -117,7 +117,7 @@
                           findNoCase(tabela.codigo, arguments.codigoTeste)
                         )>
                         <cfset nomeEncontrado = tabela.nome>
-                        <cflog file="evidencias_debug" text="MATCH POR CÓDIGO encontrado: '#nomeEncontrado#' (código: '#tabela.codigo#')">
+                        <cflog file="aa_evidencias_debug" text="MATCH POR CÓDIGO encontrado: '#nomeEncontrado#' (código: '#tabela.codigo#')">
                         <cfbreak>
                     </cfif>
                 </cfloop>
@@ -125,13 +125,13 @@
             
             <!--- Terceiro: tentar match parcial (sem pontos/hífens) --->
             <cfif len(trim(nomeEncontrado)) EQ 0>
-                <cflog file="evidencias_debug" text="Tentando match parcial...">
+                <cflog file="aa_evidencias_debug" text="Tentando match parcial...">
                 <cfset var codigoLimpo = replace(replace(arguments.codigoTeste, ".", "", "all"), "-", "", "all")>
-                <cflog file="evidencias_debug" text="Código teste limpo: '#codigoLimpo#'">
+                <cflog file="aa_evidencias_debug" text="Código teste limpo: '#codigoLimpo#'">
                 
                 <cfloop array="#arguments.tabelasDisponiveis#" index="tabela">
                     <cfset var codigoTabelaLimpo = replace(replace(tabela.codigo, ".", "", "all"), "-", "", "all")>
-                    <cflog file="evidencias_debug" text="Código tabela limpo: '#codigoTabelaLimpo#'">
+                    <cflog file="aa_evidencias_debug" text="Código tabela limpo: '#codigoTabelaLimpo#'">
                     
                     <cfif len(trim(codigoTabelaLimpo)) AND (
                           lcase(codigoTabelaLimpo) EQ lcase(codigoLimpo) OR
@@ -139,7 +139,7 @@
                           findNoCase(codigoTabelaLimpo, codigoLimpo)
                         )>
                         <cfset nomeEncontrado = tabela.nome>
-                        <cflog file="evidencias_debug" text="MATCH PARCIAL encontrado: '#nomeEncontrado#'">
+                        <cflog file="aa_evidencias_debug" text="MATCH PARCIAL encontrado: '#nomeEncontrado#'">
                         <cfbreak>
                     </cfif>
                 </cfloop>
@@ -147,25 +147,25 @@
             
             <!--- Quarto: tentar match mais flexível (contém) --->
             <cfif len(trim(nomeEncontrado)) EQ 0>
-                <cflog file="evidencias_debug" text="Tentando match flexível...">
+                <cflog file="aa_evidencias_debug" text="Tentando match flexível...">
                 <cfloop array="#arguments.tabelasDisponiveis#" index="tabela">
                     <!--- Verificar se alguma parte do código está no nome da tabela --->
                     <cfif findNoCase(arguments.codigoTeste, tabela.nome) OR 
                           findNoCase(replace(arguments.codigoTeste, "-", "_", "all"), tabela.nome) OR
                           findNoCase(replace(arguments.codigoTeste, ".", "_", "all"), tabela.nome)>
                         <cfset nomeEncontrado = tabela.nome>
-                        <cflog file="evidencias_debug" text="MATCH FLEXÍVEL encontrado: '#nomeEncontrado#'">
+                        <cflog file="aa_evidencias_debug" text="MATCH FLEXÍVEL encontrado: '#nomeEncontrado#'">
                         <cfbreak>
                     </cfif>
                 </cfloop>
             </cfif>
             
             <cfif len(trim(nomeEncontrado)) EQ 0>
-                <cflog file="evidencias_debug" text="NENHUM MATCH encontrado para código: '#arguments.codigoTeste#'">
+                <cflog file="aa_evidencias_debug" text="NENHUM MATCH encontrado para código: '#arguments.codigoTeste#'">
             </cfif>
             
             <cfcatch type="any">
-                <cflog file="evidencias_erro" text="Erro na busca por código #arguments.codigoTeste#: #cfcatch.message#">
+                <cflog file="aa_evidencias_erro" text="Erro na busca por código #arguments.codigoTeste#: #cfcatch.message#">
             </cfcatch>
         </cftry>
         
@@ -189,7 +189,7 @@
             <cfreturn local.qryValidacao.recordCount GT 0>
             
             <cfcatch type="any">
-                <cflog file="evidencias_erro" text="Erro na validação da tabela #arguments.nomeTabela#: #cfcatch.message#">
+                <cflog file="aa_evidencias_erro" text="Erro na validação da tabela #arguments.nomeTabela#: #cfcatch.message#">
                 <cfreturn false>
             </cfcatch>
         </cftry>
@@ -201,15 +201,15 @@
         <cfset var local = {}>
         <cfset local.colunas = arrayNew(1)>
         
-        <cflog file="evidencias_debug" text="Iniciando obterEstruturasTabela para: #arguments.nomeTabela#">
+        <cflog file="aa_evidencias_debug" text="Iniciando obterEstruturasTabela para: #arguments.nomeTabela#">
         
         <cfif NOT validarNomeTabela(arguments.nomeTabela)>
-            <cflog file="evidencias_debug" text="Tabela não válida: #arguments.nomeTabela#">
+            <cflog file="aa_evidencias_debug" text="Tabela não válida: #arguments.nomeTabela#">
             <cfreturn local.colunas>
         </cfif>
         
         <cftry>
-            <cflog file="evidencias_debug" text="Consultando colunas da tabela: #arguments.nomeTabela#">
+            <cflog file="aa_evidencias_debug" text="Consultando colunas da tabela: #arguments.nomeTabela#">
             
             <cfquery name="local.qryColunas" datasource="#application.dsn_avaliacoes_automatizadas#">
                 SELECT 
@@ -225,7 +225,7 @@
                 ORDER BY ORDINAL_POSITION
             </cfquery>
             
-            <cflog file="evidencias_debug" text="Query executada. Registros encontrados: #local.qryColunas.recordCount#">
+            <cflog file="aa_evidencias_debug" text="Query executada. Registros encontrados: #local.qryColunas.recordCount#">
             
             <cfloop query="local.qryColunas">
                 <cfset arrayAppend(local.colunas, {
@@ -235,13 +235,13 @@
                     "tamanho" = CHARACTER_MAXIMUM_LENGTH,
                     "posicao" = ORDINAL_POSITION
                 })>
-                <cflog file="evidencias_debug" text="Coluna adicionada: #COLUMN_NAME# (#DATA_TYPE#)">
+                <cflog file="aa_evidencias_debug" text="Coluna adicionada: #COLUMN_NAME# (#DATA_TYPE#)">
             </cfloop>
             
-            <cflog file="evidencias_debug" text="Total de colunas processadas: #arrayLen(local.colunas)#">
+            <cflog file="aa_evidencias_debug" text="Total de colunas processadas: #arrayLen(local.colunas)#">
             
             <cfcatch type="any">
-                <cflog file="evidencias_erro" text="Erro ao obter estrutura da tabela #arguments.nomeTabela#: #cfcatch.message# - #cfcatch.detail#">
+                <cflog file="aa_evidencias_erro" text="Erro ao obter estrutura da tabela #arguments.nomeTabela#: #cfcatch.message# - #cfcatch.detail#">
             </cfcatch>
         </cftry>
         
@@ -266,26 +266,26 @@
             "draw" = val(url.draw ?: 1)
         }>
         
-        <cflog file="evidencias_debug" text="obterDadosTabela chamado para: #arguments.nomeTabela#">
+        <cflog file="aa_evidencias_debug" text="obterDadosTabela chamado para: #arguments.nomeTabela#">
         
         <!--- Verificar se a tabela existe e é válida --->
         <cfif NOT validarNomeTabela(arguments.nomeTabela)>
-            <cflog file="evidencias_debug" text="Tabela não encontrada: #arguments.nomeTabela#">
+            <cflog file="aa_evidencias_debug" text="Tabela não encontrada: #arguments.nomeTabela#">
             <cfset local.resultado.error = "Tabela não encontrada ou não válida: " & arguments.nomeTabela>
             <cfreturn local.resultado>
         </cfif>
         
         <cftry>
             <!--- Obter estrutura das colunas --->
-            <cflog file="evidencias_debug" text="Obtendo estrutura da tabela: #arguments.nomeTabela#">
+            <cflog file="aa_evidencias_debug" text="Obtendo estrutura da tabela: #arguments.nomeTabela#">
             <cfset local.colunas = obterEstruturasTabela(arguments.nomeTabela)>
             <cfset local.resultado.columns = local.colunas>
             
-            <cflog file="evidencias_debug" text="Colunas obtidas: #arrayLen(local.colunas)#">
+            <cflog file="aa_evidencias_debug" text="Colunas obtidas: #arrayLen(local.colunas)#">
             
             <cfif arrayLen(local.colunas) EQ 0>
                 <cfset local.resultado.error = "Nenhuma coluna encontrada para a tabela: " & arguments.nomeTabela>
-                <cflog file="evidencias_debug" text="Nenhuma coluna encontrada para: #arguments.nomeTabela#">
+                <cflog file="aa_evidencias_debug" text="Nenhuma coluna encontrada para: #arguments.nomeTabela#">
                 <cfreturn local.resultado>
             </cfif>
             
@@ -294,7 +294,7 @@
             <cfif structKeyExists(application, "rsUsuarioParametros") AND structKeyExists(application.rsUsuarioParametros, "Und_MCU")>
                 <cfset local.sk_mcu = val(application.rsUsuarioParametros.Und_MCU)>
             </cfif>
-            <cflog file="evidencias_debug" text="MCU da unidade: #local.sk_mcu#">
+            <cflog file="aa_evidencias_debug" text="MCU da unidade: #local.sk_mcu#">
             
             <!--- Construir WHERE clause para filtro por MCU --->
             <cfset local.mcuClause = "">
@@ -310,9 +310,9 @@
                 
                 <cfif local.temColunaMCU>
                     <cfset local.mcuClause = " WHERE sk_mcu = #local.sk_mcu#">
-                    <cflog file="evidencias_debug" text="Aplicando filtro MCU: #local.sk_mcu#">
+                    <cflog file="aa_evidencias_debug" text="Aplicando filtro MCU: #local.sk_mcu#">
                 <cfelse>
-                    <cflog file="evidencias_debug" text="Tabela não possui coluna sk_mcu - sem filtro">
+                    <cflog file="aa_evidencias_debug" text="Tabela não possui coluna sk_mcu - sem filtro">
                 </cfif>
             </cfif>
             
@@ -324,12 +324,12 @@
             </cfquery>
             <cfset local.resultado.recordsTotal = local.qryTotal.total>
             
-            <cflog file="evidencias_debug" text="Total de registros na tabela: #local.qryTotal.total#">
+            <cflog file="aa_evidencias_debug" text="Total de registros na tabela: #local.qryTotal.total#">
             
             <!--- Se não há registros, retornar resultado vazio mas válido --->
             <cfif local.qryTotal.total EQ 0>
                 <cfset local.resultado.recordsFiltered = 0>
-                <cflog file="evidencias_debug" text="Tabela vazia - retornando resultado válido sem dados">
+                <cflog file="aa_evidencias_debug" text="Tabela vazia - retornando resultado válido sem dados">
                 <cfreturn local.resultado>
             </cfif>
             
@@ -393,7 +393,7 @@
                     </cfif>
                 </cfquery>
                 
-                <cflog file="evidencias_debug" text="Query de dados executada. Registros retornados: #local.qryDados.recordCount#">
+                <cflog file="aa_evidencias_debug" text="Query de dados executada. Registros retornados: #local.qryDados.recordCount#">
                 
                 <!--- Converter dados para array --->
                 <cfloop query="local.qryDados">
@@ -419,7 +419,7 @@
                             </cfif>
                             
                             <cfcatch type="any">
-                                <cflog file="evidencias_erro" text="Erro ao acessar coluna #local.nomeColuna#: #cfcatch.message#">
+                                <cflog file="aa_evidencias_erro" text="Erro ao acessar coluna #local.nomeColuna#: #cfcatch.message#">
                                 <cfset local.valor = "Erro">
                             </cfcatch>
                         </cftry>
@@ -430,10 +430,10 @@
                 </cfloop>
             </cfif>
             
-            <cflog file="evidencias_debug" text="Processamento concluído. Linhas de dados: #arrayLen(local.resultado.data)#">
+            <cflog file="aa_evidencias_debug" text="Processamento concluído. Linhas de dados: #arrayLen(local.resultado.data)#">
             
             <cfcatch type="any">
-                <cflog file="evidencias_erro" text="Erro ao obter dados da tabela #arguments.nomeTabela#: #cfcatch.message# - #cfcatch.detail#">
+                <cflog file="aa_evidencias_erro" text="Erro ao obter dados da tabela #arguments.nomeTabela#: #cfcatch.message# - #cfcatch.detail#">
                 <cfset local.resultado.error = "Erro ao consultar dados: " & cfcatch.message>
             </cfcatch>
         </cftry>
@@ -452,26 +452,26 @@
             "columns" = arrayNew(1)
         }>
         
-        <cflog file="evidencias_debug" text="obterDadosTabela chamado para: #arguments.nomeTabela# (client-side mode)">
+        <cflog file="aa_evidencias_debug" text="obterDadosTabela chamado para: #arguments.nomeTabela# (client-side mode)">
         
         <!--- Verificar se a tabela existe e é válida --->
         <cfif NOT validarNomeTabela(arguments.nomeTabela)>
-            <cflog file="evidencias_debug" text="Tabela não encontrada: #arguments.nomeTabela#">
+            <cflog file="aa_evidencias_debug" text="Tabela não encontrada: #arguments.nomeTabela#">
             <cfset local.resultado.error = "Tabela não encontrada ou não válida: " & arguments.nomeTabela>
             <cfreturn local.resultado>
         </cfif>
         
         <cftry>
             <!--- Obter estrutura das colunas --->
-            <cflog file="evidencias_debug" text="Obtendo estrutura da tabela: #arguments.nomeTabela#">
+            <cflog file="aa_evidencias_debug" text="Obtendo estrutura da tabela: #arguments.nomeTabela#">
             <cfset local.colunas = obterEstruturasTabela(arguments.nomeTabela)>
             <cfset local.resultado.columns = local.colunas>
             
-            <cflog file="evidencias_debug" text="Colunas obtidas: #arrayLen(local.colunas)#">
+            <cflog file="aa_evidencias_debug" text="Colunas obtidas: #arrayLen(local.colunas)#">
             
             <cfif arrayLen(local.colunas) EQ 0>
                 <cfset local.resultado.error = "Nenhuma coluna encontrada para a tabela: " & arguments.nomeTabela>
-                <cflog file="evidencias_debug" text="Nenhuma coluna encontrada para: #arguments.nomeTabela#">
+                <cflog file="aa_evidencias_debug" text="Nenhuma coluna encontrada para: #arguments.nomeTabela#">
                 <cfreturn local.resultado>
             </cfif>
             
@@ -480,7 +480,7 @@
             <cfif structKeyExists(application, "rsUsuarioParametros") AND structKeyExists(application.rsUsuarioParametros, "Und_MCU")>
                 <cfset local.sk_mcu = val(application.rsUsuarioParametros.Und_MCU)>
             </cfif>
-            <cflog file="evidencias_debug" text="MCU da unidade: #local.sk_mcu#">
+            <cflog file="aa_evidencias_debug" text="MCU da unidade: #local.sk_mcu#">
             
             <!--- Construir WHERE clause para filtro por MCU --->
             <cfset local.mcuClause = "">
@@ -496,9 +496,9 @@
                 
                 <cfif local.temColunaMCU>
                     <cfset local.mcuClause = " WHERE sk_mcu = #local.sk_mcu#">
-                    <cflog file="evidencias_debug" text="Aplicando filtro MCU: #local.sk_mcu#">
+                    <cflog file="aa_evidencias_debug" text="Aplicando filtro MCU: #local.sk_mcu#">
                 <cfelse>
-                    <cflog file="evidencias_debug" text="Tabela não possui coluna sk_mcu - sem filtro">
+                    <cflog file="aa_evidencias_debug" text="Tabela não possui coluna sk_mcu - sem filtro">
                 </cfif>
             </cfif>
             
@@ -522,7 +522,7 @@
                 #PreserveSingleQuotes(local.orderClause)#
             </cfquery>
             
-            <cflog file="evidencias_debug" text="Query de dados executada. Registros retornados: #local.qryDados.recordCount#">
+            <cflog file="aa_evidencias_debug" text="Query de dados executada. Registros retornados: #local.qryDados.recordCount#">
             
             <!--- Definir totais baseados nos dados retornados --->
             <cfset local.resultado.recordsTotal = local.qryDados.recordCount>
@@ -552,7 +552,7 @@
                         </cfif>
                         
                         <cfcatch type="any">
-                            <cflog file="evidencias_erro" text="Erro ao acessar coluna #local.nomeColuna#: #cfcatch.message#">
+                            <cflog file="aa_evidencias_erro" text="Erro ao acessar coluna #local.nomeColuna#: #cfcatch.message#">
                             <cfset local.valor = "Erro">
                         </cfcatch>
                     </cftry>
@@ -562,10 +562,10 @@
                 <cfset arrayAppend(local.resultado.data, local.linha)>
             </cfloop>
             
-            <cflog file="evidencias_debug" text="Processamento concluído. Total de linhas: #arrayLen(local.resultado.data)#">
+            <cflog file="aa_evidencias_debug" text="Processamento concluído. Total de linhas: #arrayLen(local.resultado.data)#">
             
             <cfcatch type="any">
-                <cflog file="evidencias_erro" text="Erro ao obter dados da tabela #arguments.nomeTabela#: #cfcatch.message# - #cfcatch.detail#">
+                <cflog file="aa_evidencias_erro" text="Erro ao obter dados da tabela #arguments.nomeTabela#: #cfcatch.message# - #cfcatch.detail#">
                 <cfset local.resultado.error = "Erro ao consultar dados: " & cfcatch.message>
             </cfcatch>
         </cftry>
