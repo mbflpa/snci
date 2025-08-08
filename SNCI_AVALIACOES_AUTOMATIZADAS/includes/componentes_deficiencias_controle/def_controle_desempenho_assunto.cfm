@@ -1218,17 +1218,14 @@
                     
                     // Configurações de layout e responsividade
                    dom: '<"row align-items-center"' +
-        '<"col-md-12 d-flex justify-content-between flex-wrap"' +
-            '<"me-auto"l>' +
-            '<"mx-auto"f>' +
-            '<"ms-auto me-2"B>' +   // 👈 margem à direita aqui
-        '>' +
-     '>' +
-     '<"row"<"col-sm-12"tr>>' +
-     '<"row"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>',
-
-
-
+                            '<"col-md-12 d-flex justify-content-between flex-wrap"' +
+                                '<"me-auto"l>' +
+                                '<"mx-auto"f>' +
+                                '<"ms-auto me-2"B>' +   
+                            '>' +
+                        '>' +
+                        '<"row"<"col-sm-12"tr>>' +
+                        '<"row"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>',
                     buttons: [{
 								extend: 'excelHtml5',
 								text: '<i class="fas fa-file-excel fa-2x" ></i>',

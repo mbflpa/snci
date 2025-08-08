@@ -50,7 +50,7 @@
         { href = "index.cfm", icon = "fas fa-home", text = "Principal" },
         { href = "aa_deficiencias_controle.cfm", icon = "fas fa-bug", text = "Deficiências de Controle" },
         { href = "teste.cfm", icon = "fas fa-shield-alt", text = "Vulnerabilidades" },
-        { href = "teste.cfm", icon = "fas fa-tasks", text = "Testes Aplicados" },
+        { href = "aa_testes_aplicados.cfm", icon = "fas fa-tasks", text = "Testes Aplicados" },
         { href = "relatorios.cfm", icon = "fas fa-database", text = "Base de Eventos" },
         { href = "orientacoes.cfm", icon = "fas fa-info-circle", text = "Orientações" },
         { href = "historicoAnual.cfm", icon = "fas fa-history", text = "Histórico Anual" }
