@@ -4,7 +4,7 @@
 <div class="modal fade" id="modalEvidencias" tabindex="-1" role="dialog" aria-labelledby="modalEvidenciasLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered" role="document" style="max-width: 95%; width: 95%;">
         <div class="modal-content modern-modal">
-            <div class="modal-header modern-header">
+            <div class="modal-header  card-header_navbar_backgroundColor" style="padding: 0.6rem;">
                 <h5 class="modal-title d-flex align-items-center" id="modalEvidenciasLabel">
                     <i class="fas fa-table mr-2 modern-icon"></i>
                     Evidências
@@ -52,12 +52,6 @@ body {
     overflow: hidden;
 }
 
-/* Cabeçalho moderno */
-#modalEvidencias .modern-header {
-    background: linear-gradient(90deg, #007bff 0%, #0056b3 100%);
-    color: white;
-    border-bottom: 1px solid #dee2e6;
-}
 
 /* Título do modal */
 #modalEvidencias .modal-title {

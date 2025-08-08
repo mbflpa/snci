@@ -877,7 +877,7 @@
                                     <cfif len(trim(item.teste))>
                                         <cfset tabelaEvidencia = objEvidencias.buscarTabelaPorCodigo(item.teste, tabelasEvidencias)>
                                         <cfif len(trim(tabelaEvidencia))>
-                                            <cfset tituloEvidencia = item.titulo & " - Evidências (" & item.teste & ")">
+                                            <cfset tituloEvidencia = "<span style='margin-right: 4px;'>EVIDÊNCIAS: </span>" & item.titulo & " (" & item.teste & ")">
                                         </cfif>
                                         <cfoutput>
                                             <!-- RESULTADO BUSCA POR TESTE "#item.teste#": "#tabelaEvidencia#" -->
@@ -888,19 +888,13 @@
                                     <cfif len(trim(tabelaEvidencia)) EQ 0 AND len(trim(item.chave))>
                                         <cfset tabelaEvidencia = objEvidencias.buscarTabelaPorCodigo(item.chave, tabelasEvidencias)>
                                         <cfif len(trim(tabelaEvidencia))>
-                                            <cfset tituloEvidencia = item.titulo & " - Evidências (" & item.chave & ")">
+                                            <cfset tituloEvidencia = "<strong>Evidências: </strong>" & item.titulo & " (" & item.chave & ")">
                                         </cfif>
                                         <cfoutput>
                                             <!-- RESULTADO BUSCA POR CHAVE "#item.chave#": "#tabelaEvidencia#" -->
                                         </cfoutput>
                                     </cfif>
-                                    
-                                    <!--- Debug: resultado final --->
-                                    <cfoutput>
-                                        <!-- RESULTADO FINAL: tabelaEvidencia = "#tabelaEvidencia#" -->
-                                        <!-- len(trim(tabelaEvidencia)) = "#len(trim(tabelaEvidencia))#" -->
-                                        <!-- Será clicável: #(len(trim(tabelaEvidencia)) GT 0 ? "SIM" : "NÃO")# -->
-                                    </cfoutput>
+                                                                       
                                     
                                     <div class="period-card current<cfif len(trim(tabelaEvidencia)) AND item.atual GT 0 AND mesAtualEhMaiorDisponivel> evidencias-clickable</cfif>" 
                                          <cfif len(trim(tabelaEvidencia)) AND item.atual GT 0 AND mesAtualEhMaiorDisponivel>
@@ -1411,4 +1405,4 @@
 </script>
 
 <!--- Incluir modal primeiro --->
-<cfinclude template="../modal_evidencias.cfm">
+<cfinclude template="../aa_modal_evidencias.cfm">
