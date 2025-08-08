@@ -4017,19 +4017,18 @@
 									</div>
 
 									<cfquery name="rs_OrgAvaliado" datasource="#application.dsn_processos#">
-										SELECT pc_orgaos.*
+										SELECT 1 as ordem_prioridade, pc_orgaos.*
 										FROM pc_orgaos
 										WHERE pc_org_controle_interno ='N' AND (pc_org_Status = 'A') and (pc_org_mcu_subord_tec = '#arguments.numOrgaoAvaliado#' or pc_org_mcu = '#arguments.numOrgaoAvaliado#' 
 												or pc_org_mcu_subord_tec in (SELECT pc_orgaos.pc_org_mcu	FROM pc_orgaos WHERE pc_org_controle_interno ='N' AND pc_org_mcu_subord_tec = '#arguments.numOrgaoAvaliado#'))
-				
 										UNION
 
-										SELECT pc_orgaos.*
+										SELECT 2 as ordem_prioridade, pc_orgaos.*
 										FROM pc_orgaos
 										WHERE pc_org_controle_interno ='N' AND (pc_org_Status = 'A') and (pc_org_mcu_subord_tec IN('#application.listaDiretorias#') or pc_org_mcu IN('#application.listaDiretorias#') 
 												or pc_org_mcu_subord_tec in (SELECT pc_orgaos.pc_org_mcu	FROM pc_orgaos WHERE pc_org_controle_interno ='N' AND pc_org_mcu_subord_tec in (#application.listaDiretorias#)))
-				
-										ORDER BY pc_org_sigla
+
+										ORDER BY ordem_prioridade, pc_org_sigla
 
 									</cfquery>
 									
