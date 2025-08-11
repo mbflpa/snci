@@ -259,6 +259,7 @@
         width: 100%;
         margin: 0;
         padding: 0;
+        margin-bottom: 30px;
     }
 
     .snci-desempenho-assunto .desempenho-container {

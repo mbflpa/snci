@@ -147,7 +147,7 @@
     .snci-resumo-geral .kpi-row {
         display: flex;
         flex-direction: row;
-
+        gap: 5px;
         justify-content: center;
         align-items: stretch;
         flex-wrap: wrap;
@@ -155,7 +155,7 @@
 
     .snci-resumo-geral .kpi-card {
         background: #fff;
-        padding: 12px 16px;
+        padding: 10px 10px;
         border-radius: 12px;
         box-shadow: 0 4px 8px rgba(0,0,0,0.05);
         display: flex;
