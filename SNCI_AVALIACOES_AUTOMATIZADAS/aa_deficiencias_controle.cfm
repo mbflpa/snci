@@ -90,7 +90,7 @@
 
 	<div class="wrapper">
  
-        <cfinclude template="includes/teste.cfm">
+        <cfinclude template="includes/aa_sidebar.cfm">
         
         <div class="content-wrapper">
             <section class="content">
