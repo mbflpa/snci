@@ -368,7 +368,7 @@
     <script  src="../SNCI_AVALIACOES_AUTOMATIZADAS/plugins/toastr/toastr.min.js"></script>
 
     <!-- Popper -->
-    <script  src="../SNCI_AVALIACOES_AUTOMATIZADAS/plugins/popper/popper.min.js"></script>
+    <script  src="../SNCI_AVALIACOES_AUTOMATIZADAS/plugins/popper/umd/popper.min.js"></script>
 
     <!-- DataTables  & Plugins -->
     <script  src="../SNCI_AVALIACOES_AUTOMATIZADAS/plugins/datatables/datatables.min.js"></script>
