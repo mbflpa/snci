@@ -24,7 +24,7 @@
                 
                 <div id="evidenciasContent" style="display: none;" class="p-3">
                     <div class="table-container" style="width: 100%; overflow: hidden;">
-                        <table id="tabelaEvidencias" class="table table-striped table-bordered table-hover compact nowrap" style="width: 100%;">
+                        <table id="tabelaEvidencias" class="table table-striped table-hover text-nowrap  table-responsive table-responsive" style="width: 100%;">
                             <!-- Estrutura será criada dinamicamente pelo JavaScript -->
                         </table>
                     </div>

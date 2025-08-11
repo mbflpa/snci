@@ -1059,7 +1059,7 @@
             $('#tabelaEvidencias').remove();
             
             // Recriar elemento da tabela do zero
-            const novaTabela = '<table id="tabelaEvidencias" class="table table-striped table-bordered table-hover compact nowrap" style="width: 100%;"></table>';
+            const novaTabela = '<table id="tabelaEvidencias" class="table table-striped table-hover text-nowrap  table-responsive table-responsive" style="width: 100%;"></table>';
             $('.table-container').html(novaTabela);
             
             try {
@@ -1234,21 +1234,14 @@
 								className: 'btExcel'
                             }
 						],
-                    // Habilitar rolagem horizontal e vertical
-                    scrollX: true,
-                    scrollY: '50vh',
-                    scrollCollapse: true,
-                    
+                  
                     // Habilitar autoWidth para permitir larguras automáticas
                     autoWidth: true,
                     
                     // Configurações de exibição
                     pageLength: 10,
                     lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "Todos"]],
-                    
-                    // Classes CSS para estilo compacto
-                    className: 'compact',
-                    
+                  
                     // Configurar ordenação padrão
                     order: [[0, 'asc']],
                     
@@ -1381,7 +1374,7 @@
             
             // Limpar completamente o container
             $('#tabelaEvidencias').remove();
-            $('.table-container').html('<table id="tabelaEvidencias" class="table table-striped table-bordered table-hover compact nowrap" style="width: 100%;"></table>');
+            $('.table-container').html('<table id="tabelaEvidencias" class="table table-striped table-hover text-nowrap  table-responsive table-responsive" style="width: 100%;"></table>');
             $('#evidenciasInfo').empty();
             
             // Reset do estado do modal
