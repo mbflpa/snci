@@ -14,14 +14,10 @@
                 ),
                 cteUnidadeSelecionada AS (
                     SELECT 
-                            CASE 
-                                WHEN tu.TUN_Descricao IN ('CTC (COM GCCAP)', 'CTE (COM GCCAP)', 'CTCE (COM GCCAP)') 
-                                    THEN REPLACE(tu.TUN_Descricao, ' (COM GCCAP)', '')
-                                ELSE tu.TUN_Descricao
-                            END AS TUN_Descricao
-                        FROM Unidades u
-                        INNER JOIN Tipo_Unidades tu 
-                            ON tu.TUN_Codigo = u.Und_TipoUnidade
+                    REPLACE(REPLACE(tu.TUN_Descricao, ' (COM GCCAP)', ''),' (SEM GCCAP)', '') AS TUN_Descricao
+                    FROM Unidades u
+                    INNER JOIN Tipo_Unidades tu 
+                    ON tu.TUN_Codigo = u.Und_TipoUnidade
                     WHERE CAST(u.Und_MCU AS INT) = <cfqueryparam cfsqltype="cf_sql_integer" value="#application.rsUsuarioParametros.Und_MCU#">
                 )
 
