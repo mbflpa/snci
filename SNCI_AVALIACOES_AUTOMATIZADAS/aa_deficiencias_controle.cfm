@@ -70,6 +70,31 @@
             }
         }
 
+         /* Customizar largura dos popovers */
+        .popover {
+            max-width: 400px !important; /* Aumenta de ~276px para 400px */
+            width: auto !important;
+        }
+
+        /* Para popovers muito grandes */
+        .popover-large {
+            max-width: 500px !important;
+            width: auto !important;
+        }
+
+        /* Melhorar formatação do conteúdo do popover */
+        .popover-body {
+            font-size: 0.85rem;
+            line-height: 1.4;
+            padding: 12px 14px;
+            word-wrap: break-word;
+        }
+
+        /* Ajustar largura da seta do popover */
+        .popover .arrow::before {
+            border-width: 0.5rem;
+        }
+
     </style>
 </head>
 <body class="hold-transition layout-fixed layout-navbar-fixed layout-footer-fixed" data-panel-auto-height-mode="height" >
