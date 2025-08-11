@@ -95,7 +95,7 @@
                         <div>
                         <h5 class="mb-1 font-weight-bold" style="color: #0c5460;">Interpretação Simplificada</h5>
                         <p class="mb-0" style="font-size: 1rem;color: #0c5460;">
-                            Esta página transformará dados complexos dos dashboards em explicações claras e acessíveis para as unidades.
+                            Esta página transformará dados dos dashboards em explicações claras e acessíveis para as unidades.
                         </p>
                         </div>
                     </div>

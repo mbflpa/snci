@@ -63,7 +63,7 @@
                                     data-trigger="hover" 
                                     data-placement="right"
                                     data-html="false"
-                                    data-content="Lista todos os testes aplicados nas unidades operacionais conforme o tipo de unidade.">
+                                    data-content="Lista todos os testes aplicados conforme o tipo de unidade.">
                                 </i>
                             </h3>
                         </div>
@@ -127,7 +127,7 @@
 						},
                     responsive: true,
                     autoWidth: false,
-                    pageLength: 25,
+                    paging:false,
                     order: [[ 0, "asc" ]],
                    
                 });
