@@ -2,17 +2,6 @@
 <cfinclude template="../SNCI_AVALIACOES_AUTOMATIZADAS/includes/aa_modal_overlay.cfm ">
 <cfinclude template="../SNCI_AVALIACOES_AUTOMATIZADAS/includes/aa_modal_preloader.cfm">
 
-<!DOCTYPE html>
-<html lang="pt-br">
-
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>SNCI - deficiencias-geral de Análise</title>
-    <link rel="icon" type="image/x-icon" href="../SNCI_AVALIACOES_AUTOMATIZADAS/dist/img/icone_sistema_standalone_ico.png">
-    
     <style>
         .deficiencias-geral-layout {
             padding: 16px;
@@ -96,12 +85,12 @@
         }
 
     </style>
-</head>
+
 <body class="hold-transition layout-fixed layout-navbar-fixed layout-footer-fixed" data-panel-auto-height-mode="height" >
 
 	<div class="wrapper">
-        <cfinclude template="includes/aa_navBar.cfm">
-        <cfinclude template="includes/aa_sidebar.cfm">
+ 
+        <cfinclude template="includes/teste.cfm">
         
         <div class="content-wrapper">
             <section class="content">
@@ -145,5 +134,3 @@
         });
     </script>
 </body>
-
-</html>

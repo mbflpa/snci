@@ -312,17 +312,49 @@
 			
 			// Função para selecionar um mês
 			function selecionarMes(mesId, btnElement) {
-				// Remove active de todos os botões
+				console.log('selecionarMes chamado com mesId:', mesId);
 				$('.btn-mes').removeClass('active');
-				
-				// Adiciona active ao botão clicado
 				btnElement.addClass('active');
-				
-				// Recarregar página com filtro de mês
-				var urlAtual = new URL(window.location);
-				urlAtual.searchParams.set('mesFiltro', mesId);
-				window.location.href = urlAtual.toString();
+
+				var recarregouAlguma = false;
+				$('.tab-pane').each(function(index) {
+					var $iframe = $(this).find('iframe');
+					if ($iframe.length) {
+						var iframeSrc = $iframe.attr('src') || '';
+						console.log('Aba', index, 'iframe src original:', iframeSrc);
+
+						// Remove barra inicial, se existir
+						if (iframeSrc.charAt(0) === '/') {
+							iframeSrc = iframeSrc.substring(1);
+							console.log('Aba', index, 'src sem barra inicial:', iframeSrc);
+						}
+						// Se não tiver o prefixo correto, adiciona
+						if (!iframeSrc.toLowerCase().startsWith('snci/snci_avaliacoes_automatizadas/')) {
+							iframeSrc = 'snci/SNCI_AVALIACOES_AUTOMATIZADAS/' + iframeSrc;
+							console.log('Aba', index, 'src com prefixo:', iframeSrc);
+						}
+
+						var urlObj = new URL(iframeSrc, window.location.origin);
+						console.log('Aba', index, 'URL antes do filtro:', urlObj.pathname + urlObj.search);
+
+						urlObj.searchParams.set('mesFiltro', mesId);
+						console.log('Aba', index, 'URL final:', urlObj.pathname + urlObj.search);
+
+						$iframe.attr('src', urlObj.pathname + urlObj.search);
+						recarregouAlguma = true;
+					} else {
+						console.log('Aba', index, 'não possui iframe');
+					}
+				});
+				if (!recarregouAlguma) {
+					console.log('Nenhuma aba aberta, recarregando página principal');
+					var urlAtual = new URL(window.location);
+					urlAtual.searchParams.set('mesFiltro', mesId);
+					console.log('URL principal:', urlAtual.toString());
+					window.location.href = urlAtual.toString();
+				}
 			}
 	
+		
 		</script>
 

@@ -47,14 +47,14 @@
     <link rel="stylesheet" href="../SNCI_AVALIACOES_AUTOMATIZADAS/dist/css/stylesSNCI.css">
 
    <cfset links = [
-        { href = "index.cfm", icon = "fas fa-home", text = "Principal" },
+        { href = "aa_pagina_construcao.cfm", icon = "fas fa-home", text = "Principal" },
         { href = "aa_deficiencias_controle.cfm", icon = "fas fa-bug", text = "Deficiências de Controle" },
         { href = "aa_pagina_construcao.cfm", icon = "fas fa-shield-alt", text = "Vulnerabilidades" },
         { href = "aa_testes_aplicados.cfm", icon = "fas fa-tasks", text = "Testes Aplicados" },
         { href = "aa_pagina_construcao.cfm", icon = "fas fa-database", text = "Base de Eventos" },
         { href = "aa_pagina_construcao.cfm", icon = "fas fa-info-circle", text = "Orientações" },
         { href = "aa_pagina_construcao.cfm", icon = "fas fa-history", text = "Histórico Anual" }
-      ] />
+        ] />
 
 
     

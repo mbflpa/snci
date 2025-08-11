@@ -283,8 +283,7 @@
 <body class="hold-transition layout-fixed layout-navbar-fixed layout-footer-fixed" data-panel-auto-height-mode="height">
 
     <div class="wrapper">
-        <cfinclude template="includes/aa_navBar.cfm" />
-        <cfinclude template="includes/aa_sidebar.cfm" />
+         <cfinclude template="includes/aa_sidebar.cfm">
 
         <div class="content-wrapper">
             <section class="content p-0">

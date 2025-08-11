@@ -1,7 +1,6 @@
 <cfprocessingdirective pageencoding = "utf-8">
 <cfinclude template="../SNCI_AVALIACOES_AUTOMATIZADAS/includes/aa_modal_overlay.cfm ">
 <cfinclude template="../SNCI_AVALIACOES_AUTOMATIZADAS/includes/aa_modal_preloader.cfm">
-
 <cftry>
     <cfobject name="testesObj" component="cfc.TestesAplicados">
     <cfset dadosTestes = testesObj.rsTestesAplicados()>
@@ -11,47 +10,34 @@
     </cfcatch>
 </cftry>
 
-<!DOCTYPE html>
-<html lang="pt-br">
-
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>SNCI - Testes Aplicados</title>
-    <link rel="icon" type="image/x-icon" href="../SNCI_AVALIACOES_AUTOMATIZADAS/dist/img/icone_sistema_standalone_ico.png">
+<style>
+    .testes-aplicados-layout {
+        padding: 16px;
+    }
     
-    <style>
+    .testes-table-container {
+        background: white;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    #testesAplicadosTable td,
+    #testesAplicadosTable th {
+        text-align: justify;
+    }
+
+    @media (max-width: 1200px) {
         .testes-aplicados-layout {
-            padding: 16px;
+            flex-direction: column;
         }
-        
-        .testes-table-container {
-            background: white;
-            border-radius: 8px;
-            padding: 20px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
+    }
+</style>
 
-        #testesAplicadosTable td,
-        #testesAplicadosTable th {
-            text-align: justify;
-        }
-
-        @media (max-width: 1200px) {
-            .testes-aplicados-layout {
-                flex-direction: column;
-            }
-        }
-    </style>
-</head>
 <body class="hold-transition layout-fixed layout-navbar-fixed layout-footer-fixed" data-panel-auto-height-mode="height" >
 
 	<div class="wrapper">
-        <cfinclude template="includes/aa_navBar.cfm">
-        <cfinclude template="includes/aa_sidebar.cfm">
-        
+       <cfinclude template="includes/aa_sidebar.cfm">
         <div class="content-wrapper">
             <section class="content">
                 <div class="container-fluid">
@@ -136,5 +122,4 @@
     </script>
 </body>
 
-</html>
 
