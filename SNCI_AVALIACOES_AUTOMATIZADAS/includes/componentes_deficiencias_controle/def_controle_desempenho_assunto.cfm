@@ -1107,7 +1107,7 @@
             
             try {
                 // Criar estrutura HTML da tabela antes de inicializar DataTables
-                let tableHTML = '<thead class="thead-dark"><tr>';
+                let tableHTML = '<thead class="table_thead_backgroundColor"><tr>';
                 colunas.forEach(function(coluna) {
                     tableHTML += '<th>' + coluna.nome + '</th>';
                 });
