@@ -1,4 +1,4 @@
-<cfprocessingdirective pageencoding = "utf-8">
+<cfprocessingdirective pageencoding="utf-8">
 <cfinclude template="../SNCI_AVALIACOES_AUTOMATIZADAS/includes/aa_modal_overlay.cfm">
 <cfinclude template="../SNCI_AVALIACOES_AUTOMATIZADAS/includes/aa_modal_preloader.cfm">
 
@@ -6,18 +6,19 @@
 <html lang="pt-br">
 
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <title>SNCI - Página em Construção</title>
-    <link rel="icon" type="image/x-icon" href="../SNCI_AVALIACOES_AUTOMATIZADAS/dist/img/icone_sistema_standalone_ico.png">
-    
+    <link rel="icon" type="image/x-icon" href="../SNCI_AVALIACOES_AUTOMATIZADAS/dist/img/icone_sistema_standalone_ico.png" />
+
     <style>
         :root {
             --azul_claro_correios: #2980b9;
         }
 
+        /* --- seu CSS original aqui, exceto a progress bar que vamos substituir --- */
         .construcao-container {
             min-height: calc(100vh - 200px);
             display: flex;
@@ -101,6 +102,7 @@
             font-weight: 600;
         }
 
+        /* --- Barra de progresso indeterminada tipo Windows 11 --- */
         .progress-container {
             margin: 2rem 0;
         }
@@ -113,38 +115,105 @@
         }
 
         .progress-bar-custom {
+            position: relative;
             width: 100%;
-            height: 8px;
-            background: rgba(41, 128, 185, 0.2);
-            border-radius: 10px;
+            height: 14px;
+            background: rgba(41, 128, 185, 0.12);
+            border-radius: 999px;
             overflow: hidden;
-            position: relative;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3);
         }
 
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--azul_claro_correios), #1e73a7);
-            border-radius: 10px;
-            animation: progressAnimation 3s ease-in-out infinite;
-            position: relative;
-        }
-
-        .progress-fill::after {
-            content: '';
+        .progress-indeterminate {
             position: absolute;
             top: 0;
-            left: -100%;
-            width: 100%;
+            left: -30%; /* começa fora da barra, esquerda */
             height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
-            animation: shimmer 2s infinite;
+            width: 30%; /* tamanho da barra que desliza */
+            background: linear-gradient(90deg, var(--azul_claro_correios), #1e73a7);
+            border-radius: 999px;
+            overflow: hidden;
+            animation: indeterminateMove 2s linear infinite;
+            transform: translateZ(0);
         }
 
+        /* zigzag overlay */
+        .progress-indeterminate::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image: linear-gradient(
+                135deg,
+                rgba(255, 255, 255, 0.14) 0%,
+                rgba(255, 255, 255, 0.14) 12.5%,
+                rgba(255, 255, 255, 0) 12.5%,
+                rgba(255, 255, 255, 0) 25%
+            );
+            background-size: 40px 40px;
+            transform: skewX(-20deg) translateX(-40px) translateZ(0);
+            mix-blend-mode: overlay;
+            animation: zigzagMove 1.2s linear infinite;
+            pointer-events: none;
+            opacity: 0.95;
+        }
+
+        /* brilho suave */
+        .progress-indeterminate::after {
+            content: "";
+            position: absolute;
+            top: -40%;
+            left: -40%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 10% 20%, rgba(255, 255, 255, 0.06), transparent 8%);
+            animation: subtleShine 3.2s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes indeterminateMove {
+            0% {
+                left: -30%;
+            }
+
+            100% {
+                left: 100%;
+            }
+        }
+
+        @keyframes zigzagMove {
+            0% {
+                transform: skewX(-20deg) translateX(-40px);
+            }
+
+            100% {
+                transform: skewX(-20deg) translateX(120%);
+            }
+        }
+
+        @keyframes subtleShine {
+            0% {
+                transform: translateX(-10%) translateY(0) scale(1);
+                opacity: 0.9;
+            }
+
+            50% {
+                transform: translateX(10%) translateY(0) scale(1.02);
+                opacity: 0.6;
+            }
+
+            100% {
+                transform: translateX(-10%) translateY(0) scale(1);
+                opacity: 0.9;
+            }
+        }
+
+        /* Outras animações e responsividade originais */
         @keyframes fadeInUp {
             from {
                 opacity: 0;
                 transform: translateY(30px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -152,26 +221,21 @@
         }
 
         @keyframes bounce {
-            0%, 20%, 50%, 80%, 100% {
+            0%,
+            20%,
+            50%,
+            80%,
+            100% {
                 transform: translateY(0);
             }
+
             40% {
                 transform: translateY(-20px);
             }
+
             60% {
                 transform: translateY(-10px);
             }
-        }
-
-        @keyframes progressAnimation {
-            0% { width: 0%; }
-            50% { width: 75%; }
-            100% { width: 0%; }
-        }
-
-        @keyframes shimmer {
-            0% { left: -100%; }
-            100% { left: 100%; }
         }
 
         /* Responsividade */
@@ -219,9 +283,9 @@
 <body class="hold-transition layout-fixed layout-navbar-fixed layout-footer-fixed" data-panel-auto-height-mode="height">
 
     <div class="wrapper">
-        <cfinclude template="includes/aa_navBar.cfm">
-        <cfinclude template="includes/aa_sidebar.cfm">
-        
+        <cfinclude template="includes/aa_navBar.cfm" />
+        <cfinclude template="includes/aa_sidebar.cfm" />
+
         <div class="content-wrapper">
             <section class="content p-0">
                 <div class="construcao-container">
@@ -229,13 +293,13 @@
                         <div class="construcao-icon">
                             <i class="fas fa-hammer"></i>
                         </div>
-                        
+
                         <h1 class="construcao-title">
                             Página em Construção
                         </h1>
-                        
+
                         <p class="construcao-subtitle">
-                            Estamos trabalhando para trazer novos recursos e melhorias para o sistema SNCI. 
+                            Estamos trabalhando para trazer novos recursos e melhorias para o sistema SNCI.
                             Esta funcionalidade estará disponível em breve!
                         </p>
 
@@ -248,7 +312,7 @@
                                     Design Moderno
                                 </div>
                             </div>
-                            
+
                             <div class="feature-item">
                                 <div class="feature-icon">
                                     <i class="fas fa-mobile-alt"></i>
@@ -257,7 +321,7 @@
                                     Responsivo
                                 </div>
                             </div>
-                            
+
                             <div class="feature-item">
                                 <div class="feature-icon">
                                     <i class="fas fa-shield-alt"></i>
@@ -266,7 +330,7 @@
                                     Seguro
                                 </div>
                             </div>
-                            
+
                             <div class="feature-item">
                                 <div class="feature-icon">
                                     <i class="fas fa-tachometer-alt"></i>
@@ -282,90 +346,11 @@
                                 Progresso do Desenvolvimento
                             </div>
                             <div class="progress-bar-custom">
-                                <div class="progress-fill"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-        </div>
-
-        <cfinclude template="includes/aa_footer.cfm">
-    </div>
-    
-    <script language="JavaScript">
-        $(document).ready(function(){
-            $.widget.bridge('uibutton', $.ui.button);
-            $('#modalOverlay').modal('hide');
-            
-            // Adicionar efeito de hover nos feature items
-            $('.feature-item').on('mouseenter', function() {
-                $(this).find('.feature-icon').addClass('fa-bounce');
-            }).on('mouseleave', function() {
-                $(this).find('.feature-icon').removeClass('fa-bounce');
-            });
-        });
-    </script>
-</body>
-
-</html>
-    <script language="JavaScript">
-        $(document).ready(function(){
-            $.widget.bridge('uibutton', $.ui.button);
-            $('#modalOverlay').modal('hide');
-            
-            // Adicionar efeito de hover nos feature items
-            $('.feature-item').on('mouseenter', function() {
-                $(this).find('.feature-icon').addClass('fa-bounce');
-            }).on('mouseleave', function() {
-                $(this).find('.feature-icon').removeClass('fa-bounce');
-            });
-        });
-    </script>
-</body>
-
-</html>
-                                </div>
-                            </div>
-                            
-                            <div class="feature-item">
-                                <div class="feature-icon">
-                                    <i class="fas fa-mobile-alt"></i>
-                                </div>
-                                <div class="feature-text">
-                                    Responsivo
-                                </div>
-                            </div>
-                            
-                            <div class="feature-item">
-                                <div class="feature-icon">
-                                    <i class="fas fa-shield-alt"></i>
-                                </div>
-                                <div class="feature-text">
-                                    Seguro
-                                </div>
-                            </div>
-                            
-                            <div class="feature-item">
-                                <div class="feature-icon">
-                                    <i class="fas fa-tachometer-alt"></i>
-                                </div>
-                                <div class="feature-text">
-                                    Performático
-                                </div>
+                                <div class="progress-indeterminate"></div>
                             </div>
                         </div>
 
-                        <div class="progress-container">
-                            <div class="progress-label">
-                                Progresso do Desenvolvimento
-                            </div>
-                            <div class="progress-bar-custom">
-                                <div class="progress-fill"></div>
-                            </div>
-                        </div>
-
-                        <a href="javascript:history.back()" class="btn-voltar">
+                        <a href="javascript:history.back()" class="btn-voltar" style="display:inline-block; margin-top:1rem; font-weight:600; color: var(--azul_claro_correios); text-decoration:none;">
                             <i class="fas fa-arrow-left me-2"></i>
                             Voltar à Página Anterior
                         </a>
@@ -374,25 +359,18 @@
             </section>
         </div>
 
-        <cfinclude template="includes/aa_footer.cfm">
+        <cfinclude template="includes/aa_footer.cfm" />
     </div>
-    
+
     <script language="JavaScript">
-        $(document).ready(function(){
+        $(document).ready(function () {
             $.widget.bridge('uibutton', $.ui.button);
             $('#modalOverlay').modal('hide');
-            
-            // Adicionar efeito de parallax suave aos elementos flutuantes
-            $(window).on('scroll', function() {
-                const scrolled = $(this).scrollTop();
-                const parallax = scrolled * 0.5;
-                $('.floating-elements').css('transform', 'translateY(' + parallax + 'px)');
-            });
-            
+
             // Adicionar efeito de hover nos feature items
-            $('.feature-item').on('mouseenter', function() {
+            $('.feature-item').on('mouseenter', function () {
                 $(this).find('.feature-icon').addClass('fa-bounce');
-            }).on('mouseleave', function() {
+            }).on('mouseleave', function () {
                 $(this).find('.feature-icon').removeClass('fa-bounce');
             });
         });
