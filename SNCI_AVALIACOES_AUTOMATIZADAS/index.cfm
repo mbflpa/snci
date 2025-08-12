@@ -59,9 +59,17 @@
             if (window.location.pathname.toLowerCase().includes('aa_navegacao_por_abas.cfm')) {
                 $('a[href*="aa_navegacao_por_abas.cfm"]').closest('li').remove();
             }
-           
+
+            // Monitorar fechamento de abas e desativar links do sidebar se não houver abas abertas
+            $(document).on('click', '[data-widget="iframe-close"]', function() {
+                setTimeout(function() {
+                    // Se não houver mais abas abertas
+                    if ($('.tab-content .tab-pane').length === 0 || $('.tab-content .tab-pane.active').length === 0) {
+                        $('.modern-nav-link').removeClass('active');
+                    }
+                }, 300);
+            });
         });
-        
     </script>
     
 </body>

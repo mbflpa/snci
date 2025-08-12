@@ -421,8 +421,16 @@
           // Remover parâmetros da URL para comparação
           const linkUrl = new URL(link.href);
           const currentUrlObj = new URL(currentUrl);
-          
-          if (linkUrl.pathname === currentUrlObj.pathname) {
+
+          // Caso especial: se está na index.cfm e a aba inicial é aa_mensagem_temporaria.cfm, ativa o link "Principal"
+          if (
+            currentUrlObj.pathname.toLowerCase().endsWith('/index.cfm') &&
+            $('.tab-empty .display-5').length &&
+            linkUrl.pathname.toLowerCase().endsWith('/aa_mensagem_temporaria.cfm') &&
+            link.textContent.trim() === 'Principal'
+          ) {
+            link.classList.add('active');
+          } else if (linkUrl.pathname === currentUrlObj.pathname) {
             link.classList.add('active');
           }
         });
