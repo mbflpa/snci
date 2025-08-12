@@ -164,7 +164,7 @@
 								data-html="true"
 								data-content="<strong>Avaliação Automatizada:</strong> Processo de avaliação automatizada dos testes de controles internos realizados no âmbito de unidades operacionais das Superintendências Estaduais.">
 							</i>
-							Avaliação Automatizada - 
+							<span style="font-weight:400">Avaliação Automatizada - </span>
 							<cfif structKeyExists(application, "rsUsuarioParametros") AND structKeyExists(application.rsUsuarioParametros, "Und_Descricao") AND len(trim(application.rsUsuarioParametros.Und_Descricao))>
 								<cfoutput>#application.rsUsuarioParametros.Und_Descricao# - #application.rsUsuarioParametros.Dir_Sigla#<span style="font-weight:400;font-size:0.8rem;margin-left:10px">(MCU: #application.rsUsuarioParametros.Und_MCU# / STO: #application.rsUsuarioParametros.Und_Codigo#)</span></cfoutput>
 							<cfelse>
@@ -359,49 +359,67 @@
 	}
 	
 	// Função para selecionar um mês
+		// ...existing code...
+		// ...existing code...
 	function selecionarMes(mesId, btnElement) {
 		console.log('selecionarMes chamado com mesId:', mesId);
 		$('.btn-mes').removeClass('active');
 		btnElement.addClass('active');
-
+	
 		var recarregouAlguma = false;
+		var iframesIgnorados = 0;
+	
+		// Lista de páginas a serem ignoradas
+		var paginasIgnoradas = [
+			'aa_testes_aplicados.cfm',
+			'aa_pagina_construcao.cfm'
+		];
+	
 		$('.tab-pane').each(function(index) {
 			var $iframe = $(this).find('iframe');
 			if ($iframe.length) {
 				var iframeSrc = $iframe.attr('src') || '';
 				console.log('Aba', index, 'iframe src original:', iframeSrc);
-
-				// Remove barra inicial, se existir
+	
+				// Verifica se o src contém alguma das páginas ignoradas
+				if (paginasIgnoradas.some(function(pagina) { return iframeSrc.includes(pagina); })) {
+					console.log('Aba', index, 'pulada (página ignorada).');
+					iframesIgnorados++;
+					return;
+				}
+	
+				// ...restante do código...
 				if (iframeSrc.charAt(0) === '/') {
 					iframeSrc = iframeSrc.substring(1);
 					console.log('Aba', index, 'src sem barra inicial:', iframeSrc);
 				}
-				// Se não tiver o prefixo correto, adiciona
 				if (!iframeSrc.toLowerCase().startsWith('snci/snci_avaliacoes_automatizadas/')) {
 					iframeSrc = 'snci/SNCI_AVALIACOES_AUTOMATIZADAS/' + iframeSrc;
 					console.log('Aba', index, 'src com prefixo:', iframeSrc);
 				}
-
+	
 				var urlObj = new URL(iframeSrc, window.location.origin);
 				console.log('Aba', index, 'URL antes do filtro:', urlObj.pathname + urlObj.search);
-
+	
 				urlObj.searchParams.set('mesFiltro', mesId);
 				console.log('Aba', index, 'URL final:', urlObj.pathname + urlObj.search);
-
+	
 				$iframe.attr('src', urlObj.pathname + urlObj.search);
 				recarregouAlguma = true;
 			} else {
 				console.log('Aba', index, 'não possui iframe');
 			}
 		});
-		if (!recarregouAlguma) {
-			console.log('Nenhuma aba aberta, recarregando página principal');
+	
+		if (!recarregouAlguma && iframesIgnorados === 0) {
+			console.log('Nenhuma aba com iframe encontrada para recarregar, recarregando página principal');
 			var urlAtual = new URL(window.location);
 			urlAtual.searchParams.set('mesFiltro', mesId);
 			console.log('URL principal:', urlAtual.toString());
 			window.location.href = urlAtual.toString();
 		}
 	}
+	// ...existing code...
 
 
 </script>
