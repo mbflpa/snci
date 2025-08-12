@@ -10,7 +10,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <title>SNCI - Página em Construção</title>
+    <title>SNCI - Deficiências do Controle</title>
     <link rel="icon" type="image/x-icon" href="../SNCI_AVALIACOES_AUTOMATIZADAS/dist/img/icone_sistema_standalone_ico.png" />
    
    
@@ -86,8 +86,7 @@
                 <div class="container-fluid">
                     <div class="row">
                         <div class="col-12">
-                            <h3 class="m-3">Avaliação Geral - Deficiência do Controle
-                            
+                            <h3 class="m-3" style="padding-bottom: 0!important;margin-bottom: 0!important;">Avaliação Geral - Deficiência do Controle
                                 <i class="fas fa-info-circle info-icon-automatizadas" style="position: relative;right: 3px;bottom: 13px;font-size: 1rem;" 
                                     data-toggle="popover" 
                                     data-trigger="hover" 
@@ -95,7 +94,6 @@
                                     data-html="true"
                                     data-content="Tratam-se de situações identificadas nas avaliações realizadas nas unidades operacionais, por meio da aplicação de testes de controle (Plano de Testes), que não condizem com o previsto em normas internas dos Correios, documentos de orientações vigentes (ofícios) e legislações.">
                                 </i>
-                               
                             </h3>
                         </div>
                     </div>

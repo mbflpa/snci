@@ -13,6 +13,7 @@
 <style>
     .testes-aplicados-layout {
         padding: 16px;
+        padding-top: 0px;
     }
     
     .testes-table-container {
@@ -43,7 +44,7 @@
                 <div class="container-fluid">
                     <div class="row">
                         <div class="col-12">
-                            <h3 class="m-3">Testes Aplicados
+                            <h3 class="m-1" >Testes Aplicados
                                 <i class="fas fa-info-circle info-icon-automatizadas" style="position: relative;right: 3px;bottom: 13px;font-size: 1rem;" 
                                     data-toggle="popover" 
                                     data-trigger="hover" 
@@ -115,7 +116,8 @@
                     autoWidth: false,
                     paging:false,
                     order: [[ 0, "asc" ]],
-                   
+                    searching: false
+
                 });
            
         });
