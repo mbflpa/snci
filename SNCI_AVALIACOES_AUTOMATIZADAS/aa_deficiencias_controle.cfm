@@ -12,7 +12,7 @@
 
     <title>SNCI - Página em Construção</title>
     <link rel="icon" type="image/x-icon" href="../SNCI_AVALIACOES_AUTOMATIZADAS/dist/img/icone_sistema_standalone_ico.png" />
-
+   
    
     <style>
         .deficiencias-geral-layout {
@@ -115,6 +115,7 @@
 
         <cfinclude template="includes/aa_footer.cfm">
    </div>
+    
    
     <script language="JavaScript">
         $(document).ready(function(){
