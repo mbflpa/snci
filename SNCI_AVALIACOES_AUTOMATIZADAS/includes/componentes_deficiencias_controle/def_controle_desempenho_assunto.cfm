@@ -790,11 +790,13 @@
         color: #457b9d;
     }
 
-    /* Aumentar largura dos popovers Bootstrap */
+        /* Aumentar largura dos popovers Bootstrap */
     .popover {
         max-width: 420px !important;
         width: 420px !important;
     }
+
+
 
 </style>
 
