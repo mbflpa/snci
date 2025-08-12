@@ -349,10 +349,7 @@
                             </div>
                         </div>
 
-                        <a href="javascript:history.back()" class="btn-voltar" style="display:inline-block; margin-top:1rem; font-weight:600; color: var(--azul_claro_correios); text-decoration:none;">
-                            <i class="fas fa-arrow-left me-2"></i>
-                            Voltar à Página Anterior
-                        </a>
+                        
                     </div>
                 </div>
             </section>

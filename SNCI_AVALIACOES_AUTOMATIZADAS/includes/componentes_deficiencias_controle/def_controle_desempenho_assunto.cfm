@@ -790,6 +790,12 @@
         color: #457b9d;
     }
 
+    /* Aumentar largura dos popovers Bootstrap */
+    .popover {
+        max-width: 420px !important;
+        width: 420px !important;
+    }
+
 </style>
 
 <div class="snci-desempenho-assunto">
@@ -822,7 +828,6 @@
                                     <i class=" info-icon-automatizadas" 
                                         data-toggle="popover" 
                                         data-trigger="hover" 
-                                        data-placement="right"
                                         data-html="false"
                                         data-content=
                                         "<cfoutput>
@@ -840,7 +845,6 @@
                                     <i class=" info-icon-automatizadas" 
                                         data-toggle="popover" 
                                         data-trigger="hover" 
-                                        data-placement="right"
                                         data-html="false"
                                         data-content="<strong>Grupo-Item:</strong> numeração atribuída a cada teste de controle interno.">
                                     </i>
@@ -1220,7 +1224,6 @@
                     // Configurações de layout e responsividade
                    dom: '<"row align-items-center"' +
                             '<"col-md-12 d-flex justify-content-between flex-wrap"' +
-                                '<"me-auto"l>' +
                                 '<"mx-auto"f>' +
                                 '<"ms-auto me-2"B>' +   
                             '>' +
