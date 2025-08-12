@@ -1,7 +1,7 @@
 <cfprocessingdirective pageEncoding ="utf-8">
 <cfsetting requesttimeout="800">
 
-   <cfif (not isDefined("Session.vPermissao")) OR (Session.vPermissao eq 'False')>
+<cfif (not isDefined("Session.vPermissao")) OR (Session.vPermissao eq 'False')>
 	<cfinclude template="aviso_sessao_encerrada.htm">
 	  <cfabort> 
   </cfif>          
@@ -19,7 +19,6 @@
   <cfinclude template="aviso_sessao_encerrada.htm">
 	  <cfabort> 
 </cfif>      
-
 
 <cfif trim(qAcesso.Usu_Coordena) neq ''>
     <cfset se= '#trim(qAcesso.Usu_Coordena)#'>
@@ -212,7 +211,6 @@
 	ORDER BY Dir_Sigla, Und_Descricao
 </cfquery> 
 <!---  --->
-
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
