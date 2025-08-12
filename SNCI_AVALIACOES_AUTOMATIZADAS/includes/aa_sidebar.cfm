@@ -317,7 +317,8 @@
              <cfloop array="#links#" index="link">
               <cfoutput>
                 <li class="nav-item" style="margin-bottom: 0;">
-                  <a href="#link.href#" class="nav-link modern-nav-link">
+                  <a href="#link.href#" class="nav-link modern-nav-link"
+                     <cfif link.text EQ "Principal">id="sidebarPrincipal"</cfif>>
                     <div class="modern-nav-icon">
                       <i class="#link.icon#"></i>
                     </div>

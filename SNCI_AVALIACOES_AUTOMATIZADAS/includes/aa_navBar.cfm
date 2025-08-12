@@ -251,6 +251,17 @@
 		
 		// Verificar se há filtro de mês na URL e marcar botão ativo
 		verificarMesSelecionadoURL();
+
+		// Simula clique no link "Principal" do sidebar ao carregar a página
+		setTimeout(function() {
+			var $principalLink = $('#sidebarPrincipal');
+			var isMensagemTemporaria = window.location.pathname.toLowerCase().indexOf('aa_mensagem_temporaria.cfm') !== -1;
+			var isIndex = window.location.pathname.toLowerCase().indexOf('index.cfm') !== -1;
+			// Só dispara se está na index e não na aa_mensagem_temporaria.cfm
+			if ($principalLink.length > 0 && isIndex && !isMensagemTemporaria) {
+				$principalLink[0].click();
+			}
+		}, 300);
 	});
 	
 	// Função para verificar mês selecionado na URL

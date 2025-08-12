@@ -10,6 +10,18 @@
     </cfcatch>
 </cftry>
 
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>SNCI - Avaliações Automatizadas</title>
+    <link rel="icon" type="image/x-icon" href="../SNCI_AVALIACOES_AUTOMATIZADA/dist/img/icone_sistema_standalone_ico.png">
+
+
 <style>
     .testes-aplicados-layout {
         padding: 16px;
@@ -38,7 +50,9 @@
 <body class="hold-transition layout-fixed layout-navbar-fixed layout-footer-fixed" data-panel-auto-height-mode="height" >
 
 	<div class="wrapper">
-       <cfinclude template="includes/aa_sidebar.cfm">
+      
+       <cfinclude template="includes/aa_navBar.cfm">
+        <cfinclude template="includes/aa_sidebar.cfm">
         <div class="content-wrapper">
             <section class="content">
                 <div class="container-fluid">
@@ -124,4 +138,4 @@
     </script>
 </body>
 
-
+</html>
