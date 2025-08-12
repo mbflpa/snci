@@ -1,7 +1,19 @@
 <cfprocessingdirective pageencoding = "utf-8">
+<cfcontent type="text/html">
 <cfinclude template="../SNCI_AVALIACOES_AUTOMATIZADAS/includes/aa_modal_overlay.cfm ">
 <cfinclude template="../SNCI_AVALIACOES_AUTOMATIZADAS/includes/aa_modal_preloader.cfm">
+<!DOCTYPE html>
+<html lang="pt-br">
 
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>SNCI - Página em Construção</title>
+    <link rel="icon" type="image/x-icon" href="../SNCI_AVALIACOES_AUTOMATIZADAS/dist/img/icone_sistema_standalone_ico.png" />
+
+   
     <style>
         .deficiencias-geral-layout {
             padding: 16px;
@@ -59,39 +71,16 @@
             }
         }
 
-         /* Customizar largura dos popovers */
-        .popover {
-            max-width: 400px !important; /* Aumenta de ~276px para 400px */
-            width: auto !important;
-        }
-
-        /* Para popovers muito grandes */
-        .popover-large {
-            max-width: 500px !important;
-            width: auto !important;
-        }
-
-        /* Melhorar formatação do conteúdo do popover */
-        .popover-body {
-            font-size: 0.85rem;
-            line-height: 1.4;
-            padding: 12px 14px;
-            word-wrap: break-word;
-        }
-
-        /* Ajustar largura da seta do popover */
-        .popover .arrow::before {
-            border-width: 0.5rem;
-        }
 
     </style>
+</head>
 
 <body class="hold-transition layout-fixed layout-navbar-fixed layout-footer-fixed" data-panel-auto-height-mode="height" >
 
 	<div class="wrapper">
  
         <cfinclude template="includes/aa_sidebar.cfm">
-        
+        <cfinclude template="includes/aa_navBar.cfm">
         <div class="content-wrapper">
             <section class="content">
                 <div class="container-fluid">
@@ -103,7 +92,7 @@
                                     data-toggle="popover" 
                                     data-trigger="hover" 
                                     data-placement="right"
-                                    data-html="false"
+                                    data-html="true"
                                     data-content="Tratam-se de situações identificadas nas avaliações realizadas nas unidades operacionais, por meio da aplicação de testes de controle (Plano de Testes), que não condizem com o previsto em normas internas dos Correios, documentos de orientações vigentes (ofícios) e legislações.">
                                 </i>
                                
@@ -126,11 +115,23 @@
 
         <cfinclude template="includes/aa_footer.cfm">
    </div>
-    
+   
     <script language="JavaScript">
         $(document).ready(function(){
             $.widget.bridge('uibutton', $.ui.button);
             $('#modalOverlay').modal('hide');
+            // Inicializa todos os popovers
+				$('[data-toggle="popover"]').popover({
+					html: true,
+					trigger: 'hover'
+				});
+				
+				// Popover com dismiss específico
+				$('.popover-dismiss').popover({
+					trigger: 'hover'
+				});
         });
     </script>
 </body>
+
+</html>

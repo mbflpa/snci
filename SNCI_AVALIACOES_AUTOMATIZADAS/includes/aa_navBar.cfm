@@ -188,26 +188,32 @@
 				</li>
 			</ul>
 		</nav>
-		
+		 <!-- jQuery -->
+<script src="../SNCI_AVALIACOES_AUTOMATIZADAS/plugins/jquery/jquery.min.js"></script>
+<!-- Popper.js (se Bootstrap 4) -->
+<script src="../SNCI_AVALIACOES_AUTOMATIZADAS/plugins/popper/umd/popper.min.js"></script>
+<!-- Bootstrap JS -->
+<script src="../SNCI_AVALIACOES_AUTOMATIZADAS/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<!-- jQuery UI -->
+<script src="../SNCI_AVALIACOES_AUTOMATIZADAS/plugins/jquery-ui/jquery-ui.min.js"></script>
+<!-- Select2 -->
+<script src="../SNCI_AVALIACOES_AUTOMATIZADAS/plugins/select2/js/select2.full.min.js"></script>
 		<script language="JavaScript">
 		    
-			// Garante que o sidebar fique sempre oculto e o navbar full width
+	
 			$(document).ready(function() {
 				// Inicializa todos os popovers
 				$('[data-toggle="popover"]').popover({
-					container: 'body',
 					html: true,
 					trigger: 'hover'
 				});
-				
-				// Inicializa tooltips se necessário
-				$('[data-toggle="tooltip"]').tooltip();
 				
 				// Popover com dismiss específico
 				$('.popover-dismiss').popover({
 					trigger: 'hover'
 				});
-				//$('body').addClass('sidebar-collapse');
+
+		
 				
 				// Carregar meses disponíveis
 				carregarMesesDisponiveis();
