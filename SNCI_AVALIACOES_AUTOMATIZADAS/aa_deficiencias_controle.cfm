@@ -247,6 +247,11 @@
             text: 'Este tour irá guiá-lo pelas principais funcionalidades desta página. Vamos começar?',
             buttons: [
                 {
+                    action() { return this.cancel(); },
+                    classes: 'shepherd-button-secondary',
+                    text: 'Fechar'
+                },
+                {
                     action() {
                         return this.next();
                     },
@@ -255,45 +260,45 @@
             ]
         });
 
-        tour.addStep({
-            title: 'Menu de Navegação',
-            text: 'Use este menu para navegar entre as diferentes seções das Avaliações Automatizadas.',
-            attachTo: {
-                element: '.main-sidebar',
-                on: 'right'
-            },
-            buttons: [
-                {
-                    action() { return this.back(); },
-                    classes: 'shepherd-button-secondary',
-                    text: 'Voltar'
-                },
-                {
-                    action() { return this.next(); },
-                    text: 'Avançar'
-                }
-            ]
-        });
+        // tour.addStep({
+        //     title: 'Menu de Navegação',
+        //     text: 'Use este menu para navegar entre as diferentes seções das Avaliações Automatizadas.',
+        //     attachTo: {
+        //         element: '.main-sidebar',
+        //         on: 'right'
+        //     },
+        //     buttons: [
+        //         {
+        //             action() { return this.back(); },
+        //             classes: 'shepherd-button-secondary',
+        //             text: 'Voltar'
+        //         },
+        //         {
+        //             action() { return this.next(); },
+        //             text: 'Avançar'
+        //         }
+        //     ]
+        // });
 
-        tour.addStep({
-            title: 'Filtro de Mês',
-            text: 'Selecione um mês para visualizar os dados do período correspondente. A página será atualizada automaticamente.',
-            attachTo: {
-                element: '.meses-container',
-                on: 'bottom'
-            },
-            buttons: [
-                {
-                    action() { return this.back(); },
-                    classes: 'shepherd-button-secondary',
-                    text: 'Voltar'
-                },
-                {
-                    action() { return this.next(); },
-                    text: 'Avançar'
-                }
-            ]
-        });
+        // tour.addStep({
+        //     title: 'Filtro de Mês',
+        //     text: 'Selecione um mês para visualizar os dados do período correspondente. A página será atualizada automaticamente.',
+        //     attachTo: {
+        //         element: '.meses-container',
+        //         on: 'bottom'
+        //     },
+        //     buttons: [
+        //         {
+        //             action() { return this.back(); },
+        //             classes: 'shepherd-button-secondary',
+        //             text: 'Voltar'
+        //         },
+        //         {
+        //             action() { return this.next(); },
+        //             text: 'Avançar'
+        //         }
+        //     ]
+        // });
 
         tour.addStep({
             title: 'Resumo Geral',
@@ -303,6 +308,11 @@
                 on: 'bottom'
             },
             buttons: [
+                {
+                    action() { return this.cancel(); },
+                    classes: 'shepherd-button-secondary',
+                    text: 'Fechar'
+                },
                 {
                     action() { return this.back(); },
                     classes: 'shepherd-button-secondary',
@@ -324,6 +334,11 @@
             },
             buttons: [
                 {
+                    action() { return this.cancel(); },
+                    classes: 'shepherd-button-secondary',
+                    text: 'Fechar'
+                },
+                {
                     action() { return this.back(); },
                     classes: 'shepherd-button-secondary',
                     text: 'Voltar'
@@ -343,6 +358,11 @@
                 on: 'top'
             },
             buttons: [
+                {
+                    action() { return this.cancel(); },
+                    classes: 'shepherd-button-secondary',
+                    text: 'Fechar'
+                },
                 {
                     action() { return this.back(); },
                     classes: 'shepherd-button-secondary',
@@ -364,6 +384,11 @@
             },
             buttons: [
                 {
+                    action() { return this.cancel(); },
+                    classes: 'shepherd-button-secondary',
+                    text: 'Fechar'
+                },
+                {
                     action() { return this.back(); },
                     classes: 'shepherd-button-secondary',
                     text: 'Voltar'
@@ -383,6 +408,11 @@
                 on: 'top-end'
             },
             buttons: [
+                {
+                    action() { return this.cancel(); },
+                    classes: 'shepherd-button-secondary',
+                    text: 'Fechar'
+                },
                 {
                     action() { return this.back(); },
                     classes: 'shepherd-button-secondary',
