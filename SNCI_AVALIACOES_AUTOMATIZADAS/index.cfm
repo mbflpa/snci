@@ -45,7 +45,7 @@
             font-weight: 600;
             color:  var(--azul_correios)!important;
             background-color: var(--amarelo_prisma_escuro_correios)!important;
-            border-bottom-color:  var(--azul_correios)!important;
+            border-bottom-color:  var(--amarelo_escuro_correios)!important;
         }
         
         .iframe-mode .navbar-nav .nav-link.active::after {
@@ -81,22 +81,24 @@
         <!-- Content Wrapper. Contains page content -->
         <div class="content-wrapper iframe-mode" data-widget="iframe" >
             <div class="nav navbar navbar-expand navbar-white navbar-light border-bottom p-0">
-            <div class="nav-item dropdown">
-                <a class="nav-link bg-danger dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Fechar</a>
-                <div class="dropdown-menu mt-0">
-                    <a class="dropdown-item" href="#" data-widget="iframe-close" data-type="all">
-                        <i class="fas fa-times-circle" ></i> Fechar todas as páginas
+                <div class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+                        <i class="fas fa-times"></i>
                     </a>
-                    <a class="dropdown-item" href="#" data-widget="iframe-close" data-type="all-other">
-                        <i class="far fa-times-circle"></i> Fechar outras páginas
-                    </a>
-                   
+                    <div class="dropdown-menu mt-0">
+                        <a class="dropdown-item" href="#" data-widget="iframe-close" data-type="all">
+                            <i class="fas fa-times-circle" ></i> Fechar todas as páginas
+                        </a>
+                        <a class="dropdown-item" href="#" data-widget="iframe-close" data-type="all-other">
+                            <i class="far fa-times-circle"></i> Fechar outras páginas
+                        </a>
+                    
+                    </div>
                 </div>
-            </div>
-                <a class="nav-link bg-light" href="#" data-widget="iframe-scrollleft"><i class="fas fa-angle-double-left"></i></a>
+                <a class="nav-link" href="#" data-widget="iframe-scrollleft"><i class="fas fa-angle-double-left"></i></a>
                 <ul class="navbar-nav overflow-hidden" role="tablist"></ul>
-                <a class="nav-link bg-light" href="#" data-widget="iframe-scrollright"><i class="fas fa-angle-double-right"></i></a>
-                <a class="nav-link bg-light" href="#" data-widget="iframe-fullscreen"><i class="fas fa-expand"></i></a>
+                <a class="nav-link" href="#" data-widget="iframe-scrollright"><i class="fas fa-angle-double-right"></i></a>
+                <a class="nav-link" href="#" data-widget="iframe-fullscreen"><i class="fas fa-expand"></i></a>
             </div>
             <div class="tab-content">
                 <div class="tab-empty">
@@ -113,6 +115,57 @@
 
     <script>
         $(document).ready(function() {
+            // --- PATCH PARA O PLUGIN AdminLTE IFrame PARA INCLUIR ÍCONES NAS ABAS ---
+            // Espera um pouco para garantir que o plugin do AdminLTE foi carregado
+            setTimeout(function() {
+                // Verifica se o plugin IFrame existe no jQuery para evitar erros
+                if ($.fn.IFrame) {
+                    // Guarda a função original que abre abas a partir do menu lateral
+                    const originalOpenTabSidebar = $.fn.IFrame.Constructor.prototype.openTabSidebar;
+                    
+                    // Sobrescreve a função original com uma nova versão modificada
+                    $.fn.IFrame.Constructor.prototype.openTabSidebar = function(item, autoOpen) {
+                        const $item = $(item);
+                        const link_obj = $item.attr('href') ? $item : $item.parent('a');
+                        const link = link_obj.attr('href');
+
+                        if (link === '#' || link === '' || link === undefined) {
+                            return;
+                        }
+
+                        // Lógica customizada para pegar o ícone e o texto do nosso menu
+                        const text = link_obj.find('.modern-nav-text').text().trim();
+                        const iconClass = link_obj.find('.modern-nav-icon i').attr('class');
+                        
+                        // Prepara o título da aba com o ícone (se ele existir)
+                        const titleWithIcon = (iconClass) ? `<i class="${iconClass}" style="margin-right: 8px;"></i>${text}` : text;
+
+                        // Lógica original do AdminLTE para criar um nome único para a aba
+                        const uniqueName = unescape(link).replace('./', '').replace(/["#&'./:=?[\]]/gi, '-').replace(/(--)/gi, '');
+                        const navId = "#tab-" + uniqueName;
+
+                        // Lógica original para verificar se a aba já existe
+                        if (!this._config.allowDuplicates && $(navId).length > 0) {
+                            // Se já existe, apenas troca para ela
+                            return this.switchTab(navId, this._config.allowReload);
+                        }
+                        
+                        // Lógica original para criar a aba, mas agora passando nosso título com o ícone
+                        if ((!this._config.allowDuplicates && $(navId).length === 0) || this._config.allowDuplicates) {
+                            this.createTab(titleWithIcon, link, uniqueName, autoOpen === undefined ? this._config.autoShowNewTab : autoOpen);
+                        }
+                    };
+                    
+                    // Adiciona a classe 'active' ao item de menu clicado e remove das outras
+                    $(document).on('click', 'a.modern-nav-link', function() {
+                        $('a.modern-nav-link').removeClass('active');
+                        $(this).addClass('active');
+                    });
+                }
+            }, 200); // O timeout garante que o script do AdminLTE já tenha sido processado
+            // --- FIM DO PATCH ---
+
+
             if (window.location.pathname.toLowerCase().includes('aa_navegacao_por_abas.cfm')) {
                 $('a[href*="aa_navegacao_por_abas.cfm"]').closest('li').remove();
             }
@@ -120,11 +173,11 @@
             // Monitorar fechamento de abas e desativar links do sidebar se não houver abas abertas
             $(document).on('click', '[data-widget="iframe-close"]', function() {
                 setTimeout(function() {
-                    // Se não houver mais abas abertas
-                    if ($('.tab-content .tab-pane').length === 0 || $('.tab-content .tab-pane.active').length === 0) {
+                    // Se não houver mais abas abertas, remove a classe 'active' de todos os links do menu
+                    if ($('.navbar-nav .nav-item').length === 0) {
                         $('.modern-nav-link').removeClass('active');
                     }
-                }, 300);
+                }, 100);
             });
         });
     </script>
