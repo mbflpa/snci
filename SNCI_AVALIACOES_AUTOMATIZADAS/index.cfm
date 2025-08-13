@@ -173,11 +173,11 @@
             // Monitorar fechamento de abas e desativar links do sidebar se não houver abas abertas
             $(document).on('click', '[data-widget="iframe-close"]', function() {
                 setTimeout(function() {
-                    // Se não houver mais abas abertas, remove a classe 'active' de todos os links do menu
-                    if ($('.navbar-nav .nav-item').length === 0) {
+                    // Conta apenas as abas criadas pelo plugin
+                    if ($('.navbar-nav li[role="presentation"]').length === 0) {
                         $('.modern-nav-link').removeClass('active');
                     }
-                }, 100);
+                }, 300);
             });
         });
     </script>
