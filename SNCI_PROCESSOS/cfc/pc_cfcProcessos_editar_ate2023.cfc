@@ -430,10 +430,18 @@
 	
 
 		<cfquery name="rs_OrgAvaliado" datasource="#application.dsn_processos#">
-			SELECT pc_orgaos.*
+			SELECT 1 as ordem_prioridade, pc_orgaos.*
 			FROM pc_orgaos
-			WHERE  (pc_org_Status = 'A') and (pc_org_mcu_subord_tec = '#rsProcForm.pc_num_orgao_avaliado#' or pc_org_mcu ='#rsProcForm.pc_num_orgao_avaliado#')
-			ORDER BY pc_org_sigla
+			WHERE pc_org_controle_interno ='N' AND (pc_org_Status = 'A') and (pc_org_mcu_subord_tec = '#rsProcAval.pc_num_orgao_avaliado#' or pc_org_mcu = '#rsProcAval.pc_num_orgao_avaliado#' 
+					or pc_org_mcu_subord_tec in (SELECT pc_orgaos.pc_org_mcu	FROM pc_orgaos WHERE pc_org_controle_interno ='N' AND pc_org_mcu_subord_tec = '#rsProcAval.pc_num_orgao_avaliado#'))
+			UNION
+
+			SELECT 2 as ordem_prioridade, pc_orgaos.*
+			FROM pc_orgaos
+			WHERE pc_org_controle_interno ='N' AND (pc_org_Status = 'A') and ((pc_org_mcu_subord_tec IN('#application.listaDiretorias#') and pc_org_mcu_subord_tec <> '#rsProcAval.pc_num_orgao_avaliado#') or (pc_org_mcu IN('#application.listaDiretorias#') and pc_org_mcu <> '#rsProcAval.pc_num_orgao_avaliado#') 
+					or pc_org_mcu_subord_tec in (SELECT pc_orgaos.pc_org_mcu	FROM pc_orgaos WHERE pc_org_controle_interno ='N' AND (pc_org_mcu_subord_tec in (#application.listaDiretorias#) and pc_org_mcu_subord_tec <> '#rsProcAval.pc_num_orgao_avaliado#')))
+
+			ORDER BY ordem_prioridade, pc_org_sigla
 		</cfquery>
 
 
@@ -1521,15 +1529,18 @@
 					<input id="pcProcessoId"  required="" hidden  value="#arguments.idAvaliacao#">
 
 					<cfquery name="rs_OrgAvaliado" datasource="#application.dsn_processos#">
-						SELECT pc_orgaos.*
+						SELECT 1 as ordem_prioridade, pc_orgaos.*
 						FROM pc_orgaos
-						WHERE pc_org_controle_interno ='N' AND pc_org_Status = 'A'
-								AND (pc_org_mcu_subord_tec = '#rsProcAval.pc_num_orgao_avaliado#' or pc_org_mcu = '#rsProcAval.pc_num_orgao_avaliado#' 
-										or pc_org_mcu_subord_tec in (SELECT pc_orgaos.pc_org_mcu	FROM pc_orgaos WHERE pc_org_controle_interno ='N' 
-																		and pc_org_mcu_subord_tec = '#rsProcAval.pc_num_orgao_avaliado#'
-																	)
-									)
-						ORDER BY pc_org_sigla
+						WHERE pc_org_controle_interno ='N' AND (pc_org_Status = 'A') and (pc_org_mcu_subord_tec = '#rsProcAval.pc_num_orgao_avaliado#' or pc_org_mcu = '#rsProcAval.pc_num_orgao_avaliado#' 
+								or pc_org_mcu_subord_tec in (SELECT pc_orgaos.pc_org_mcu	FROM pc_orgaos WHERE pc_org_controle_interno ='N' AND pc_org_mcu_subord_tec = '#rsProcAval.pc_num_orgao_avaliado#'))
+						UNION
+
+						SELECT 2 as ordem_prioridade, pc_orgaos.*
+						FROM pc_orgaos
+						WHERE pc_org_controle_interno ='N' AND (pc_org_Status = 'A') and ((pc_org_mcu_subord_tec IN('#application.listaDiretorias#') and pc_org_mcu_subord_tec <> '#rsProcAval.pc_num_orgao_avaliado#') or (pc_org_mcu IN('#application.listaDiretorias#') and pc_org_mcu <> '#rsProcAval.pc_num_orgao_avaliado#') 
+								or pc_org_mcu_subord_tec in (SELECT pc_orgaos.pc_org_mcu	FROM pc_orgaos WHERE pc_org_controle_interno ='N' AND (pc_org_mcu_subord_tec in (#application.listaDiretorias#) and pc_org_mcu_subord_tec <> '#rsProcAval.pc_num_orgao_avaliado#')))
+
+						ORDER BY ordem_prioridade, pc_org_sigla
 					</cfquery>
 
 					<cfquery datasource="#application.dsn_processos#" name="rsModalidadeProcesso">

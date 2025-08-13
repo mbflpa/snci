@@ -5,24 +5,38 @@
 </cfif>  
  
 <cfquery name="qAcesso" datasource="#dsn_inspecao#">
-	select Usu_email,Usu_GrupoAcesso,trim(Usu_Matricula) as Usu_Matricula from usuarios where Usu_login = (<cfqueryparam cfsqltype="cf_sql_varchar" value="#cgi.REMOTE_USER#">)
+	select Usu_Coordena,Usu_email,Usu_GrupoAcesso,trim(Usu_Matricula) as Usu_Matricula from usuarios where Usu_login = (<cfqueryparam cfsqltype="cf_sql_varchar" value="#cgi.REMOTE_USER#">)
 </cfquery>
 <cfset grpacesso = ucase(trim(qAcesso.Usu_GrupoAcesso))>
- <cfif (grpacesso neq 'INSPETORES')>
-	<cfinclude template="aviso_sessao_encerrada.htm">
-	<cfabort>  
-</cfif>  
+ <cfif (grpacesso neq 'GESTORES') and (grpacesso neq 'DESENVOLVEDORES') and (grpacesso neq 'GESTORMASTER') and (grpacesso neq 'INSPETORES')>
+  <cfinclude template="aviso_sessao_encerrada.htm">
+  <cfabort>  
+</cfif>    
+<cfif trim(qAcesso.Usu_Coordena) neq ''>
+    <cfset se= '#qAcesso.Usu_Coordena#'>
+<cfelseif qAcesso.Usu_DR eq '04'>
+    <cfset se= '04,70'>
+<cfelseif qAcesso.Usu_DR eq '10'>
+    <cfset se= '10,16'>
+<cfelseif qAcesso.Usu_DR eq '06'>
+    <cfset se= '06,65'>
+<cfelseif qAcesso.Usu_DR eq '26'>
+    <cfset se= '26,03'>                                       
+<cfelseif qAcesso.Usu_DR eq '28'>
+    <cfset se= '28,05'>
+<cfelse>
+    <cfset se= '#qAcesso.Usu_DR#'>
+</cfif>
+
+<cfoutput>
 <cfparam name="formgrp" default="0">
 <cfparam name="formitm" default="0">
-<cfoutput>
+<cfparam name="url.acao" default="0">
 <cfparam name="URL.numInspecao" default="0">
 <cfif isDefined("form.acao") and form.acao neq ''>
-	<!---
-		<cfdump var="#form#">
-		<cfset gil = gil>
-	--->
 	<cfset formgrp = #form.grpsel#>
 	<cfset formitm = #form.itmsel#>
+	<cfset url.acao = #form.acao#>
 	<cfset URL.numInspecao = #form.numinspecao#>
 	<cfif form.acao eq 'anexar'>
 		<cfquery name="rsSeq" datasource="#dsn_inspecao#">
@@ -278,11 +292,11 @@
 						<cfset auxfrmfalta = Replace(form.frmfalta,'.','','All')>
 						<cfset auxfrmfalta = Replace(auxfrmfalta,',','.','All')>
 					</cfif>	
-					<cfif form.impactarsobra eq 'S' and form.cdfrmsobrasn eq 'S'>
+					<cfif form.impactarsobra eq 'S'>
 						<cfset auxfrmsobra = Replace(form.frmsobra,'.','','All')>
 						<cfset auxfrmsobra = Replace(auxfrmsobra,',','.','All')>
 					</cfif>				
-					<cfif form.impactarrisco eq 'R' and form.cdfrmemriscosn eq 'S'>
+					<cfif form.impactarrisco eq 'R'>
 						<cfset auxfrmemrisco = Replace(form.frmemrisco,'.','','All')>
 						<cfset auxfrmemrisco = Replace(auxfrmemrisco,',','.','All')>
 					</cfif>
@@ -367,10 +381,8 @@
 			</cfquery>	
 		</cfif>	
 	</cfif> 
-	<!---		
-	<cfset gil = gil>	
-	--->
-	<cflocation url="itens_inspetores_avaliacaov2.cfm?numInspecao=#form.numinspecao#&Unid=#form.codunidade#&formgrp=#form.grpsel#&formitm=#form.itmsel#">		
+
+	<cflocation url="itens_inspetores_avaliacaov2.cfm?acao=#url.acao#&numInspecao=#form.numinspecao#&Unid=#form.codunidade#&formgrp=#form.grpsel#&formitm=#form.itmsel#">		
 	<!--- ======================== --->		
 </cfif> 
 </cfoutput>
@@ -697,26 +709,10 @@ a:hover {
 }
 .navegacao {
 	font: bold 90%/1.4 sans-serif; 
-	background: #00a85a0b;
+	background: #fff;
 	height: 2.8em; 
-/*	overflow: hidden;
-		webkit-transition: height 2s;
-		-moz-transition: height 2s; 
-		-o-transition: height 2s; 
-		-ms-transition: height 2s; 
-		transition: height 2s;
-		*/
 }
-.navegacao:hover, .navegacao:focus, .navegacao:active {
-	/*
-	height: 60em; 
-		-webkit-transition: height 2s; 
-		-moz-transition: height 2s; 
-		-o-transition: height 2s; 
-		-ms-transition: height 2s; 
-		transition: height 2s;
-	*/
-}
+
 /* Fim navegação mobile */
 @media all and (min-width:30em) {
 	body {	
@@ -733,7 +729,7 @@ a:hover {
 	}
 	.main-page { background: #00a859; }
 	.principal {
-		width: 75%;
+		width: 58%;
 		padding: 0.5em;
 		float: right;
 	}
@@ -764,7 +760,7 @@ a:hover {
 	}
 	.main-page {background: none;}
 	.principal {
-		width: 58%;
+		width: 59%;
 		float: left;
 		background: transparent;
 	}
@@ -806,7 +802,7 @@ a:hover {
 	padding: 0.2em;
 	color: #fff;
 	display: inline-block;
-	width:330px;
+	width:200px;
 	height:25px;
 	background-color:#0c5adf;
 	border-radius: 10px 20px;
@@ -1017,6 +1013,15 @@ td, th, label {
 	vertical-align: middle;
   	text-align: center;
 }
+.cabecampo {
+	background-color:#a5dce4b9;
+	height: 20px;
+	border: 1px solid #181616;
+	border-radius: 4px;
+	font: bold 75%/1.4 sans-serif; 
+	vertical-align: middle;
+  	text-align: center;	
+}
 label {
 	padding: 0.25em 1em 0.25em 1em;
 	background-color:#DCDCDC;
@@ -1036,7 +1041,7 @@ label {
 <body id="home">
 <div class="tudo">
 	<header class="topo">	
-    	<cfinclude template="cabecalho.cfm">
+    	<!--- <cfinclude template="cabecalho.cfm"> --->
 	</header>
 	<nav class="navegacao" aria-haspopup="true">
 		<cfif rsNC.recordcount gt 0><div>&nbsp;</div><div><label>Não Conforme (<cfoutput>#rsNC.recordcount#</cfoutput>)</label></div></cfif>
@@ -1088,7 +1093,7 @@ label {
 	</nav>
 	<main class="main-page cf">
 	<section class="principal">
-		<form name="formx" id="formx" action="itens_inspetores_avaliacaov2.cfm" method="post" enctype="multipart/form-data">
+		<form name="formx" id="formx" onSubmit="return validarform()" action="itens_inspetores_avaliacaov2.cfm" method="post" enctype="multipart/form-data">
 			<header>
 				<hgroup>  
 					<div align="center" class="card-title"><h2>AVALIAÇÃO DOS ITENS DE CONTROLE INTERNO</h2></div>	
@@ -1097,7 +1102,7 @@ label {
 			<div class="bloco selecionar" align="center">
 				<div align="left">
 					<label><h4>SELECIONAR AVALIAÇÃO:</h4></label> 
-					<select name="selInspecoes" id="selInspecoes" class="form-control-sm">
+					<select name="selInspecoes" id="selInspecoes" style="font-size:18px">
 						<option selected="selected" value="">---</option>
 						<cfoutput query="rsInspecoes">
 							<cfquery datasource="#dsn_inspecao#" name="rsInspecao">
@@ -1222,7 +1227,6 @@ label {
 					<div id="recomendacoesreinc"><textarea name="riprecomendacaoreinc" id="riprecomendacaoreinc" cols="130" rows="10" wrap="VIRTUAL"></textarea></div>
 					<div><h5>Histórico das manifestações</h5></div>
 					<div id="parecereinc"><textarea name="posparecereinc" id="posparecereinc" cols="172" rows="25" wrap="VIRTUAL" style="background:transparent;font-size:12px"></textarea></div>
-					<br>
 				</div>			
 				<div id="blocotmpantes">
 					<div id="numinsptmpantes"></div>
@@ -1236,7 +1240,6 @@ label {
 					<div id="nomeinsptmpantes"></div>
 					<div id="melhoriatmpantes"><textarea name="melhoriantes" id="melhoriantes" cols="130" rows="10" wrap="VIRTUAL"></textarea></div>
 					<div id="recomendacoestmpantes"><textarea name="recomendacoesantes" id="recomendacoesantes" cols="130" rows="10" wrap="VIRTUAL"></textarea></div>
-					<br>
 				</div>						
 				<div id="blocotmp">
 					<div id="grupotmp"></div>
@@ -1249,10 +1252,9 @@ label {
 					<div id="nomeinsptmp"></div>
 				</div>	
 				<div id="corpomanifestacao">
-					<br>
 					<div class="bloco row">
 						<div class="col" align="left"><label id="nomeavalitem">AVALIAR PARA:</label>
-							<select class="form-control-sm" name="avalitem" id="avalitem"> 			
+							<select class="form-control-sm" name="avalitem" id="avalitem" style="font-size:18px"> 			
 								<option value="A">---</option>				
 								<option value="C">CONFORME</option>
 								<option value="N">NÃO CONFORME</option>
@@ -1261,87 +1263,88 @@ label {
 							</select>	 
 						</div>
 						<div class="col" id="paratodos"><label>Aplicar à todos do Grupo(não avaliados)?:</label>
-							<select name="propagaval" id="propagaval" class="form-control-sm">
+							<select name="propagaval" id="propagaval" class="form-control-sm" style="font-size:18px">
 								<option value="N" selected>Não</option>
 								<option value="S">Sim</option>
 							</select>
 						</div>						
 					</div>
-					
+					<br>
+					<div id="mostrarmanchete">
+						<div align="left"><label class="cabecampo">Manchete</label></div>
+						<div align="left"><textarea  name="manchete" id="manchete" cols="135" rows="2" wrap="VIRTUAL" style="color:#036;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:13px"><cfoutput>#form.manchete#</cfoutput></textarea></div>
+					</div>
+					<div id="mostrartextarea">
+						<br>
+						<div align="left"><label class="cabecampo">Situação Encontrada</label></div>
+						<div align="left"><textarea name="melhoria" id="melhoria" wrap="VIRTUAL"><cfoutput>#Form.melhoria#</cfoutput></textarea></div>
+						<br>
+						<div id="mostrarrecomendacoes">
+							<div align="left"><label class="cabecampo">Orientações</label></div>
+							<div align="left"><textarea name="recomendacoes" id="recomendacoes"  wrap="VIRTUAL"><cfoutput>#Form.recomendacoes#</cfoutput></textarea></div>
+						</div>
+					</div>
 					<div id="reincidente">
+						<br>
 						<table width="90%" align="center" class="table table-bordered table-hover">
 							<tr>
-								<td colspan="3" align="center"><div id="impactofin"><label>Reincidência</label></div></td>
-							</tr>
-							<tr>
-								<td><label>Nº Avaliação</label>
-								<td><label>Nº Grupo</label>
-								<td><label>Nº Item</label>
-							</tr> 	
-							<tr>
-								<td><input name="frmreincInsp" type="text" class="form-control-sm" id="frmreincInsp" size="16" maxlength="10" value="0" readonly=""></td>
-								<td><input name="frmreincGrup" type="text" class="form-control-sm" id="frmreincGrup" size="8" maxlength="5" value="0"  readonly=""></td>
-								<td><input name="frmreincItem" type="text" class="form-control-sm" id="frmreincItem" size="7" maxlength="4" value="0" readonly=""></td>
+								<td align="left"><div id="impactofin"><label class="cabecampo">Reincidência</label></div></td>
+								<td><label>Nº Avaliação</label>&nbsp;&nbsp;<input name="frmreincInsp" type="text" class="form-control-sm" id="frmreincInsp" size="10" maxlength="10" value="0" readonly=""></td>
+								<td><label>Nº Grupo</label>&nbsp;&nbsp;<input name="frmreincGrup" type="text" class="form-control-sm" id="frmreincGrup" size="5" maxlength="5" value="0"  readonly=""></td>
+								<td><label>Nº Item</label>&nbsp;&nbsp;<input name="frmreincItem" type="text" class="form-control-sm" id="frmreincItem" size="5" maxlength="5" value="0" readonly=""></td>
 							</tr> 	
 						</table>					
-					</div>
+					</div>				
 					<div id="pontencialvalor">
-						<table width="90%" align="center" class="table table-bordered table-hover">
+						<br>
+						<table align="center" class="table table-bordered table-hover">
 							<tr>
-								<td colspan="5" align="center"><div id="impactofin"><label>Potencial Valor</label></div></td>
+								<td colspan="5" align="left"><div id="impactofin"><label class="cabecampo">Potencial Valor</label></div></td>
 							</tr>
 							<tr>
 								<td><div><label>Estimado a Recuperar(R$)</label></div></td>
-								<td colspan="2"><div><label>Estimado Não Planejado/Extrapolado/Sobra(R$)</label></div></td>
-								<td colspan="2"><div><label>Estimado em Risco ou Envolvido(R$)</label></div></td>
+								<td><div><label>Estimado Não Planejado/Extrapolado/Sobra(R$)</label></div></td>
+								<td><div><label>Estimado em Risco ou Envolvido(R$)</label></div></td>
 							</tr> 
 							<tr>
 								<td><div><input name="frmfalta" id="frmfalta" type="text" class="form-control-sm" value="" size="22" maxlength="18" onKeyPress="numericos()" onKeyUp="moedadig(this.name)"></div></td>
 								<td><div><input name="frmsobra" id="frmsobra" type="text" class="form-control-sm" value="" size="22" maxlength="18"  onKeyPress="numericos()" onKeyUp="moedadig(this.name)"></div></td>
-								<td><div><input type="checkbox" id="cdfrmsobra" name="cdfrmsobra" title="inativo">&nbsp;<label>Não se Aplica</label></div></td>
 								<td><div><input name="frmemrisco" id="frmemrisco" type="text" class="form-control-sm" value="" size="22" maxlength="18" onKeyPress="numericos()" onKeyUp="moedadig(this.name)"></div></td>
-								<td><div><input type="checkbox" id="cdfrmemrisco" name="cdfrmemrisco" title="inativo">&nbsp;<label>Não se Aplica</label></div></td>
 							</tr>  						
 						</table>
 					</div>
-					<br>
-					<div id="mostrarmanchete">
-						<div align="left"><label>Manchete</label></div>
-						<div align="left"><textarea  name="manchete" id="manchete" cols="133" rows="2" wrap="VIRTUAL"><cfoutput>#form.manchete#</cfoutput></textarea></div>
-					</div>
-					<br>
-					<div id="mostrartextarea">
-						<div align="left"><label>Situação Encontrada</label></div>
-						<div align="left"><textarea name="melhoria" id="melhoria" cols="145" rows="15" wrap="VIRTUAL"><cfoutput>#Form.melhoria#</cfoutput></textarea></div>
-						<br>
-						<div id="mostrarrecomendacoes">
-							<div align="left"><label>Orientações</label></div>
-							<div align="left"><textarea name="recomendacoes" id="recomendacoes" cols="133" rows="5" wrap="VIRTUAL"><cfoutput>#Form.recomendacoes#</cfoutput></textarea></div>
-							<br>
-						</div>
-					</div>
-					<div id="notacontrole">				
-						<table width="100%" align="center" class="table table-bordered table-hover">
+					<div id="notacontrole">	
+						<br>			
+						<table align="center" class="table table-bordered table-hover">
 							<tr>
-								<td align="center" colspan="2"><label>Nota de Controle?</label></td>
-							</tr>	
-							<tr>			
+								<td align="left"><label class="cabecampo">Nota de Controle?</label></td>
 								<td> 
-									<div class="col" align="left">
-										<select name="nci" id="nci" class="form-select">
-											<option value="" selected>Não</option>
-											<option value="S">Sim</option>
-										</select>
-									</div>
-								</td>						
-								<td align="Center">	
-									<div class="row">				
-										<div class="col" align="right"><label>Nº SEI da NCI</label></div>
-										<div class="col"><input class="form-control" name="frmnumseinci" id="frmnumseinci" type="text" onKeyPress="numericos();" onKeyUp="Mascara_SEI(this.value);" size="27" maxlength="20" value="" readonly></div>
-									</div>
+									<select name="nci" id="nci" class="form-select">
+										<option value="" selected>Não</option>
+										<option value="S">Sim</option>
+									</select>
 								</td>
-							</tr>
+								<td align="right"><br><label>Nº SEI da NCI</label></td>
+								<td align="Center"><input class="form-control" name="frmnumseinci" id="frmnumseinci" type="text" onKeyPress="numericos();" onKeyUp="Mascara_SEI(this.value);" size="27" maxlength="20" value="" readonly></td>								
+							</tr>	
 						</table>
+					</div>
+					<div id='mostraranexos'>
+						<br>
+						<table align="center" class="table table-bordered table-hover">
+							<tr>
+								<td colspan="2"><div align="left"><label class="cabecampo">Anexos</label></div></td>
+							</tr>
+								<tr>
+									<td colspan="1"><input type="file" id="arquivo" name="arquivo" class="form-control" size="50"></td>
+									<td colspan="1" align="center"><div id='anexar' class="form-control"><label class="lblbtn">Anexar</label></div>
+								</tr>
+							<tr>
+								<td colspan="4">
+									<div id='tableanexo'></div>							
+								</td>
+							</tr>					
+						</table>			
 					</div>
 					<input type="hidden" name="grpacesso" id="grpacesso" value="<cfoutput>#grpacesso#</cfoutput>">
 					<input type="hidden" name="numinspecao" id="numinspecao" value="<cfoutput>#url.numinspecao#</cfoutput>">
@@ -1373,36 +1376,18 @@ label {
 					<input type="hidden" name="concluirevisaosn" id="concluirevisaosn" value="<cfoutput>#concluiravalasn#</cfoutput>">
 					<input type="hidden" name="impactarfalta" id="impactarfalta" value="N">
 					<input type="hidden" name="impactarsobra" id="impactarsobra" value="N">
-					<input type="hidden" name="cdfrmsobrasn" id="cdfrmsobrasn" value="N">
 					<input type="hidden" name="impactarrisco" id="impactarrisco" value="N">
-					<input type="hidden" name="cdfrmemriscosn" id="cdfrmemriscosn" value="N">
 					<input type="hidden" name="qtdlistainspsemaval" id="qtdlistainspsemaval" value="">
 					<input type="hidden" name="numanexoexcluir" id="numanexoexcluir" value="">
 					<input type="hidden" name="formgrp" id="formgrp" value="<cfoutput>#formgrp#</cfoutput>">
-					<input type="hidden" name="formitm" id="formitm" value="<cfoutput>#formitm#</cfoutput>">				
-					<input type="hidden" name="acao" id="acao" value="">
-					<div id='mostraranexos'>
-						<table width="100%" align="center" class="table table-bordered table-hover">
-							<tr>
-								<td colspan="2"><div align="center"><label>Anexos</label></div></td>
-							</tr>
-								<tr>
-									<td colspan="1"><input type="file" id="arquivo" name="arquivo" class="form-control" size="50"></td>
-									<td colspan="1" align="center"><div id='anexar' class="form-control"><label class="lblbtn">Anexar</label></div>
-								</tr>
-							<tr>
-								<td colspan="4">
-									<div id='tableanexo'></div>							
-								</td>
-							</tr>					
-						</table>			
-					</div>
+					<input type="hidden" name="formitm" id="formitm" value="<cfoutput>#formitm#</cfoutput>">			
+					<input type="hidden" name="acao" id="acao" value="<cfoutput>#url.acao#</cfoutput>">
 			</form>					
 				<div id='divbtnsalvar'>
-					<table width="100%" align="center" class="table table-hover">
+					<table align="center" class="table table-hover">
 					<tr>
 						<td align="center">
-							<div class="btnsalvar" align="center" title="Salvar Avaliação do Grupo/Item"><h5>Salvar Avaliação do Grupo/Item selecionado</h5></div>  
+							<div class="btnsalvar" align="center" title="Salvar Avaliação do Grupo/Item"><h5>Salvar avaliação do item</h5></div>  
 						</td>   
 					</tr>
 					</table>
@@ -1574,13 +1559,16 @@ label {
 		let formgrp = $('#formgrp').val()
 		let formitm = $('#formitm').val()
 		//alert(formgrp + ' '+formitm)
-		$('.box').each(function(index) {
-			let grp = $(this).attr("grp")
-			let itm = $(this).attr("itm")
-			//alert('formgrp: '+formgrp+' formitm: '+formitm)
-			//if(grp==formgrp && itm ==formitm){$(this).trigger('click')}
-			if(grp==formgrp && itm==formitm){ $(this).css('box-shadow', '8px 8px 5px #888')}
-		})	
+		let acao = <cfoutput>'#url.acao#'</cfoutput> 
+		setTimeout(function() {
+			$('.box').each(function(index) {
+				let grp = $(this).attr("grp")
+				let itm = $(this).attr("itm")
+				//alert('formgrp: '+formgrp+' formitm: '+formitm)
+				if(grp == formgrp && itm == formitm && acao != 'salvargrpitm'){$(this).trigger('click')}
+				if(grp == formgrp && itm == formitm){ $(this).css('box-shadow', '8px 8px 5px #888')}
+			})	
+		 }, 1000)
 	})
 	//================
 	$('#nci').change(function(){ 
@@ -1719,7 +1707,7 @@ label {
 			return false
 		}	
 		$('#acao').val('anexar')
-		$('#formx').submit()	
+		$('#formx').submit()		
 	})
 
 	$('.botaomostrareinc').click(function(){  
@@ -2105,42 +2093,7 @@ label {
 			  
 		})  // final busca avaliação anterior	
 	})
-	$('#cdfrmemrisco').click(function(){  
-		//alert('$("#dbfrmemrisco").val(): '+$("#dbfrmemrisco").val())
-		let title = $(this).attr('title')
-		if(title == 'inativo'){
-			$('#cdfrmemrisco').attr('title','ativo')
-			$('#frmemrisco').val('0,00')
-			$("#frmemrisco").attr('disabled', true)
-			$("#cdfrmemrisco").val('off')
-			$("#cdfrmemriscosn").val('N')
-		}else{
-			$('#cdfrmemrisco').attr('title','inativo')
-			$('#frmemrisco').val($("#dbfrmemrisco").val())
-			$("#frmemrisco").attr('disabled', false)
-			$("#cdfrmemrisco").val('on')
-			$("#cdfrmemriscosn").val('S')
-		}
-	})	
-	$('#cdfrmsobra').click(function(){  
-		//alert('$("#dbfrmsobra").val(): '+$("#dbfrmsobra").val())
-		//alert('$("#cdfrmsobrasn").val(): '+$("#cdfrmsobrasn").val())
-		
-		let title = $(this).attr('title')
-		if(title == 'inativo'){
-			$('#cdfrmsobra').attr('title','ativo')
-			$('#frmsobra').val('0,00')
-			$("#frmsobra").attr('disabled', true);	
-			$("#cdfrmsobra").val('off')
-			$("#cdfrmsobrasn").val('N')
-		}else{
-			$('#cdfrmsobra').attr('title','inativo')
-			$('#frmsobra').val($("#dbfrmsobra").val())
-			$("#frmsobra").attr('disabled', false)
-			$("#cdfrmsobra").val('on')
-			$("#cdfrmsobrasn").val('S')
-		}
-	})	
+	
 	//====================================	
 	$('#avalitem').change(function(){   
 		let respsel = $(this).val()
@@ -2191,13 +2144,9 @@ label {
 		$('#frmemrisco').val('0,00')
 		$('#frmsobra').val('0,00')
 
-		$('#cdfrmsobra').attr('title','inativo')
-		$("#cdfrmsobra").prop("checked", false)
 		$('#frmsobra').val($("#dbfrmsobra").val())
 		$("#frmsobra").attr('disabled', false)
 		
-		$('#cdfrmemrisco').attr('title','inativo')
-		$("#cdfrmemrisco").prop("checked", false)
 		$('#frmemrisco').val($("#dbfrmemrisco").val())
 		$("#frmemrisco").attr('disabled', false)
 
@@ -2231,11 +2180,11 @@ label {
 						}
 						if(i == 1){
 							$("#impactarsobra").val(val)
-							if(val == 'S'){$("#frmsobra").attr('disabled', false);$("#cdfrmsobra").attr('disabled', false);$("#cdfrmsobrasn").val('S')}else{$("#frmsobra").attr('disabled', true);$("#cdfrmsobra").attr('disabled', true);$("#cdfrmsobrasn").val('N')}
+							if(val == 'S'){$("#frmsobra").attr('disabled', false)}else{$("#frmsobra").attr('disabled', true)}
 						}
 						if(i == 2){
 							$("#impactarrisco").val(val)
-							if(val == 'R'){$("#frmemrisco").attr('disabled', false);$("#cdfrmemrisco").attr('disabled', false);$("#cdfrmemriscosn").val('S')}else{$("#frmemrisco").attr('disabled', true);$("#cdfrmemrisco").attr('disabled', true);$("#cdfrmemriscosn").val('N')}
+							if(val == 'R'){$("#frmemrisco").attr('disabled', false)}else{$("#frmemrisco").attr('disabled', true)}
 						}
 					})
 				}  
@@ -2292,11 +2241,11 @@ label {
 						}
 						if(i == 1){
 							$("#impactarsobra").val(val)
-							if(val == 'S'){$("#frmsobra").attr('disabled', false);$("#cdfrmsobra").attr('disabled', false);$("#cdfrmsobrasn").val('S')}else{$("#frmsobra").attr('disabled', true);$("#cdfrmsobra").attr('disabled', true);$("#cdfrmsobrasn").val('N')}
+							if(val == 'S'){$("#frmsobra").attr('disabled', false)}else{$("#frmsobra").attr('disabled', true)}
 						}
 						if(i == 2){
 							$("#impactarrisco").val(val)
-							if(val == 'R'){$("#frmemrisco").attr('disabled', false);$("#cdfrmemrisco").attr('disabled', false);$("#cdfrmemriscosn").val('S')}else{$("#frmemrisco").attr('disabled', true);$("#cdfrmemrisco").attr('disabled', true);$("#cdfrmemriscosn").val('N')}
+							if(val == 'R'){$("#frmemrisco").attr('disabled', false)}else{$("#frmemrisco").attr('disabled', true)}
 						}
 					})
 				}  
@@ -2309,7 +2258,9 @@ label {
 		if(riprecomendacao=='S' && concluirevisaosn == 'N'){
 			$('#reanalisegeral').show(500)
 			reanaliseajustar()
-		}							
+		}	
+		let grpacesso = $("#grpacesso").val()
+		if(grpacesso != 'INSPETORES'){$('#divbtnsalvar').hide()} 								
 	}
 //=====================================
 	// realizar as buscas a partir do clicar do botão Avaliar Grupo/Item
@@ -2887,9 +2838,12 @@ label {
 					$("#dbfrmsobra").val(ret[1].toLocaleString('pt-br', {minimumFractionDigits: 2}))
 					$("#dbfrmemrisco").val(ret[2].toLocaleString('pt-br', {minimumFractionDigits: 2}))
 					//alert('prerelato: '+ret[3])
+					let corpotxt = ''
+					if(respsel == 'C'){corpotxt = 'Descrever as verificações que concluíram na conformidade do teste.'}
+					if(respsel == 'V'){corpotxt = 'Descrever a(s) justificativa(s) para a não avaliação o item.'}
 					if(respsel != 'N')
 					{
-						$("#melhoria").val('Descrever a Situação Encontrada...');
+						$("#melhoria").val(corpotxt);
 						CKEDITOR.instances['melhoria'].setData(melhoria)
 					}else{
 						let melhoria = ret[3] + '<strong>Ref. Normativa:</strong>'+ret[9]
@@ -3096,124 +3050,134 @@ label {
 	// Inicial   Salvar o grupo/item
 	//***************************************************
 	$('.btnsalvar').click(function(){
-		let tipoavaliacao = $('#avalitem').val()
-		//controle - 01 não salvar avaliação tipo = A
-		if (tipoavaliacao == 'A'){
-			alert('Inspetor(a), selecione o tipo de avaliação para o grupo/item')
-			$('#avalitem').focus()
-			return false
-		}
-
-		let melhoria = CKEDITOR.instances.melhoria.getData()
-		melhoria = melhoria.replace(/\s/g, '')
-
-		var recomedar = CKEDITOR.instances.recomendacoes.getData() 
-		recomedar = recomedar.replace(/\s/g, '')
-
-		let codunid = $("#codunidade").val()
-		let numinsp = $('#numinspecao').val()
-		let grp = $("#grpsel").val()
-		let itm = $("#itmsel").val()
-		if (melhoria.length < 100 && tipoavaliacao == 'C')
-		{
-			alert('Inspetor(a), para avaliação "CONFORME", o campo "Situação Encontrada" deve ser preenchido com, pelo menos, 100(cem) caracteres!')
-			$('#melhoria').focus()
-			return false
-		}
-
-		if (melhoria.length < 100 && tipoavaliacao == 'V' && grp != 500 ) 
-		{
-			alert('Inspetor(a), para avaliação "NÃO VERIFICADO", o campo "Situação Encontrada" deve conter a justificativa com, no mínimo, 100(cem) caracteres!')
-			$('#melhoria').focus()
-			return false
-		}	
-
-		if (tipoavaliacao == 'N'){
-			if ($('#manchete').val() =='')
-			{
-				alert('Inspetor(a), informar o campo Manchete')
-				$('#manchete').focus()
-				return false
-			}
-
-			if (melhoria.length < 100 || recomedar.length < 100)
-			{
-				alert('Inspetor(a), para avaliação "NÃO CONFORME", o campo "Situação Encontrada e/ou Orientações" deve conter, no mínimo, 100 caracteres')
-				$('#melhoria').focus()
-				return false
-			}
-			let potencvlr = $("#potencvlr").val()
-			if(potencvlr == 'S'){
-				let impactarfalta = 'N'
-				let impactarsobra = 'N'
-				let impactarrisco = 'N'
-				let intimpactartipos = $("#intimpactartipos").val()	
-				var arr = intimpactartipos.split(',')
-				$.each( arr, function( i, val ) {
-					if(i == 0){
-						impactarfalta = val
-					}
-					if(i == 1){
-						impactarsobra = val
-					}
-					if(i == 2){
-						impactarrisco = val
-					}
-				})
-
-				if(impactarfalta == 'F'){
-					let vlrfalta = $("#frmfalta").val()
-					$("#impactarfalta").val('F')
-					if(vlrfalta == '0,00'){
-						alert('Inspetor(a), informar valor no campo Estimado a Recuperar(R$)')
-						$('#frmfalta').focus()
-						return false
-					}
-				}
-				if(impactarsobra == 'S'){
-					let vlrsobra = $("#frmsobra").val()
-					$("#impactarsobra").val('S')
-					let cdfrmsobra = $("#cdfrmsobra").val()
-					//$("#cdfrmsobrasn").val('N')
-					if(vlrsobra == '0,00' && cdfrmsobra == 'on'){
-						$("#cdfrmsobrasn").val('S')
-						alert('Inspetor(a), informar valor no campo Estimado Não Planejado/Extrapolado/Sobra:(R$)')
-						$('#frmsobra').focus()
-						return false
-					}
-				}
-				if(impactarrisco == 'R'){
-					let vlrrisco = $("#frmemrisco").val()
-					$("#impactarrisco").val('R')
-					let cdfrmemrisco = $("#cdfrmemrisco").val()
-					//$("#cdfrmemriscosn").val('N')
-					if(vlrrisco == '0,00' && cdfrmemrisco == 'on'){
-						$("#cdfrmemriscosn").val('S')
-						alert('Inspetor(a), informar valor no campo Estimado em Risco ou Envolvido(R$)')
-						$('#frmemrisco').focus()
-						return false
-					}
-				}				
-			}
-		}
-
-		if ($('#nci').val() == 'S'){
-			// controle de dados do N.SEI da NCI
-			var nsnci = $('#frmnumseinci').val() 
-			if (nsnci.length != 20 || nsnci ==''){		
-				alert('Inspetor(a), N° SEI inválido:  (ex. 99999.999999/9999-99)');
-				$('#frmnumseinci').focus()
-				return false;
-			}
-		}
 		$('#acao').val('salvargrpitm')	
 		$('#formx').submit()	
 	})
-			
+	function validarform(){
+			let tipoavaliacao = $('#avalitem').val()
+			//controle - 01 não salvar avaliação tipo = A
+			if (tipoavaliacao == 'A'){
+				alert('Inspetor(a), selecione o tipo de avaliação para o grupo/item')
+				$('#avalitem').focus()
+				return false
+			}
+
+			let melhoria = CKEDITOR.instances.melhoria.getData()
+			melhoria = melhoria.replace(/\s/g, '')
+
+			var recomedar = CKEDITOR.instances.recomendacoes.getData() 
+			recomedar = recomedar.replace(/\s/g, '')
+
+			let codunid = $("#codunidade").val()
+			let numinsp = $('#numinspecao').val()
+			let grp = $("#grpsel").val()
+			let itm = $("#itmsel").val()
+			if (melhoria.length < 100 && tipoavaliacao == 'C')
+			{
+				alert('Inspetor(a), para avaliação "CONFORME", o campo "Situação Encontrada" deve ser preenchido com, pelo menos, 100(cem) caracteres!')
+				$('#melhoria').focus()
+				return false
+			}
+
+			if (melhoria.length < 100 && tipoavaliacao == 'V' && grp != 500 ) 
+			{
+				alert('Inspetor(a), para avaliação "NÃO VERIFICADO", o campo "Situação Encontrada" deve conter a justificativa com, no mínimo, 100(cem) caracteres!')
+				$('#melhoria').focus()
+				return false
+			}	
+
+			if (tipoavaliacao == 'N'){
+				if ($('#manchete').val() =='')
+				{
+					alert('Inspetor(a), informar o campo Manchete')
+					$('#manchete').focus()
+					return false
+				}
+
+				if (melhoria.length < 100 || recomedar.length < 100)
+				{
+					alert('Inspetor(a), para avaliação "NÃO CONFORME", o campo "Situação Encontrada e/ou Orientações" deve conter, no mínimo, 100 caracteres')
+					$('#melhoria').focus()
+					return false
+				}
+				let potencvlr = $("#potencvlr").val()
+				if(potencvlr == 'S'){
+					let impactarfalta = 'N'
+					let impactarsobra = 'N'
+					let impactarrisco = 'N'
+					let intimpactartipos = $("#intimpactartipos").val()	
+					var arr = intimpactartipos.split(',')
+					$.each( arr, function( i, val ) {
+						if(i == 0){
+							impactarfalta = val
+						}
+						if(i == 1){
+							impactarsobra = val
+						}
+						if(i == 2){
+							impactarrisco = val
+						}
+					})
+						
+					if(impactarfalta == 'F' && impactarsobra == 'S' && impactarrisco == 'R'){
+						if($("#frmfalta").val() == '0,00' && $("#frmsobra").val() == '0,00' && $("#frmemrisco").val() == '0,00'){
+							alert('Sr(a) Inspetor(a), informar valor(es) no(s) campo(s)\n\n Estimado a Recuperar(R$)\ne/ou\n Estimado Não Planejado/Extrapolado/Sobra(R$)\ne/ou\n Estimado em Risco ou Envolvido(R$)')
+							$('#frmfalta').focus()
+							return false
+						}
+					}
+					if(impactarfalta == 'F' && impactarsobra == 'S' && impactarrisco == 'N'){
+						if($("#frmfalta").val() == '0,00' && $("#frmsobra").val() == '0,00'){
+							alert('Sr(a) Inspetor(a), informar valor(es) no(s) campo(s)\n\n Estimado a Recuperar(R$)\ne/ou\n Estimado Não Planejado/Extrapolado/Sobra(R$)')
+							$('#frmfalta').focus()
+							return false
+						}
+					}
+					if(impactarfalta == 'F' && impactarsobra == 'N' && impactarrisco == 'N'){
+						if($("#frmfalta").val() == '0,00'){
+							alert('Sr(a) Inspetor(a), informar valor no campo\n\n Estimado a Recuperar(R$)')
+							$('#frmfalta').focus()
+							return false
+						}
+					}	
+					if(impactarfalta == 'N' && impactarsobra == 'S' && impactarrisco == 'R'){
+						if($("#frmsobra").val() == '0,00' && $("#frmemrisco").val() == '0,00'){
+							alert('Sr(a) Inspetor(a), informar valor(es) no(s) campo(s)\n\n Estimado Não Planejado/Extrapolado/Sobra(R$)\ne/ou\n Estimado em Risco ou Envolvido(R$)')
+							$('#frmsobra').focus()
+							return false
+						}
+					}	
+					if(impactarfalta == 'N' && impactarsobra == 'S' && impactarrisco == 'N'){
+						if($("#frmsobra").val() == '0,00'){
+							alert('Sr(a) Inspetor(a), informar valor no campo\n\n Estimado Não Planejado/Extrapolado/Sobra(R$)')
+							$('#frmsobra').focus()
+							return false
+						}
+					}	
+					if(impactarfalta == 'N' && impactarsobra == 'N' && impactarrisco == 'R'){
+						if($("#frmemrisco").val() == '0,00'){
+							alert('Sr(a) Inspetor(a), informar valor no campo\n\n Estimado em Risco ou Envolvido(R$)')
+							$('#frmemrisco').focus()
+							return false
+						}
+					}															
+				}
+			}
+
+			if ($('#nci').val() == 'S'){
+				// controle de dados do N.SEI da NCI
+				var nsnci = $('#frmnumseinci').val() 
+				if (nsnci.length != 20 || nsnci ==''){		
+					alert('Inspetor(a), N° SEI inválido:  (ex. 99999.999999/9999-99)');
+					$('#frmnumseinci').focus()
+					return false;
+				}
+			}
+	}			
 
 	CKEDITOR.replace('melhoria', {
       // Define the toolbar groups as it is a more accessible solution.
-	  width: '1085',
+	  width: '1096',
 		height: 350,
 		removePlugins: 'scayt',
 		disableNativeSpellChecker: false,
@@ -3230,7 +3194,7 @@ label {
       //removeButtons: 'Strike,Subscript,Superscript,Specialchar,PasteFromWord'
     });
 	CKEDITOR.replace('recomendacoes', {
-		width: '1085',
+		width: '1096',
 		height: 100,
 		removePlugins: 'scayt',
 		disableNativeSpellChecker: false,
@@ -3281,7 +3245,7 @@ label {
 		]
     });
 	CKEDITOR.replace('melhoriantes', {
-		width: '1050',
+		width: '1055',
 		height: 350,
 		removePlugins: 'scayt',
 		disableNativeSpellChecker: false,
@@ -3299,7 +3263,7 @@ label {
 		
     });	
 	CKEDITOR.replace('recomendacoesantes', {
-		width: '1050',
+		width: '1055',
 		height: 100,
 		removePlugins: 'scayt',
 		disableNativeSpellChecker: false,

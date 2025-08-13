@@ -3,7 +3,7 @@
 	<cfparam name = "dsnSNCI" default = "DBSNCI"> 
     <cffunction name="init">
         <cfreturn this>
-    </cffunction>
+    </cffunction>		
 	<cffunction name="contaravaliador" access="remote" ReturnFormat="json" returntype="any">
         <cfargument name="numinspecao" required="true">
         <cftry>			
@@ -218,7 +218,6 @@
             <cfreturn rsgrpitmavaliar>
         </cftransaction>
     </cffunction> 
-
 	<cffunction  name="anexos" access="remote" ReturnFormat="json" returntype="any">
         <cfargument name="numaval" required="true">  
 		<cfargument name="codunid" required="true">
