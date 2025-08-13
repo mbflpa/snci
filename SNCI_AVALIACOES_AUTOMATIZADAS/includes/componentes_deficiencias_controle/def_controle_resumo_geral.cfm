@@ -313,7 +313,7 @@
                                     <i class=" info-icon-automatizadas" 
                                        data-toggle="popover" 
                                        data-trigger="hover" 
-                                       data-placement="right"
+                                       data-placement="top"
                                        data-html="false"
                                        data-content="<cfoutput>#htmlEditFormat(item.definicao)#</cfoutput>"></i>
                                 </cfif>
