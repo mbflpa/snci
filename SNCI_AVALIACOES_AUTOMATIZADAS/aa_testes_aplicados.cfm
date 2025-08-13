@@ -23,6 +23,17 @@
 
 
 <style>
+    :root {
+    --azul_correios: #00416B;
+    --azul_claro_correios: #0083CA;
+    --amarelo_correios: #FFD400;
+    --amarelo_escuro_correios: #CD992B;
+    --amarelo_prisma_claro_correios: #FFE600;
+    --amarelo_prisma_escuro_correios: #FFC20E;
+    --cinza_warm_gray_claro_correios: #D1CCC7;
+    --cinza_warm_gray_escuro_correios: #BDB4AB;
+    --preto_slogan_pantone_black_correios: #323335;
+    }
     .testes-aplicados-layout {
         padding: 16px;
         padding-top: 0px;
@@ -44,6 +55,43 @@
         .testes-aplicados-layout {
             flex-direction: column;
         }
+    }
+    #testesAplicadosTable {
+        border-collapse: collapse;
+        width: 100%;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    #testesAplicadosTable thead th {
+        background: linear-gradient(to top, var(--azul_correios), var(--azul_claro_correios));
+        color: #fff;
+        padding: 12px 15px;
+        text-align: left;
+        font-weight: 600;
+        border-bottom: 2px solid var(--cinza_warm_gray_claro_correios);
+    }
+
+    #testesAplicadosTable tbody tr {
+        border-bottom: 1px solid var(--cinza_warm_gray_claro_correios);
+        transition: background-color 0.3s ease;
+    }
+
+    #testesAplicadosTable tbody tr:last-of-type {
+        border-bottom: none;
+    }
+
+    #testesAplicadosTable tbody tr:hover {
+        background-color: var(--amarelo_prisma_claro_correios) !important;
+    }
+
+    #testesAplicadosTable td {
+        padding: 10px 15px;
+        color: var(--preto_slogan_pantone_black_correios);
+    }
+    #testesAplicadosTable thead th {
+        text-align: center !important;
     }
 </style>
 
@@ -78,11 +126,11 @@
                                 <strong>Erro:</strong> <cfoutput>#dadosTestes.erro#</cfoutput>
                             </div>
                         </cfif>
-
+                        
                         <table id="testesAplicadosTable" class="table table-striped table-bordered" style="width:100%;margin-bottom: 5rem;">
                             <thead>
                                 <tr>
-                                    <th>N° do Teste</th>
+                                    <th>N°  </th>
                                     <th>Assunto</th>
                                     <th>Teste</th>
                                     <th>Fonte de Dados</th>
@@ -94,7 +142,7 @@
                                     <cfoutput>
                                         <cfloop query="dadosTestes.testes">
                                             <tr>
-                                                <td>#TESTE#</td>
+                                                <td style="width: 5%;">#TESTE#</td>
                                                  <td>#MANCHETE#</td>
                                                 <td>#DESCRIÇÃO#</td>
                                                 <td>#fonte_dados#</td>
