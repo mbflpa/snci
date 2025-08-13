@@ -4,10 +4,7 @@
         <cfargument name="sk_mcu" type="numeric" required="true" hint="Código da unidade MCU">
         <cfargument name="mesAnoFiltro" type="string" required="false" default="" hint="Filtro por mês no formato yyyy-MM">
         
-        <cfset var chaveCache = "cacheAADeficiencias_" & arguments.sk_mcu & "_" & arguments.mesAnoFiltro>
         
-        <!--- Verificar se os dados já estão em cache nativo --->
-        <cfset var dadosCompletos = cacheGet(chaveCache)>
         <cfif NOT isDefined("dadosCompletos") OR isNull(dadosCompletos)>
             
             <cfset dadosCompletos = structNew()>
@@ -177,8 +174,7 @@
             <cfset dadosCompletos.ultimosMeses = rsUltimosMeses>
             <cfset dadosCompletos.dadosDetalhados = rsDadosDetalhados>
 
-            <!--- Armazenar no cache nativo com expiração de 30 minutos --->
-            <cfset cachePut(chaveCache, dadosCompletos, createTimeSpan(0,0,30,0))>
+            
         </cfif>
 
         <cfreturn dadosCompletos>
