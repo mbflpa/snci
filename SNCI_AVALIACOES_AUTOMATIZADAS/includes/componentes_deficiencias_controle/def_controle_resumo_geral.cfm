@@ -63,7 +63,7 @@
         conformes = {
             valor = dadosHistoricos.conformes,
             icone = "fas fa-check-circle",
-            titulo = "Conformes",
+            titulo = "Testes Conformes",
             cor = "decrease",
             definicao = "Tratam-se de situações identificadas nas avaliações realizadas nas unidades operacionais, por meio da aplicação de testes de controle (Plano de Testes), que estão de acordo com o previsto em normas internas dos Correios, documentos de orientações vigentes (ofícios) e legislações.",
             ordem= 3
@@ -71,7 +71,7 @@
         deficienciasControle = {
             valor = dadosHistoricos.deficienciasControle,
             icone = "fas fa-exclamation-triangle",
-            titulo = "Deficiência do Controle",
+            titulo = "Testes c/ Deficiência do Controle",
             cor = "increase",
             definicao = "Tratam-se de situações identificadas nas avaliações realizadas nas unidades operacionais, por meio da aplicação de testes de controle (Plano de Testes), que não condizem com o previsto em normas internas dos Correios, documentos de orientações vigentes (ofícios) e legislações.",
             ordem= 4
@@ -147,7 +147,7 @@
     .snci-resumo-geral .kpi-row {
         display: flex;
         flex-direction: row;
-
+        gap: 5px;
         justify-content: center;
         align-items: stretch;
         flex-wrap: wrap;
@@ -155,7 +155,7 @@
 
     .snci-resumo-geral .kpi-card {
         background: #fff;
-        padding: 12px 16px;
+        padding: 10px 10px;
         border-radius: 12px;
         box-shadow: 0 4px 8px rgba(0,0,0,0.05);
         display: flex;

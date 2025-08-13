@@ -47,14 +47,14 @@
     <link rel="stylesheet" href="../SNCI_AVALIACOES_AUTOMATIZADAS/dist/css/stylesSNCI.css">
 
    <cfset links = [
-        { href = "index.cfm", icon = "fas fa-home", text = "Principal" },
+        { href = "aa_mensagem_temporaria.cfm", icon = "fas fa-home", text = "Principal" },
         { href = "aa_deficiencias_controle.cfm", icon = "fas fa-bug", text = "Deficiências de Controle" },
-        { href = "teste.cfm", icon = "fas fa-shield-alt", text = "Vulnerabilidades" },
+        { href = "aa_pagina_construcao.cfm", icon = "fas fa-shield-alt", text = "Vulnerabilidades" },
         { href = "aa_testes_aplicados.cfm", icon = "fas fa-tasks", text = "Testes Aplicados" },
-        { href = "relatorios.cfm", icon = "fas fa-database", text = "Base de Eventos" },
-        { href = "orientacoes.cfm", icon = "fas fa-info-circle", text = "Orientações" },
-        { href = "historicoAnual.cfm", icon = "fas fa-history", text = "Histórico Anual" }
-      ] />
+        { href = "aa_pagina_construcao.cfm", icon = "fas fa-database", text = "Base de Eventos" },
+        { href = "aa_pagina_construcao.cfm", icon = "fas fa-info-circle", text = "Orientações" },
+        { href = "aa_pagina_construcao.cfm", icon = "fas fa-history", text = "Histórico Anual" }
+        ] />
 
 
     
@@ -317,7 +317,8 @@
              <cfloop array="#links#" index="link">
               <cfoutput>
                 <li class="nav-item" style="margin-bottom: 0;">
-                  <a href="#link.href#" class="nav-link modern-nav-link">
+                  <a href="#link.href#" class="nav-link modern-nav-link"
+                     <cfif link.text EQ "Principal">id="sidebarPrincipal"</cfif>>
                     <div class="modern-nav-icon">
                       <i class="#link.icon#"></i>
                     </div>
@@ -368,7 +369,7 @@
     <script  src="../SNCI_AVALIACOES_AUTOMATIZADAS/plugins/toastr/toastr.min.js"></script>
 
     <!-- Popper -->
-    <script  src="../SNCI_AVALIACOES_AUTOMATIZADAS/plugins/popper/popper.min.js"></script>
+    <script  src="../SNCI_AVALIACOES_AUTOMATIZADAS/plugins/popper/umd/popper.min.js"></script>
 
     <!-- DataTables  & Plugins -->
     <script  src="../SNCI_AVALIACOES_AUTOMATIZADAS/plugins/datatables/datatables.min.js"></script>
@@ -420,8 +421,16 @@
           // Remover parâmetros da URL para comparação
           const linkUrl = new URL(link.href);
           const currentUrlObj = new URL(currentUrl);
-          
-          if (linkUrl.pathname === currentUrlObj.pathname) {
+
+          // Caso especial: se está na index.cfm e a aba inicial é aa_mensagem_temporaria.cfm, ativa o link "Principal"
+          if (
+            currentUrlObj.pathname.toLowerCase().endsWith('/index.cfm') &&
+            $('.tab-empty .display-5').length &&
+            linkUrl.pathname.toLowerCase().endsWith('/aa_mensagem_temporaria.cfm') &&
+            link.textContent.trim() === 'Principal'
+          ) {
+            link.classList.add('active');
+          } else if (linkUrl.pathname === currentUrlObj.pathname) {
             link.classList.add('active');
           }
         });

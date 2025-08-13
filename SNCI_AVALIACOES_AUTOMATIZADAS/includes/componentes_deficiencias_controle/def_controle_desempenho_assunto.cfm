@@ -246,7 +246,13 @@
 <cfloop from="1" to="#arrayLen(assuntosZerados)#" index="i">
     <cfset arrayAppend(dadosOrdenados, assuntosZerados[i])>
 </cfloop>
-
+    
+      <!-- DataTables -->
+      <link rel="stylesheet" href="../SNCI_AVALIACOES_AUTOMATIZADAS/plugins/datatables/datatables.min.css">
+          
+      <!-- Theme style -->
+    <link rel="stylesheet" href="../SNCI_AVALIACOES_AUTOMATIZADAS/dist/css/adminlte.min.css">
+    <link rel="stylesheet" href="../SNCI_AVALIACOES_AUTOMATIZADAS/dist/css/stylesSNCI.css">
 <style>
     .card-header {
         border:none!important;
@@ -259,6 +265,7 @@
         width: 100%;
         margin: 0;
         padding: 0;
+        margin-bottom: 30px;
     }
 
     .snci-desempenho-assunto .desempenho-container {
@@ -789,6 +796,14 @@
         color: #457b9d;
     }
 
+        /* Aumentar largura dos popovers Bootstrap */
+    .popover {
+        max-width: 420px !important;
+        width: 420px !important;
+    }
+
+
+
 </style>
 
 <div class="snci-desempenho-assunto">
@@ -821,7 +836,6 @@
                                     <i class=" info-icon-automatizadas" 
                                         data-toggle="popover" 
                                         data-trigger="hover" 
-                                        data-placement="right"
                                         data-html="false"
                                         data-content=
                                         "<cfoutput>
@@ -839,7 +853,6 @@
                                     <i class=" info-icon-automatizadas" 
                                         data-toggle="popover" 
                                         data-trigger="hover" 
-                                        data-placement="right"
                                         data-html="false"
                                         data-content="<strong>Grupo-Item:</strong> numeração atribuída a cada teste de controle interno.">
                                     </i>
@@ -952,19 +965,23 @@
                 </div>
             </div>
         </div>
-        
+      
         <!-- Rodapé informativo sobre evidências -->
         <div class="info-footer">
             <i class="fas fa-info-circle mr-2" style="color: #457b9d;"></i>
-            <strong class="highlight">Evidências:</strong> Os meses que possuem o ícone 
+            <strong class="highlight">Evidências:</strong> Os meses que exibem o ícone 
             <span><i class="fas fa-eye" style="color: #457b9d;"></i></span> 
-            têm tabela de evidências disponível para consulta detalhada, bastando clicar onde aparece a informação da quantidade de eventos.
+            possuem uma tabela de evidências disponível para consulta detalhada. Clique no card com a quantidade de eventos para consultar.
             <br>
             <small><strong>Observação:</strong> Atualmente, as evidências estão disponíveis apenas para o último mês.</small>
         </div>
     </div>
 </div>
 
+<!-- Popper.js (se Bootstrap 4) -->
+<script src="../SNCI_AVALIACOES_AUTOMATIZADAS/plugins/popper/umd/popper.min.js"></script>
+
+<script  src="../SNCI_AVALIACOES_AUTOMATIZADAS/plugins/datatables/datatables.min.js"></script>
 <script>
     $(document).ready(function() {
         // Animar barras de progresso
@@ -1058,7 +1075,7 @@
             $('#tabelaEvidencias').remove();
             
             // Recriar elemento da tabela do zero
-            const novaTabela = '<table id="tabelaEvidencias" class="table table-striped table-bordered table-hover compact nowrap" style="width: 100%;"></table>';
+            const novaTabela = '<table id="tabelaEvidencias" class="table table-striped table-hover text-nowrap  table-responsive table-responsive" style="width: 100%;"></table>';
             $('.table-container').html(novaTabela);
             
             try {
@@ -1106,7 +1123,7 @@
             
             try {
                 // Criar estrutura HTML da tabela antes de inicializar DataTables
-                let tableHTML = '<thead class="thead-dark"><tr>';
+                let tableHTML = '<thead class="table_thead_backgroundColor"><tr>';
                 colunas.forEach(function(coluna) {
                     tableHTML += '<th>' + coluna.nome + '</th>';
                 });
@@ -1219,7 +1236,6 @@
                     // Configurações de layout e responsividade
                    dom: '<"row align-items-center"' +
                             '<"col-md-12 d-flex justify-content-between flex-wrap"' +
-                                '<"me-auto"l>' +
                                 '<"mx-auto"f>' +
                                 '<"ms-auto me-2"B>' +   
                             '>' +
@@ -1233,21 +1249,14 @@
 								className: 'btExcel'
                             }
 						],
-                    // Habilitar rolagem horizontal e vertical
-                    scrollX: true,
-                    scrollY: '50vh',
-                    scrollCollapse: true,
-                    
+                  
                     // Habilitar autoWidth para permitir larguras automáticas
                     autoWidth: true,
                     
                     // Configurações de exibição
                     pageLength: 10,
                     lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "Todos"]],
-                    
-                    // Classes CSS para estilo compacto
-                    className: 'compact',
-                    
+                  
                     // Configurar ordenação padrão
                     order: [[0, 'asc']],
                     
@@ -1380,7 +1389,7 @@
             
             // Limpar completamente o container
             $('#tabelaEvidencias').remove();
-            $('.table-container').html('<table id="tabelaEvidencias" class="table table-striped table-bordered table-hover compact nowrap" style="width: 100%;"></table>');
+            $('.table-container').html('<table id="tabelaEvidencias" class="table table-striped table-hover text-nowrap  table-responsive table-responsive" style="width: 100%;"></table>');
             $('#evidenciasInfo').empty();
             
             // Reset do estado do modal

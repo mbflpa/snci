@@ -1,23 +1,26 @@
 <cfprocessingdirective pageencoding = "utf-8">
-<cfcontent type="text/html">
 <cfinclude template="../SNCI_AVALIACOES_AUTOMATIZADAS/includes/aa_modal_overlay.cfm ">
 <cfinclude template="../SNCI_AVALIACOES_AUTOMATIZADAS/includes/aa_modal_preloader.cfm">
+
 <!DOCTYPE html>
 <html lang="pt-br">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>SNCI - Deficiências do Controle</title>
-    <link rel="icon" type="image/x-icon" href="../SNCI_AVALIACOES_AUTOMATIZADAS/dist/img/icone_sistema_standalone_ico.png" />
-   
-   
+    <title>SNCI - Avaliações Automatizadas</title>
+    <link rel="icon" type="image/x-icon" href="../SNCI_AVALIACOES_AUTOMATIZADA/dist/img/icone_sistema_standalone_ico.png">
+
     <style>
+       
+        
         .deficiencias-geral-layout {
+            display: flex;
             padding: 16px;
-
+            align-items: flex-start; /* Alinha os itens ao topo */
+            flex-wrap: nowrap; /* Garante que os itens não quebrem para a próxima linha */
         }
         
         /* Força alinhamento específico dos containers na página index */
@@ -57,12 +60,14 @@
         }
 
         .dashboard-main-content {
+            width: 65%; /* Adjust as needed */
             flex: none; /* Remove flex shorthand for testing */
         }
 
         .dashboard-kpi-panel {
+            width: 35%; /* Adjust as needed */
             flex: none; /* Remove flex shorthand for testing */
-          }
+        }
 
         /* Responsividade */
         @media (max-width: 1200px) {
@@ -70,65 +75,42 @@
                 flex-direction: column;
             }
         }
-
-
     </style>
 </head>
-
 <body class="hold-transition layout-fixed layout-navbar-fixed layout-footer-fixed" data-panel-auto-height-mode="height" >
 
 	<div class="wrapper">
- 
-        <cfinclude template="includes/aa_sidebar.cfm">
         <cfinclude template="includes/aa_navBar.cfm">
-        <div class="content-wrapper">
+        <cfinclude template="includes/aa_sidebar.cfm">
+        
+        <div class="content-wrapper" >
             <section class="content">
-                <div class="container-fluid">
-                    <div class="row">
-                        <div class="col-12">
-                            <h3 class="m-3" style="padding-bottom: 0!important;margin-bottom: 0!important;">Avaliação Geral - Deficiência do Controle
-                                <i class="fas fa-info-circle info-icon-automatizadas" style="position: relative;right: 3px;bottom: 13px;font-size: 1rem;" 
-                                    data-toggle="popover" 
-                                    data-trigger="hover" 
-                                    data-placement="right"
-                                    data-html="true"
-                                    data-content="Tratam-se de situações identificadas nas avaliações realizadas nas unidades operacionais, por meio da aplicação de testes de controle (Plano de Testes), que não condizem com o previsto em normas internas dos Correios, documentos de orientações vigentes (ofícios) e legislações.">
-                                </i>
-                            </h3>
+   
+                <div style="width: 100%; padding: 0 16px; margin-bottom: 16px;">
+                   
+                </div>
+               
+                    <div class="alert alert-info shadow-lg rounded d-flex align-items-start p-4" role="alert" style="background-color: #e9f7fd; border-left: 5px solid #17a2b8;margin-top:120px">
+                        <i class="fas fa-lightbulb mr-3" style="font-size: 1.8rem; color: #17a2b8;margin-top: 10px;"></i>
+                        <div>
+                        <h5 class="mb-1 font-weight-bold" style="color: #0c5460;">Interpretação Simplificada</h5>
+                        <p class="mb-0" style="font-size: 1rem;color: #0c5460;">
+                            Esta página transformará dados dos dashboards em explicações claras e acessíveis para as unidades.
+                        </p>
                         </div>
                     </div>
-                </div>
- 
-                <div class="deficiencias-geral-layout">
-                    <div class="dashboard-kpi-panel">
-                        <cfinclude template="includes/componentes_deficiencias_controle/def_controle_resumo_geral.cfm">
-                    </div>
-                    <div class="dashboard-main-content">
-                        <cfinclude template="includes/componentes_deficiencias_controle/def_controle_desempenho_assunto.cfm">
-                    </div>
-                    
-                </div>
+              
+
             </section>
         </div>
 
         <cfinclude template="includes/aa_footer.cfm">
    </div>
     
-   
     <script language="JavaScript">
         $(document).ready(function(){
             $.widget.bridge('uibutton', $.ui.button);
             $('#modalOverlay').modal('hide');
-            // Inicializa todos os popovers
-				$('[data-toggle="popover"]').popover({
-					html: true,
-					trigger: 'hover'
-				});
-				
-				// Popover com dismiss específico
-				$('.popover-dismiss').popover({
-					trigger: 'hover'
-				});
         });
     </script>
 </body>

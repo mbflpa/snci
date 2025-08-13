@@ -5,6 +5,10 @@
 
 	 <cfinclude template="aa_Modal_preloader.cfm">
 	 <cfinclude template="aa_modal_overlay.cfm">
+ <link rel="stylesheet" href="../SNCI_AVALIACOES_AUTOMATIZADAS/dist/css/animate.min.css">
+    <!-- Font Awesome -->
+   
+
 
 	 <style>
 		.tituloPagina{
@@ -117,7 +121,7 @@
 		  
 	 </style>
 	<!-- Navbar -->
-		<link rel="stylesheet" href="../SNCI_AVALIACOES_AUTOMATIZADAS/dist/css/animate.min.css">
+
 		<nav class="main-header navbar navbar-expand navbar-light shadow-sm " style="height:56px;padding-right: 0;">
 			<ul class="navbar-nav w-100 d-flex justify-content-start align-items-center" style="width:100%;margin:0;padding:0;">
 				<li class="nav-item">
@@ -135,7 +139,7 @@
 								data-html="true"
 								data-content="<strong>Avaliação Automatizada:</strong> Processo de avaliação automatizada dos testes de controles internos realizados no âmbito de unidades operacionais das Superintendências Estaduais.">
 							</i>
-							Avaliação Automatizada - 
+							<span style="font-weight:400">Avaliação Automatizada - </span>
 							<cfif structKeyExists(application, "rsUsuarioParametros") AND structKeyExists(application.rsUsuarioParametros, "Und_Descricao") AND len(trim(application.rsUsuarioParametros.Und_Descricao))>
 								<cfoutput>#application.rsUsuarioParametros.Und_Descricao# - #application.rsUsuarioParametros.Dir_Sigla#<span style="font-weight:400;font-size:0.8rem;margin-left:10px">(MCU: #application.rsUsuarioParametros.Und_MCU# / STO: #application.rsUsuarioParametros.Und_Codigo#)</span></cfoutput>
 							<cfelse>
@@ -188,141 +192,199 @@
 				</li>
 			</ul>
 		</nav>
+
+<script language="JavaScript">
+	
+
+	$(document).ready(function() {
+		// Inicializa todos os popovers
+		$('[data-toggle="popover"]').popover({
+			html: true,
+			trigger: 'hover'
+		});
 		
-		<script language="JavaScript">
-		    
-			// Garante que o sidebar fique sempre oculto e o navbar full width
-			$(document).ready(function() {
-				// Inicializa todos os popovers
-				$('[data-toggle="popover"]').popover({
-					container: 'body',
-					html: true,
-					trigger: 'hover'
-				});
+		// Popover com dismiss específico
+		$('.popover-dismiss').popover({
+			trigger: 'hover'
+		});
+
+
+		
+		// Carregar meses disponíveis
+		carregarMesesDisponiveis();
+		
+		// Verificar se há filtro de mês na URL e marcar botão ativo
+		verificarMesSelecionadoURL();
+
+		// Simula clique no link "Principal" do sidebar ao carregar a página
+		setTimeout(function() {
+			var $principalLink = $('#sidebarPrincipal');
+			var isMensagemTemporaria = window.location.pathname.toLowerCase().indexOf('aa_mensagem_temporaria.cfm') !== -1;
+			var isIndex = window.location.pathname.toLowerCase().indexOf('index.cfm') !== -1;
+			// Só dispara se está na index e não na aa_mensagem_temporaria.cfm
+			if ($principalLink.length > 0 && isIndex && !isMensagemTemporaria) {
+				$principalLink[0].click();
+			}
+		}, 300);
+	});
+	
+	// Função para verificar mês selecionado na URL
+	function verificarMesSelecionadoURL() {
+		var urlParams = new URLSearchParams(window.location.search);
+		var mesFiltro = urlParams.get('mesFiltro');
+		if (mesFiltro) {
+			// Aguardar carregamento dos botões e depois marcar o ativo
+			setTimeout(function() {
+				$('.btn-mes').removeClass('active');
+				$('.btn-mes[data-mes-id="' + mesFiltro + '"]').addClass('active');
 				
-				// Inicializa tooltips se necessário
-				$('[data-toggle="tooltip"]').tooltip();
+				// Também atualizar o link ativo do sidebar
+				if (typeof setActiveLink === 'function') {
+					setActiveLink();
+				}
 				
-				// Popover com dismiss específico
-				$('.popover-dismiss').popover({
-					trigger: 'hover'
-				});
-				//$('body').addClass('sidebar-collapse');
-				
-				// Carregar meses disponíveis
-				carregarMesesDisponiveis();
-				
-				// Verificar se há filtro de mês na URL e marcar botão ativo
-				verificarMesSelecionadoURL();
-			});
-			
-			// Função para verificar mês selecionado na URL
-			function verificarMesSelecionadoURL() {
-				var urlParams = new URLSearchParams(window.location.search);
-				var mesFiltro = urlParams.get('mesFiltro');
-				if (mesFiltro) {
-					// Aguardar carregamento dos botões e depois marcar o ativo
+				// Atualizar links do sidebar com filtro de mês
+				if (typeof atualizarLinksComFiltroMes === 'function') {
+					atualizarLinksComFiltroMes();
+				}
+			}, 200);
+		}
+	}
+	
+	// Função para carregar meses disponíveis
+	function carregarMesesDisponiveis() {
+		<cfif structKeyExists(application, "rsUsuarioParametros") AND structKeyExists(application.rsUsuarioParametros, "Und_Descricao") AND len(trim(application.rsUsuarioParametros.Und_Descricao))>
+		$.ajax({
+			url: '../SNCI_AVALIACOES_AUTOMATIZADAS/cfc/DeficienciasControleDados.cfc?method=obterMesesDisponiveis',
+			type: 'POST',
+			dataType: 'json',
+			success: function(response) {
+				if (response.success && response.data.length > 0) {
+					renderizarBotoesMeses(response.data);
+					// Após renderizar os botões, verificar URL e atualizar sidebar
 					setTimeout(function() {
-						$('.btn-mes').removeClass('active');
-						$('.btn-mes[data-mes-id="' + mesFiltro + '"]').addClass('active');
-						
-						// Também atualizar o link ativo do sidebar
+						verificarMesSelecionadoURL();
 						if (typeof setActiveLink === 'function') {
 							setActiveLink();
 						}
-						
 						// Atualizar links do sidebar com filtro de mês
 						if (typeof atualizarLinksComFiltroMes === 'function') {
 							atualizarLinksComFiltroMes();
 						}
-					}, 200);
+					}, 100);
+				} else {
+					$('#mesesContainer').html('<span style="color: #6c757d; font-size: 0.75rem;">Nenhum período disponível</span>');
 				}
+			},
+			error: function(xhr, status, error) {
+				console.error('Erro ao carregar meses:', error);
+				$('#mesesContainer').html('<span style="color: #dc3545; font-size: 0.75rem;">Erro ao carregar períodos</span>');
 			}
-			
-			// Função para carregar meses disponíveis
-			function carregarMesesDisponiveis() {
-				<cfif structKeyExists(application, "rsUsuarioParametros") AND structKeyExists(application.rsUsuarioParametros, "Und_Descricao") AND len(trim(application.rsUsuarioParametros.Und_Descricao))>
-				$.ajax({
-					url: '../SNCI_AVALIACOES_AUTOMATIZADAS/cfc/DeficienciasControleDados.cfc?method=obterMesesDisponiveis',
-					type: 'POST',
-					dataType: 'json',
-					success: function(response) {
-						if (response.success && response.data.length > 0) {
-							renderizarBotoesMeses(response.data);
-							// Após renderizar os botões, verificar URL e atualizar sidebar
-							setTimeout(function() {
-								verificarMesSelecionadoURL();
-								if (typeof setActiveLink === 'function') {
-									setActiveLink();
-								}
-								// Atualizar links do sidebar com filtro de mês
-								if (typeof atualizarLinksComFiltroMes === 'function') {
-									atualizarLinksComFiltroMes();
-								}
-							}, 100);
-						} else {
-							$('#mesesContainer').html('<span style="color: #6c757d; font-size: 0.75rem;">Nenhum período disponível</span>');
-						}
-					},
-					error: function(xhr, status, error) {
-						console.error('Erro ao carregar meses:', error);
-						$('#mesesContainer').html('<span style="color: #dc3545; font-size: 0.75rem;">Erro ao carregar períodos</span>');
-					}
-				});
-				<cfelse>
-				// Não carregar meses se unidade não localizada
-				console.warn('Unidade não localizada - não é possível carregar meses');
-				</cfif>
-			}
-			
-			// Função para renderizar botões dos meses
-			function renderizarBotoesMeses(meses) {
-				var container = $('#mesesContainer');
-				container.empty();
-				
-				// Verificar se há filtro ativo na URL
-				var urlParams = new URLSearchParams(window.location.search);
-				var mesFiltroAtivo = urlParams.get('mesFiltro');
-				
-				meses.forEach(function(mes, index) {
-					var btnClass = 'btn-mes';
-					
-					// Se há filtro na URL, marcar como ativo o mês correspondente
-					// Se não há filtro, marcar o primeiro como ativo
-					if (mesFiltroAtivo) {
-						if (mes.id === mesFiltroAtivo) {
-							btnClass += ' active';
-						}
-					} else if (index === 0) {
-						btnClass += ' active';
-					}
-					
-					var btn = $('<button>')
-						.addClass(btnClass)
-						.attr('data-mes-id', mes.id)
-						.attr('title', mes.nome + '/' + mes.ano + ' - ' + mes.totalRegistros + ' eventos')
-						.html(mes.nome)
-						.click(function() {
-							selecionarMes(mes.id, $(this));
-						});
-					
-					container.append(btn);
-				});
-			}
-			
-			// Função para selecionar um mês
-			function selecionarMes(mesId, btnElement) {
-				// Remove active de todos os botões
-				$('.btn-mes').removeClass('active');
-				
-				// Adiciona active ao botão clicado
-				btnElement.addClass('active');
-				
-				// Recarregar página com filtro de mês
-				var urlAtual = new URL(window.location);
-				urlAtual.searchParams.set('mesFiltro', mesId);
-				window.location.href = urlAtual.toString();
-			}
+		});
+		<cfelse>
+		// Não carregar meses se unidade não localizada
+		console.warn('Unidade não localizada - não é possível carregar meses');
+		</cfif>
+	}
 	
-		</script>
+	// Função para renderizar botões dos meses
+	function renderizarBotoesMeses(meses) {
+		var container = $('#mesesContainer');
+		container.empty();
+		
+		// Verificar se há filtro ativo na URL
+		var urlParams = new URLSearchParams(window.location.search);
+		var mesFiltroAtivo = urlParams.get('mesFiltro');
+		
+		meses.forEach(function(mes, index) {
+			var btnClass = 'btn-mes';
+			
+			// Se há filtro na URL, marcar como ativo o mês correspondente
+			// Se não há filtro, marcar o primeiro como ativo
+			if (mesFiltroAtivo) {
+				if (mes.id === mesFiltroAtivo) {
+					btnClass += ' active';
+				}
+			} else if (index === 0) {
+				btnClass += ' active';
+			}
+			
+			var btn = $('<button>')
+				.addClass(btnClass)
+				.attr('data-mes-id', mes.id)
+				.attr('title', mes.nome + '/' + mes.ano + ' - ' + mes.totalRegistros + ' eventos')
+				.html(mes.nome)
+				.click(function() {
+					selecionarMes(mes.id, $(this));
+				});
+			
+			container.append(btn);
+		});
+	}
+	
+	// Função para selecionar um mês
+		// ...existing code...
+		// ...existing code...
+	function selecionarMes(mesId, btnElement) {
+		console.log('selecionarMes chamado com mesId:', mesId);
+		$('.btn-mes').removeClass('active');
+		btnElement.addClass('active');
+	
+		var recarregouAlguma = false;
+		var iframesIgnorados = 0;
+	
+		// Lista de páginas a serem ignoradas
+		var paginasIgnoradas = [
+			'aa_testes_aplicados.cfm',
+			'aa_pagina_construcao.cfm'
+		];
+	
+		$('.tab-pane').each(function(index) {
+			var $iframe = $(this).find('iframe');
+			if ($iframe.length) {
+				var iframeSrc = $iframe.attr('src') || '';
+				console.log('Aba', index, 'iframe src original:', iframeSrc);
+	
+				// Verifica se o src contém alguma das páginas ignoradas
+				if (paginasIgnoradas.some(function(pagina) { return iframeSrc.includes(pagina); })) {
+					console.log('Aba', index, 'pulada (página ignorada).');
+					iframesIgnorados++;
+					return;
+				}
+	
+				// ...restante do código...
+				if (iframeSrc.charAt(0) === '/') {
+					iframeSrc = iframeSrc.substring(1);
+					console.log('Aba', index, 'src sem barra inicial:', iframeSrc);
+				}
+				if (!iframeSrc.toLowerCase().startsWith('snci/snci_avaliacoes_automatizadas/')) {
+					iframeSrc = 'snci/SNCI_AVALIACOES_AUTOMATIZADAS/' + iframeSrc;
+					console.log('Aba', index, 'src com prefixo:', iframeSrc);
+				}
+	
+				var urlObj = new URL(iframeSrc, window.location.origin);
+				console.log('Aba', index, 'URL antes do filtro:', urlObj.pathname + urlObj.search);
+	
+				urlObj.searchParams.set('mesFiltro', mesId);
+				console.log('Aba', index, 'URL final:', urlObj.pathname + urlObj.search);
+	
+				$iframe.attr('src', urlObj.pathname + urlObj.search);
+				recarregouAlguma = true;
+			} else {
+				console.log('Aba', index, 'não possui iframe');
+			}
+		});
+	
+		if (!recarregouAlguma && iframesIgnorados === 0) {
+			console.log('Nenhuma aba com iframe encontrada para recarregar, recarregando página principal');
+			var urlAtual = new URL(window.location);
+			urlAtual.searchParams.set('mesFiltro', mesId);
+			console.log('URL principal:', urlAtual.toString());
+			window.location.href = urlAtual.toString();
+		}
+	}
+	// ...existing code...
+
+
+</script>
 
