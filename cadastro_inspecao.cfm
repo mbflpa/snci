@@ -194,7 +194,7 @@
 	SELECT Numera_Inspecao.*, LTRIM(RTRIM(Und_Descricao)) AS Und_Descricao, Und_Codigo, Dir_sigla FROM Numera_Inspecao
 	LEFT JOIN Unidades ON Und_Codigo = NIP_Unidade
 	LEFT JOIN Diretoria ON  Dir_Codigo = Und_CodDiretoria 
-	WHERE Left(NIP_NumInspecao,2) in(#se#) AND NIP_Situacao='P' 
+	WHERE Und_CodDiretoria in(#se#) AND NIP_Situacao='P' 
 	ORDER BY Dir_sigla,Und_Descricao  
 </cfquery>
 
@@ -990,7 +990,7 @@ tbody {
 </cfquery>
 
 <cfquery dbtype="query" name="rsEmRevisaoFinalizadasSemNC" >
-  SELECT * FROM rsEmRevisao UNION SELECT * FROM rsFinalizadasSemNC WHERE Pro_Situacao = 'AB' and INP_DTConcluirAvaliacao IS NOT NULL
+  SELECT * FROM rsEmRevisao UNION SELECT * FROM rsFinalizadasSemNC WHERE Pro_Situacao = 'AB' and INP_DTConcluirAvaliacao is not null
 </cfquery>
 
 <cfquery datasource="#dsn_inspecao#" name="rsvlralocado">
@@ -1017,7 +1017,6 @@ tbody {
     </cfif>
 </cfoutput>
 
-
 <cfquery datasource="#dsn_inspecao#" name="rsExcluidas" >
 	SELECT NIP_UserName, NIP_DtIniPrev, NIP_DtUltAtu, NIP_NumInspecao, LTRIM(RTRIM(Und_Descricao)) AS Und_Descricao, Und_Codigo, Dir_sigla FROM  Numera_Inspecao
 	LEFT JOIN Unidades ON Und_Codigo = NIP_Unidade
@@ -1025,6 +1024,7 @@ tbody {
 	WHERE  Und_CodDiretoria in(#se#) and NIP_Situacao = 'E' and right(NIP_NumInspecao,4) = CONVERT(VARCHAR(4),year(getdate())) 
 	ORDER BY NIP_NumInspecao  
 </cfquery>
+
 <h1 id="titulo" style="font-size:14px;width:100%;"><STRONG>AVALIAÇÕES</STRONG></h1>
 
 <div style="background:#6699CC;width=720px;">
@@ -1036,122 +1036,255 @@ tbody {
 	<button class="tablink" onmouseOver="corHover(this);" onMouseOut="corOut(this);" onClick="openPage('SemNC', this, '#6699CC')" id="sNC"><STRONG>SEM ITEM NC</STRONG><br>( <cfoutput>#rsFinalizadasSemNCencerrado.recordcount#</cfoutput> )</button>
     <button class="tablink" onmouseOver="corHover(this);" onMouseOut="corOut(this);" onClick="openPage('Excluidas', this, '#6699CC')" id="excl"><STRONG>EXCLUÍDAS</STRONG><br>( <cfoutput>#rsExcluidas.recordcount#</cfoutput> )</button>
 
-		<div id="NaoFinalizadas" class="tabcontent" >
-			<!---INICIO TABELA DE AVALIAÇÕES COM NUMERAÇÃO CADASTRADA, PORÉM, SEM CADASTRO CONCLUÝDO--->
-			<cfif rsNumeraInspecao.recordCount neq 0>
-				<div  id="form_container" style="width:680px;height:expression(this.scrollHeight>299?'300px':'auto');overflow-y:auto;">
-					<table  border="0" align="center"  id="tabInspecao" style="width:expression(this.scrollHeight>299?'683px':'700px');">  
-						<tr>
-							<td colspan="7" align="center" class="titulos" ><h1 style="font-size:14px;background:#6699CC">AVALIAÇÕES COM NUMERAÇÃO CADASTRADA (com cadastro não finalizado)</h1></td>
-						</tr>
-						
-						<tr bgcolor="#6699CC" class="exibir" align="center" style="color:#fff">
-
-							<td width="5%">
-								<div align="center">Número</div>
-							</td>
-							<td width="35%">
-								<div align="center">Unidade</div>
-							</td>
-							<td width="5%">
-								<div align="center">Mod.</div>
-							</td>
-							<td width="40%">
-								<div align="center">Coordenador</div>
-							</td>
-				
-							<td width="5%">
-								<div align="center">Data Prev.</div>
-							</td>
-							<td width="5%">
-								<div align="center">Inspetores</div>
-							</td>
-							<td width="5%">
-								<div align="center">Excluir</div>
-							</td>
-						</tr> 
+	<div id="NaoFinalizadas" class="tabcontent">
+		<!---INICIO TABELA DE AVALIAÇÕES COM NUMERAÇÃO CADASTRADA, PORÉM, SEM CADASTRO CONCLUÝDO--->
+		<cfif rsNumeraInspecao.recordCount gt 0>
+			<div  id="form_container" style="width:680px;height:expression(this.scrollHeight>299?'300px':'auto');overflow-y:auto;">
+				<table  border="0" align="center"  id="tabInspecao" style="width:expression(this.scrollHeight>299?'683px':'700px');">  
+					<tr>
+						<td colspan="7" align="center" class="titulos" ><h1 style="font-size:14px;background:#6699CC">AVALIAÇÕES COM NUMERAÇÃO CADASTRADA (com cadastro não finalizado)</h1></td>
+					</tr>
 					
-						<cfset scor = 'white'>
-						<cfoutput query="rsNumeraInspecao">
-							
-							<cfquery datasource="#dsn_inspecao#" name="rsModalidadeTable">
-								SELECT INP_Modalidade, INP_Coordenador FROM Inspecao WHERE INP_NumInspecao = convert(varchar,'#NIP_NumInspecao#')
+					<tr bgcolor="#6699CC" class="exibir" align="center" style="color:#fff">
+
+						<td width="5%">
+							<div align="center">Número</div>
+						</td>
+						<td width="35%">
+							<div align="center">Unidade</div>
+						</td>
+						<td width="5%">
+							<div align="center">Mod.</div>
+						</td>
+						<td width="40%">
+							<div align="center">Coordenador</div>
+						</td>
+			
+						<td width="5%">
+							<div align="center">Data Prev.</div>
+						</td>
+						<td width="5%">
+							<div align="center">Inspetores</div>
+						</td>
+						<td width="5%">
+							<div align="center">Excluir</div>
+						</td>
+					</tr> 
+				
+					<cfset scor = 'white'>
+					<cfoutput query="rsNumeraInspecao">
+						<cfquery datasource="#dsn_inspecao#" name="rsModalidadeTable">
+							SELECT INP_Modalidade, INP_Coordenador FROM Inspecao WHERE INP_NumInspecao = convert(varchar,'#NIP_NumInspecao#')
+						</cfquery>
+						<cfquery datasource="#dsn_inspecao#" name="rsInspetorTable">
+							SELECT Fun_Matric, Fun_Nome, Dir_Sigla FROM Funcionarios 
+							INNER JOIN Diretoria ON  Dir_Codigo = Fun_DR
+							WHERE Fun_Matric ='#rsModalidadeTable.INP_Coordenador#'
+						</cfquery>
+						<cfset perInspec = '#DateFormat(NIP_DtIniPrev,'dd/mm/yyyy')#'>
+						
+						<form  id="formNaoFinalizadas" action="" method="POST" >
+
+							<tr id="#rsNumeraInspecao.CurrentRow#" valign="middle" bgcolor="#scor#"  class="exibir"
+								onMouseOver="mouseOver(this);" 
+								onMouseOut="mouseOut(this);"
+								onclick="gravaOrdLinha(this);">
+								
+								<td width="5%">
+									<div align="center">#NIP_NumInspecao#</div>
+								</td>
+								<td width="35%">
+									<div align="left">#trim(Dir_Sigla)#-#trim(Und_Descricao)#</div>
+								</td>
+								<td width="5%">
+									<div align="center"><cfif #rsModalidadeTable.INP_Modalidade# eq 0>PRES.<CFELSE>A DIST.</CFIF></div>
+								</td>
+								<td width="40%">
+									<div align="left">#trim(rsInspetorTable.Fun_Nome)# (#trim(rsInspetorTable.Fun_Matric)#-#trim(rsInspetorTable.Dir_Sigla)#)</div>
+									<!--- <div align="center"><cfif '#rsModalidadeTable.INP_Modalidade#' eq '0'>PRESENCIAL<cfelse>A DISTÂNCIA</cfif></div> --->
+								</td>
+					
+								<td width="5%">
+									<div align="left">#perInspec#</div>
+								</td>
+								<cfquery datasource="#dsn_inspecao#" name="rsInspCaInsp">
+									SELECT * FROM Inspecao 
+									WHERE  Left(INP_NumInspecao,2) in(#se#) 
+										and INP_NumInspecao = '#NIP_NumInspecao#'
+										and INP_Situacao ='NA' 
+								</cfquery>
+								<td width="5%" height="25px">
+									<div align="center"><a href="cadastro_inspecao_inspetores.cfm?
+										numInspecao=#rsInspCaInsp.INP_NumInspecao#
+										&coordenador=#rsInspCaInsp.INP_Coordenador#
+										&dtInicDeslocamento=#DateFormat(rsInspCaInsp.INP_DtInicDeslocamento,'dd/mm/yyyy')#
+										&dtFimDeslocamento=#DateFormat(rsInspCaInsp.INP_DtFimDeslocamento,'dd/mm/yyyy')#
+										&dtInicInspecao=#DateFormat(rsInspCaInsp.INP_DtInicInspecao,'dd/mm/yyyy')#
+										&dtFimInspecao=#DateFormat(rsInspCaInsp.INP_DtFimInspecao,'dd/mm/yyyy')#
+										##formCad"><img src="figuras/usuario.png" alt="Clique para cadastrar/visualizar inspetores" width="20" height="20" border="0" ></a></div>
+								</td>
+
+								<td width="5%">
+									<div align="center"><a onClick="return confExc('NaoFinalizadas','Confirma a exclusão desta Avaliação? \n#trim(NIP_NumInspecao)#-#trim(Und_Descricao)#(#trim(Und_Codigo)#)');" href="cadastro_inspecao.cfm?acao=excNumInsp&numInspecao=#NIP_NumInspecao#&unidade=#NIP_Unidade#"><img src="icones/lixeiraRosa.png" alt="Clique para excluir este cadastro" width="17" height="17" border="0" ></a></div>
+								</td>
+							</tr>
+						</form>
+				
+						<cfif scor eq 'white'>
+							<cfset scor = 'f7f7f7'>
+						<cfelse>
+							<cfset scor = 'white'>
+						</cfif>
+					</cfoutput>
+				</table>
+			</div>
+		<cfelse>
+			<label>NÃO EXISTEM AVALIAÇÕES COM CADASTRO NÃO FINALIZADO</label>
+		</cfif>
+		<!---FIM TABELA DE AVALIAÇÕES COM NUMERAÇÃO CADASTRADA, PORÉM, SEM CADASTRO CONCLUÝDO--->
+	</div>
+	<div id="NaoIniciadas" class="tabcontent">
+		<!---INICIO TABELA DE AVALIAÇÕES COM CADASTRO CONCLUÍDO, POREM, NÃO AVALIADAS--->
+		<cfif rsNaoIniciadas.recordCount gt 0>
+			<div id="form_container" name="divInsp" style="width:900px;height:expression(this.scrollHeight>299?'300px':'auto');overflow-y:auto;">
+				<table border="0" align="center"  id="tabInsp" style="width:expression(this.scrollHeight>299?'683px':'700px');">
+					<tr>
+						<td colspan="7" align="center" class="titulos"><h1 style="font-size:14px;background:#6699CC">AVALIAÇÕES COM CADASTRO FINALIZADO (Avaliações não Iniciadas)</h1></td>
+					</tr>
+					
+					<tr bgcolor="#6699CC" class="exibir" align="center" style="color:#fff">
+						<td width="5%">
+							<div align="center">Número</div>
+						</td>
+						<td width="25%">
+							<div align="center">Unidade</div>
+						</td>
+						<td width="7%">
+								<div align="center">Mod.</div>
+						</td>
+
+						<td width="10%">
+							<div align="center">Período Previsto</div>
+						</td>
+
+						<td width="5%">
+							<div align="center">Inspetores</div>
+						</td>
+						<td width="5%">
+							<div align="center">Excluir</div>
+						</td>
+
+					</tr>
+					
+				
+					<cfset scor = 'white'>
+					<cfset avaliada = 0>
+					<cfoutput query="rsNaoIniciadas">
+							<cfquery datasource="#dsn_inspecao#" name="rsItensTotais" >
+								Select count(RIP_Resposta) as total FROM Resultado_Inspecao
+								Where RIP_NumInspecao = '#rsNaoIniciadas.INP_NumInspecao#'
 							</cfquery>
-							<cfquery datasource="#dsn_inspecao#" name="rsInspetorTable">
+							<cfquery datasource="#dsn_inspecao#" name="rsItemNCI" >
+								Select RIP_NCISEI FROM Resultado_Inspecao
+								Where RIP_NumInspecao = '#rsNaoIniciadas.INP_NumInspecao#' and Rtrim(Ltrim(RIP_NCISEI)) !=''
+							</cfquery>
+						
+							<cfquery datasource="#dsn_inspecao#" name="rsEmReavaliacao" >
+								Select RIP_Resposta, RIP_Recomendacao FROM Resultado_Inspecao
+								Where RIP_NumInspecao = '#rsNaoIniciadas.INP_NumInspecao#' and RIP_Recomendacao ='S'
+							</cfquery>
+							
+							<cfquery datasource="#dsn_inspecao#" name="rsReavaliado" >
+								Select RIP_Resposta, RIP_Recomendacao FROM Resultado_Inspecao
+								Where RIP_NumInspecao = '#rsNaoIniciadas.INP_NumInspecao#' and RIP_Recomendacao ='R' 
+							</cfquery>
+
+						
+							<cfquery datasource="#dsn_inspecao#" name="rsInspetorTable2">
 								SELECT Fun_Matric, Fun_Nome, Dir_Sigla FROM Funcionarios 
 								INNER JOIN Diretoria ON  Dir_Codigo = Fun_DR
-								WHERE Fun_Matric ='#rsModalidadeTable.INP_Coordenador#'
+								WHERE Fun_Matric =#rsNaoIniciadas.INP_Coordenador#
 							</cfquery>
-							<cfset perInspec = '#DateFormat(NIP_DtIniPrev,'dd/mm/yyyy')#'>
-							
-							<form  id="formNaoFinalizadas" action="" method="POST" >
+							<cfset perInspec='#DateFormat(rsNaoIniciadas.INP_DtInicInspecao,"dd/mm/yyyy")#' & ' a ' & '#DateFormat(rsNaoIniciadas.INP_DtFimInspecao,"dd/mm/yyyy")#'>
+						<form action="" method="POST">
 
-								<tr id="#rsNumeraInspecao.CurrentRow#" valign="middle" bgcolor="#scor#"  class="exibir"
+								<tr id="#rsNaoIniciadas.CurrentRow#" valign="middle" bgcolor="#scor#" class="exibir"
 									onMouseOver="mouseOver(this);" 
-                                    onMouseOut="mouseOut(this);"
-                                    onclick="gravaOrdLinha(this);">
+									onMouseOut="mouseOut(this);"
+									onclick="gravaOrdLinha(this);"
+									style="cursor:pointer">
+											<td width="5%" onClick="capturaPosicaoScroll();window.open('itens_inspetores_avaliacao.cfm?numInspecao=#INP_NumInspecao#&Unid=#INP_Unidade#','_blank');">
+												<div align="left">
+													#INP_NumInspecao#
+												</div>
+											</td>
+
+											<cfset perc='0%'>
+											<td width="25%"  onclick="capturaPosicaoScroll();window.open('itens_inspetores_avaliacao.cfm?numInspecao=#INP_NumInspecao#&Unid=#INP_Unidade#','_blank');">
+														#trim(Dir_Sigla)#-#trim(Und_Descricao)#						
+											</td>
+
+											<td width="7%" onClick="capturaPosicaoScroll();window.open('itens_inspetores_avaliacao.cfm?numInspecao=#INP_NumInspecao#&Unid=#INP_Unidade#','_blank');">
+												<div align="center">
+													<cfif #INP_Modalidade# eq 0>PRES.<CFELSE>A DIST.</CFIF>
+												</div>
+											</td>
+											<td width="10%" onClick="capturaPosicaoScroll();window.open('itens_inspetores_avaliacao.cfm?numInspecao=#INP_NumInspecao#&Unid=#INP_Unidade#','_blank');">
+												<div align="center">#perInspec#</div>
+											</td>
+											
+											
+											<cfquery datasource="#dsn_inspecao#" name="rsInspCaInsp">
+												SELECT * FROM Inspecao
+												WHERE INP_NumInspecao = '#NIP_NumInspecao#'
+											</cfquery>
 									
-									<td width="5%">
-										<div align="center">#NIP_NumInspecao#</div>
-									</td>
-									<td width="35%">
-										<div align="left">#trim(Dir_Sigla)#-#trim(Und_Descricao)#</div>
-									</td>
-									<td width="5%">
-										<div align="center"><cfif #rsModalidadeTable.INP_Modalidade# eq 0>PRES.<CFELSE>A DIST.</CFIF></div>
-									</td>
-									<td width="40%">
-										<div align="left">#trim(rsInspetorTable.Fun_Nome)# (#trim(rsInspetorTable.Fun_Matric)#-#trim(rsInspetorTable.Dir_Sigla)#)</div>
-										<!--- <div align="center"><cfif '#rsModalidadeTable.INP_Modalidade#' eq '0'>PRESENCIAL<cfelse>A DISTÂNCIA</cfif></div> --->
-									</td>
-						
-									<td width="5%">
-										<div align="left">#perInspec#</div>
-									</td>
-									<cfquery datasource="#dsn_inspecao#" name="rsInspCaInsp">
-										SELECT * FROM Inspecao 
-										WHERE  Left(INP_NumInspecao,2) in(#se#) 
-											and INP_NumInspecao = '#NIP_NumInspecao#'
-											and INP_Situacao ='NA' 
-									</cfquery>
-									<td width="5%" height="25px">
-										<div align="center"><a href="cadastro_inspecao_inspetores.cfm?
-											numInspecao=#rsInspCaInsp.INP_NumInspecao#
-											&coordenador=#rsInspCaInsp.INP_Coordenador#
-											&dtInicDeslocamento=#DateFormat(rsInspCaInsp.INP_DtInicDeslocamento,'dd/mm/yyyy')#
-											&dtFimDeslocamento=#DateFormat(rsInspCaInsp.INP_DtFimDeslocamento,'dd/mm/yyyy')#
-											&dtInicInspecao=#DateFormat(rsInspCaInsp.INP_DtInicInspecao,'dd/mm/yyyy')#
-											&dtFimInspecao=#DateFormat(rsInspCaInsp.INP_DtFimInspecao,'dd/mm/yyyy')#
-											##formCad"><img src="figuras/usuario.png" alt="Clique para cadastrar/visualizar inspetores" width="20" height="20" border="0" ></a></div>
-									</td>
-
-									<td width="5%">
-										<div align="center"><a onClick="return confExc('NaoFinalizadas','Confirma a exclusão desta Avaliação? \n#trim(NIP_NumInspecao)#-#trim(Und_Descricao)#(#trim(Und_Codigo)#)');" href="cadastro_inspecao.cfm?acao=excNumInsp&numInspecao=#NIP_NumInspecao#&unidade=#NIP_Unidade#"><img src="icones/lixeiraRosa.png" alt="Clique para excluir este cadastro" width="17" height="17" border="0" ></a></div>
-									</td>
+								<td width="5%" height="25px">	
+											<div align="center">
+									<a href="cadastro_inspecao_inspetores_alt.cfm?
+									numInspecao=#rsInspCaInsp.INP_NumInspecao#
+									&Unid=#rsInspCaInsp.INP_Unidade#
+									&coordenador=#rsInspCaInsp.INP_Coordenador#
+									&dtInicDeslocamento=#DateFormat(rsInspCaInsp.INP_DtInicDeslocamento,'dd/mm/yyyy')#
+									&dtFimDeslocamento=#DateFormat(rsInspCaInsp.INP_DtFimDeslocamento,'dd/mm/yyyy')#
+									&dtInicInspecao=#DateFormat(rsInspCaInsp.INP_DtInicInspecao,'dd/mm/yyyy')#
+									&dtFimInspecao=#DateFormat(rsInspCaInsp.INP_DtFimInspecao,'dd/mm/yyyy')#
+									&RIPMatricAvaliador=N
+									&telaretorno=cadastro_inspecao.cfm
+									##formCad"><img src="figuras/usuario.png" alt="Clique para cadastrar/visualizar inspetores" width="20" height="20" border="0" ></a>													
+									</div>
+								</td>														
+											<td width="5%" height="25px">
+													<div align="center"><a
+															onclick="return confExc('NaoAvaliadas','Confirma a exclusão desta Avaliação? \n#trim(rsNaoIniciadas.INP_NumInspecao)#-#trim(Und_Descricao)#(#trim(Und_Codigo)#)')"
+															href="cadastro_inspecao.cfm?acao=excInsp&numInspecao=#rsNaoIniciadas.INP_NumInspecao#&unidade=#Und_Codigo#"><img
+																src="icones/lixeiraRosa.png" alt="Clique para excluir esta Avaliação"
+																width="17" height="17" border="0"></img></a>
+													</div>
+											</td>
 								</tr>
-							</form>
-					
-							<cfif scor eq 'white'>
-								<cfset scor = 'f7f7f7'>
-							<cfelse>
-								<cfset scor = 'white'>
-							</cfif>
-						</cfoutput>
-					</table>
-				</div>
-			<cfelse>
-			<label>NÃO EXISTEM AVALIAÇÕES COM CADASTRO NÃO FINALIZADO</label>
-			</cfif>
-			<!---FIM TABELA DE AVALIAÇÕES COM NUMERAÇÃO CADASTRADA, PORÉM, SEM CADASTRO CONCLUÝDO--->
-		</div>
 
-		<div id="NaoIniciadas" class="tabcontent">
+						</form>
+
+						<cfif scor eq 'white'>
+							<cfset scor = 'f7f7f7'>
+						<cfelse>
+							<cfset scor = 'white'>
+						</cfif>
+					</cfoutput>
+				</table>
+			</div>
+		<cfelse>
+			<label>NÃO EXISTEM AVALIAÇÕES NÃO INICIADAS</label>
+		</cfif>
+	</div>
+	<div id="EmANDAMENTO" class="tabcontent">
 			<!---INICIO TABELA DE AVALIAÇÕES COM CADASTRO CONCLUÍDO, POREM, NÃO AVALIADAS--->
-			<cfif rsNaoIniciadas.recordCount gt 0>
-				<div id="form_container" name="divInsp" style="width:900px;height:expression(this.scrollHeight>299?'300px':'auto');overflow-y:auto;">
+			<cfif rsInspecao.recordCount gt 0>
+				<div id="form_container" name="divInsp" style="width:1100px;height:expression(this.scrollHeight>299?'300px':'auto');overflow-y:auto;">
 					<table border="0" align="center"  id="tabInsp" style="width:expression(this.scrollHeight>299?'683px':'700px');">
 						<tr>
-							<td colspan="7" align="center" class="titulos"><h1 style="font-size:14px;background:#6699CC">AVALIAÇÕES COM CADASTRO FINALIZADO (Avaliações não Iniciadas)</h1></td>
+							<td colspan="7" align="center" class="titulos"><h1 style="font-size:14px;background:#6699CC">AVALIAÇÕES COM CADASTRO FINALIZADO (Avaliações em Andamento)</h1></td>
 						</tr>
 						
 						<tr bgcolor="#6699CC" class="exibir" align="center" style="color:#fff">
@@ -1162,55 +1295,65 @@ tbody {
 								<div align="center">Unidade</div>
 							</td>
 							<td width="7%">
-									<div align="center">Mod.</div>
+								<div align="center">Percentual</div>
+							</td>
+							<td width="7%">
+								<div align="center">Mod.</div>
 							</td>
 
-							<td width="10%">
+							<td width="15%">
 								<div align="center">Período Previsto</div>
 							</td>
 
-							<td width="5%">
-								<div align="center">Inspetores</div>
-							</td>
-							<td width="5%">
-								<div align="center">Excluir</div>
+							<td width="40%">
+								<div align="center">Observações</div>
 							</td>
 
+							<td width="7%">
+								<div align="center">Inspetores</div>
+							</td>
+							<td width="7%">
+								<div align="center">Excluir</div>
+							</td>
 						</tr>
-						
-					
 						<cfset scor = 'white'>
 						<cfset avaliada = 0>
-						<cfoutput query="rsNaoIniciadas">
+						<cfoutput query="rsInspecao">
+							
+								<cfquery datasource="#dsn_inspecao#" name="rsItensAvaliados" >
+									Select count(RIP_Resposta) as avaliados FROM Resultado_Inspecao
+									Where RIP_NumInspecao = '#rsInspecao.INP_NumInspecao#' and RIP_Resposta!='A' and (RIP_Recomendacao!='S' or RIP_Recomendacao is null)
+								</cfquery>
+								<!---<cfdump  var="#rsItensAvaliados#"> --->
 								<cfquery datasource="#dsn_inspecao#" name="rsItensTotais" >
 									Select count(RIP_Resposta) as total FROM Resultado_Inspecao
-									Where RIP_NumInspecao = '#rsNaoIniciadas.INP_NumInspecao#'
+									Where RIP_NumInspecao = '#rsInspecao.INP_NumInspecao#'
 								</cfquery>
 								<cfquery datasource="#dsn_inspecao#" name="rsItemNCI" >
 									Select RIP_NCISEI FROM Resultado_Inspecao
-									Where RIP_NumInspecao = '#rsNaoIniciadas.INP_NumInspecao#' and Rtrim(Ltrim(RIP_NCISEI)) !=''
+									Where RIP_NumInspecao = '#rsInspecao.INP_NumInspecao#' and Rtrim(Ltrim(RIP_NCISEI)) !=''
 								</cfquery>
 							
 								<cfquery datasource="#dsn_inspecao#" name="rsEmReavaliacao" >
 									Select RIP_Resposta, RIP_Recomendacao FROM Resultado_Inspecao
-									Where RIP_NumInspecao = '#rsNaoIniciadas.INP_NumInspecao#' and RIP_Recomendacao ='S'
+									Where RIP_NumInspecao = '#rsInspecao.INP_NumInspecao#' and RIP_Recomendacao ='S'
 								</cfquery>
 								
 								<cfquery datasource="#dsn_inspecao#" name="rsReavaliado" >
 									Select RIP_Resposta, RIP_Recomendacao FROM Resultado_Inspecao
-									Where RIP_NumInspecao = '#rsNaoIniciadas.INP_NumInspecao#' and RIP_Recomendacao ='R' 
+									Where RIP_NumInspecao = '#rsInspecao.INP_NumInspecao#' and RIP_Recomendacao ='R' 
 								</cfquery>
 
 							
 								<cfquery datasource="#dsn_inspecao#" name="rsInspetorTable2">
 									SELECT Fun_Matric, Fun_Nome, Dir_Sigla FROM Funcionarios 
 									INNER JOIN Diretoria ON  Dir_Codigo = Fun_DR
-									WHERE Fun_Matric =#rsNaoIniciadas.INP_Coordenador#
+									WHERE Fun_Matric =#rsInspecao.INP_Coordenador#
 								</cfquery>
-								<cfset perInspec='#DateFormat(rsNaoIniciadas.INP_DtInicInspecao,"dd/mm/yyyy")#' & ' a ' & '#DateFormat(rsNaoIniciadas.INP_DtFimInspecao,"dd/mm/yyyy")#'>
+								<cfset perInspec='#DateFormat(rsInspecao.INP_DtInicInspecao,"dd/mm/yyyy")#' & ' a ' & '#DateFormat(rsInspecao.INP_DtFimInspecao,"dd/mm/yyyy")#'>
 							<form action="" method="POST">
 
-									<tr id="#rsNaoIniciadas.CurrentRow#" valign="middle" bgcolor="#scor#" class="exibir"
+									<tr id="#rsInspecao.CurrentRow#" valign="middle" bgcolor="#scor#" class="exibir"
 										onMouseOver="mouseOver(this);" 
 										onMouseOut="mouseOut(this);"
 										onclick="gravaOrdLinha(this);"
@@ -1221,9 +1364,33 @@ tbody {
 													</div>
 												</td>
 
-												<cfset perc='0%'>
+
+												<cfif '#rsItensAvaliados.avaliados#' gt 0>
+													<cfset perc=round(('#rsItensAvaliados.avaliados#' / '#rsItensTotais.total#' )*100)>
+													<cfif '#perc#' lt 1>
+														<cfset perc='1%'>
+													<cfelse>
+														<cfset perc=round(('#rsItensAvaliados.avaliados#' / '#rsItensTotais.total#')*100) & '%'>
+													</cfif>
+													<cfif '#perc#' gte 99.5 and '#perc#' lt 100>
+														<cfset perc="99%">
+													</cfif>
+												<cfelse>
+														<cfset perc='0%'>
+												</cfif>
 												<td width="25%"  onclick="capturaPosicaoScroll();window.open('itens_inspetores_avaliacao.cfm?numInspecao=#INP_NumInspecao#&Unid=#INP_Unidade#','_blank');">
-															#trim(Dir_Sigla)#-#trim(Und_Descricao)#						
+													
+															#trim(Dir_Sigla)#-#trim(Und_Descricao)#	
+													<!---								
+														<div align="left" style="background:red;width:'#perc#';height:5%;position:relative">
+															<div align="center" style="color:white">#perc#</div>
+														</div>
+													--->
+												</td>
+												<td width="7%">
+													<div align="left" style="background:red;width:'#perc#';height:5%;position:relative">
+														<div align="center" style="color:white">#perc#</div>
+													</div>
 												</td>
 
 												<td width="7%" onClick="capturaPosicaoScroll();window.open('itens_inspetores_avaliacao.cfm?numInspecao=#INP_NumInspecao#&Unid=#INP_Unidade#','_blank');">
@@ -1231,17 +1398,48 @@ tbody {
 														<cfif #INP_Modalidade# eq 0>PRES.<CFELSE>A DIST.</CFIF>
 													</div>
 												</td>
-												<td width="10%" onClick="capturaPosicaoScroll();window.open('itens_inspetores_avaliacao.cfm?numInspecao=#INP_NumInspecao#&Unid=#INP_Unidade#','_blank');">
+												<td width="15%" onClick="capturaPosicaoScroll();window.open('itens_inspetores_avaliacao.cfm?numInspecao=#INP_NumInspecao#&Unid=#INP_Unidade#','_blank');">
 													<div align="center">#perInspec#</div>
 												</td>
-												
+												<td width="40%" onClick="capturaPosicaoScroll();window.open('itens_inspetores_avaliacao.cfm?numInspecao=#INP_NumInspecao#&Unid=#INP_Unidade#','_blank');">
+													<cfset temNCI="">
+													<cfset NCI="">
+													<cfif '#rsItemNCI.RecordCount#' gt 0>
+														<cfif '#rsItemNCI.RecordCount#' eq 1>
+														<cfset temNCI="NCI: #rsItemNCI.RecordCount# item">
+														<cfelse>
+														<cfset temNCI="NCI: #rsItemNCI.RecordCount# itens">
+														</cfif>
+													</cfif>
+													<cfset emReanalise="">
+													<cfif '#rsEmReavaliacao.RecordCount#' gt 0>
+														<cfif '#rsEmReavaliacao.RecordCount#' eq 1>
+															<cfset emReanalise="Em Reanálise: #rsEmReavaliacao.RecordCount# item">
+														<cfelse>
+															<cfset emReanalise="Em Reanálise: #rsEmReavaliacao.RecordCount# itens">
+														</cfif>	
+													</cfif>
+													<cfset reanalisado="">
+													<cfif '#rsReavaliado.RecordCount#' gt 0>
+														<cfif '#rsReavaliado.RecordCount#' eq 1>
+														<cfset reanalisado="Reanalisado: #rsReavaliado.RecordCount# item">
+														<cfelse>
+														<cfset reanalisado="Reanalisado: #rsReavaliado.RecordCount# itens">
+														</cfif>  
+													</cfif>
+													<div align="left" style="margin-left:10px">
+														<div style="color:red;">#temNCI#</div>
+														<div style="color:red;">#emReanalise#</div>
+														<div style="color:darkBlue;">#reanalisado#</div>    
+													</div>   
+													
+												</td>
 												
 												<cfquery datasource="#dsn_inspecao#" name="rsInspCaInsp">
 													SELECT * FROM Inspecao
 													WHERE INP_NumInspecao = '#NIP_NumInspecao#'
-												</cfquery>
-										
-									<td width="5%" height="25px">	
+												</cfquery>										
+									<td width="7%" height="25px">	
 												<div align="center">
 										<a href="cadastro_inspecao_inspetores_alt.cfm?
 										numInspecao=#rsInspCaInsp.INP_NumInspecao#
@@ -1256,13 +1454,24 @@ tbody {
 										##formCad"><img src="figuras/usuario.png" alt="Clique para cadastrar/visualizar inspetores" width="20" height="20" border="0" ></a>													
 										</div>
 									</td>														
-												<td width="5%" height="25px">
+												<td width="7%" height="25px">
+
+													<cfif '#rsItensAvaliados.avaliados#' eq 0>
 														<div align="center"><a
-																onclick="return confExc('NaoAvaliadas','Confirma a exclusão desta Avaliação? \n#trim(rsNaoIniciadas.INP_NumInspecao)#-#trim(Und_Descricao)#(#trim(Und_Codigo)#)')"
-																href="cadastro_inspecao.cfm?acao=excInsp&numInspecao=#rsNaoIniciadas.INP_NumInspecao#&unidade=#Und_Codigo#"><img
+																onclick="return confExc('NaoAvaliadas','Confirma a exclusão desta Avaliação? \n#trim(rsInspecao.INP_NumInspecao)#-#trim(Und_Descricao)#(#trim(Und_Codigo)#)')"
+																href="cadastro_inspecao.cfm?acao=excInsp&numInspecao=#rsInspecao.INP_NumInspecao#&unidade=#Und_Codigo#"><img
 																	src="icones/lixeiraRosa.png" alt="Clique para excluir esta Avaliação"
-																	width="17" height="17" border="0"></img></a>
-														</div>
+																	width="17" height="17" border="0"></img></a></div>
+													<cfelse>
+														<cfset avaliada=1>
+														<div align="center"><a
+																		onclick="return confExc('NaoAvaliadas','Foram avaliados #rsItensAvaliados.avaliados# itens desta Avaliação.\n\nConfirma a exclusão definitiva desta Avaliação? \n\n#trim(rsInspecao.INP_NumInspecao)#-#trim(Und_Descricao)# (#trim(Und_Codigo)#)')"
+																		href="cadastro_inspecao.cfm?acao=excInsp&numInspecao=#rsInspecao.INP_NumInspecao#&unidade=#Und_Codigo#"><img
+																			src="icones/lixeiraRosa.png"
+																			alt="Clique para excluir esta Avaliação" width="17" height="17"
+																			border="0"></img></a></div>
+
+													</cfif>
 												</td>
 									</tr>
 
@@ -1274,240 +1483,16 @@ tbody {
 								<cfset scor = 'white'>
 							</cfif>
 						</cfoutput>
-
-
 					</table>
 				</div>
 			<cfelse>
-				<label>NÃO EXISTEM AVALIAÇÕES NÃO INICIADAS </label>
+				<label>NÃO EXISTEM AVALIAÇÕES EM ANDAMENTO </label>
 			</cfif>
-			
-		</div>
-
-		<div id="EmANDAMENTO" class="tabcontent">
-				<!---INICIO TABELA DE AVALIAÇÕES COM CADASTRO CONCLUÍDO, POREM, NÃO AVALIADAS--->
-				
-				<cfif rsInspecao.recordCount neq 0>
-					<div id="form_container" name="divInsp" style="width:1100px;height:expression(this.scrollHeight>299?'300px':'auto');overflow-y:auto;">
-						<table border="0" align="center"  id="tabInsp" style="width:expression(this.scrollHeight>299?'683px':'700px');">
-							<tr>
-								<td colspan="7" align="center" class="titulos"><h1 style="font-size:14px;background:#6699CC">AVALIAÇÕES COM CADASTRO FINALIZADO (Avaliações em Andamento)</h1></td>
-							</tr>
-							
-							<tr bgcolor="#6699CC" class="exibir" align="center" style="color:#fff">
-								<td width="5%">
-									<div align="center">Número</div>
-								</td>
-								<td width="25%">
-									<div align="center">Unidade</div>
-								</td>
-								<td width="7%">
-									<div align="center">Percentual</div>
-								</td>
-								<td width="7%">
-									<div align="center">Mod.</div>
-								</td>
-
-								<td width="15%">
-									<div align="center">Período Previsto</div>
-								</td>
-
-								<td width="40%">
-									<div align="center">Observações</div>
-								</td>
-
-								<td width="7%">
-									<div align="center">Inspetores</div>
-								</td>
-								<td width="7%">
-									<div align="center">Excluir</div>
-								</td>
-
-							</tr>
-							
-						
-							<cfset scor = 'white'>
-							<cfset avaliada = 0>
-							<cfoutput query="rsInspecao">
-							     
-								    <cfquery datasource="#dsn_inspecao#" name="rsItensAvaliados" >
-										Select count(RIP_Resposta) as avaliados FROM Resultado_Inspecao
-										Where RIP_NumInspecao = '#rsInspecao.INP_NumInspecao#' and RIP_Resposta!='A' and (RIP_Recomendacao!='S' or RIP_Recomendacao is null)
-									</cfquery>
-									<!---<cfdump  var="#rsItensAvaliados#"> --->
-									<cfquery datasource="#dsn_inspecao#" name="rsItensTotais" >
-										Select count(RIP_Resposta) as total FROM Resultado_Inspecao
-										Where RIP_NumInspecao = '#rsInspecao.INP_NumInspecao#'
-									</cfquery>
-									<cfquery datasource="#dsn_inspecao#" name="rsItemNCI" >
-										Select RIP_NCISEI FROM Resultado_Inspecao
-										Where RIP_NumInspecao = '#rsInspecao.INP_NumInspecao#' and Rtrim(Ltrim(RIP_NCISEI)) !=''
-									</cfquery>
-								
-									<cfquery datasource="#dsn_inspecao#" name="rsEmReavaliacao" >
-										Select RIP_Resposta, RIP_Recomendacao FROM Resultado_Inspecao
-										Where RIP_NumInspecao = '#rsInspecao.INP_NumInspecao#' and RIP_Recomendacao ='S'
-									</cfquery>
-									
-									<cfquery datasource="#dsn_inspecao#" name="rsReavaliado" >
-										Select RIP_Resposta, RIP_Recomendacao FROM Resultado_Inspecao
-										Where RIP_NumInspecao = '#rsInspecao.INP_NumInspecao#' and RIP_Recomendacao ='R' 
-									</cfquery>
-
-								
-									<cfquery datasource="#dsn_inspecao#" name="rsInspetorTable2">
-										SELECT Fun_Matric, Fun_Nome, Dir_Sigla FROM Funcionarios 
-										INNER JOIN Diretoria ON  Dir_Codigo = Fun_DR
-										WHERE Fun_Matric =#rsInspecao.INP_Coordenador#
-									</cfquery>
-									<cfset perInspec='#DateFormat(rsInspecao.INP_DtInicInspecao,"dd/mm/yyyy")#' & ' a ' & '#DateFormat(rsInspecao.INP_DtFimInspecao,"dd/mm/yyyy")#'>
-								<form action="" method="POST">
-
-										<tr id="#rsInspecao.CurrentRow#" valign="middle" bgcolor="#scor#" class="exibir"
-											onMouseOver="mouseOver(this);" 
-											onMouseOut="mouseOut(this);"
-											onclick="gravaOrdLinha(this);"
-											style="cursor:pointer">
-													<td width="5%" onClick="capturaPosicaoScroll();window.open('itens_inspetores_avaliacao.cfm?numInspecao=#INP_NumInspecao#&Unid=#INP_Unidade#','_blank');">
-														<div align="left">
-															#INP_NumInspecao#
-														</div>
-													</td>
-
-
-													<cfif '#rsItensAvaliados.avaliados#' gt 0>
-														<cfset perc=round(('#rsItensAvaliados.avaliados#' / '#rsItensTotais.total#' )*100)>
-														<cfif '#perc#' lt 1>
-															<cfset perc='1%'>
-														<cfelse>
-															<cfset perc=round(('#rsItensAvaliados.avaliados#' / '#rsItensTotais.total#')*100) & '%'>
-														</cfif>
-														<cfif '#perc#' gte 99.5 and '#perc#' lt 100>
-															<cfset perc="99%">
-														</cfif>
-													<cfelse>
-															<cfset perc='0%'>
-													</cfif>
-													<td width="25%"  onclick="capturaPosicaoScroll();window.open('itens_inspetores_avaliacao.cfm?numInspecao=#INP_NumInspecao#&Unid=#INP_Unidade#','_blank');">
-													    
-														    	#trim(Dir_Sigla)#-#trim(Und_Descricao)#	
-														<!---								
-															<div align="left" style="background:red;width:'#perc#';height:5%;position:relative">
-																<div align="center" style="color:white">#perc#</div>
-															</div>
-														--->
-													</td>
-													<td width="7%">
-														<div align="left" style="background:red;width:'#perc#';height:5%;position:relative">
-															<div align="center" style="color:white">#perc#</div>
-														</div>
-													</td>
-
-													<td width="7%" onClick="capturaPosicaoScroll();window.open('itens_inspetores_avaliacao.cfm?numInspecao=#INP_NumInspecao#&Unid=#INP_Unidade#','_blank');">
-														<div align="center">
-															<cfif #INP_Modalidade# eq 0>PRES.<CFELSE>A DIST.</CFIF>
-														</div>
-													</td>
-													<td width="15%" onClick="capturaPosicaoScroll();window.open('itens_inspetores_avaliacao.cfm?numInspecao=#INP_NumInspecao#&Unid=#INP_Unidade#','_blank');">
-														<div align="center">#perInspec#</div>
-													</td>
-													<td width="40%" onClick="capturaPosicaoScroll();window.open('itens_inspetores_avaliacao.cfm?numInspecao=#INP_NumInspecao#&Unid=#INP_Unidade#','_blank');">
-														<cfset temNCI="">
-														<cfset NCI="">
-														<cfif '#rsItemNCI.RecordCount#' gt 0>
-															<cfif '#rsItemNCI.RecordCount#' eq 1>
-															  <cfset temNCI="NCI: #rsItemNCI.RecordCount# item">
-															<cfelse>
-															  <cfset temNCI="NCI: #rsItemNCI.RecordCount# itens">
-															</cfif>
-														</cfif>
-														<cfset emReanalise="">
-														<cfif '#rsEmReavaliacao.RecordCount#' gt 0>
-															<cfif '#rsEmReavaliacao.RecordCount#' eq 1>
-														        <cfset emReanalise="Em Reanálise: #rsEmReavaliacao.RecordCount# item">
-															<cfelse>
-														    	<cfset emReanalise="Em Reanálise: #rsEmReavaliacao.RecordCount# itens">
-															</cfif>	
-														</cfif>
-														<cfset reanalisado="">
-														<cfif '#rsReavaliado.RecordCount#' gt 0>
-															<cfif '#rsReavaliado.RecordCount#' eq 1>
-														       <cfset reanalisado="Reanalisado: #rsReavaliado.RecordCount# item">
-															<cfelse>
-															   <cfset reanalisado="Reanalisado: #rsReavaliado.RecordCount# itens">
-															</cfif>  
-														</cfif>
-														<div align="left" style="margin-left:10px">
-															<div style="color:red;">#temNCI#</div>
-															<div style="color:red;">#emReanalise#</div>
-															<div style="color:darkBlue;">#reanalisado#</div>    
-														</div>   
-                                                        
-													</td>
-													
-													<cfquery datasource="#dsn_inspecao#" name="rsInspCaInsp">
-														SELECT * FROM Inspecao
-														WHERE INP_NumInspecao = '#NIP_NumInspecao#'
-													</cfquery>										
-										<td width="7%" height="25px">	
-													<div align="center">
-											<a href="cadastro_inspecao_inspetores_alt.cfm?
-											numInspecao=#rsInspCaInsp.INP_NumInspecao#
-											&Unid=#rsInspCaInsp.INP_Unidade#
-											&coordenador=#rsInspCaInsp.INP_Coordenador#
-											&dtInicDeslocamento=#DateFormat(rsInspCaInsp.INP_DtInicDeslocamento,'dd/mm/yyyy')#
-											&dtFimDeslocamento=#DateFormat(rsInspCaInsp.INP_DtFimDeslocamento,'dd/mm/yyyy')#
-											&dtInicInspecao=#DateFormat(rsInspCaInsp.INP_DtInicInspecao,'dd/mm/yyyy')#
-											&dtFimInspecao=#DateFormat(rsInspCaInsp.INP_DtFimInspecao,'dd/mm/yyyy')#
-											&RIPMatricAvaliador=N
-											&telaretorno=cadastro_inspecao.cfm
-											##formCad"><img src="figuras/usuario.png" alt="Clique para cadastrar/visualizar inspetores" width="20" height="20" border="0" ></a>													
-											</div>
-										</td>														
-													<td width="7%" height="25px">
-
-														<cfif '#rsItensAvaliados.avaliados#' eq 0>
-															<div align="center"><a
-																	onclick="return confExc('NaoAvaliadas','Confirma a exclusão desta Avaliação? \n#trim(rsInspecao.INP_NumInspecao)#-#trim(Und_Descricao)#(#trim(Und_Codigo)#)')"
-																	href="cadastro_inspecao.cfm?acao=excInsp&numInspecao=#rsInspecao.INP_NumInspecao#&unidade=#Und_Codigo#"><img
-																		src="icones/lixeiraRosa.png" alt="Clique para excluir esta Avaliação"
-																		width="17" height="17" border="0"></img></a></div>
-														<cfelse>
-															<cfset avaliada=1>
-															<div align="center"><a
-																			onclick="return confExc('NaoAvaliadas','Foram avaliados #rsItensAvaliados.avaliados# itens desta Avaliação.\n\nConfirma a exclusão definitiva desta Avaliação? \n\n#trim(rsInspecao.INP_NumInspecao)#-#trim(Und_Descricao)# (#trim(Und_Codigo)#)')"
-																			href="cadastro_inspecao.cfm?acao=excInsp&numInspecao=#rsInspecao.INP_NumInspecao#&unidade=#Und_Codigo#"><img
-																				src="icones/lixeiraRosa.png"
-																				alt="Clique para excluir esta Avaliação" width="17" height="17"
-																				border="0"></img></a></div>
-
-														</cfif>
-													</td>
-										</tr>
-
-								</form>
-
-								<cfif scor eq 'white'>
-									<cfset scor = 'f7f7f7'>
-								<cfelse>
-									<cfset scor = 'white'>
-								</cfif>
-							</cfoutput>
-
-
-						</table>
-					</div>
-				<cfelse>
-					<label>NÃO EXISTEM AVALIAÇÕES EM ANDAMENTO </label>
-				</cfif>
-				
-		</div>
-
-		<div id="EmRevisao" class="tabcontent" >
-				<!---INICIO TABELA DE AVALIAÇÕES EM REVISÃO--->
-				<cfif rsEmRevisaoFinalizadasSemNC.recordCount neq 0>
-					
-					<div id="form_container" name="divEmVerificacao" style="width:1500px;height:expression(this.scrollHeight>299?'300px':'auto');overflow-y:auto;">
+	</div>
+	<div id="EmRevisao" class="tabcontent">
+			<!---INICIO TABELA DE AVALIAÇÕES EM REVISÃO--->
+			<cfif rsEmRevisaoFinalizadasSemNC.recordCount gt 0>
+				<div id="form_container" name="divEmVerificacao" style="width:1500px;height:expression(this.scrollHeight>299?'300px':'auto');overflow-y:auto;">
 					<table border="0" align="center"  id="tabEmVerificacao" style="width:expression(this.scrollHeight>299?'690px':'700px');">
 						<tr>
 							<td colspan="9" align="center" class="titulos"><h1 style="font-size:14px;background:#6699CC">AVALIAÇÕES FINALIZADAS (Em Revisão)</h1></td>
@@ -1543,201 +1528,197 @@ tbody {
 							</td>
 						</tr>
 
-					<cfset scor = 'white'>
-					<cfset avaliada = 0>
-					<cfoutput query="rsEmRevisaoFinalizadasSemNC">
-						<form action="" method="POST" >
-							<cfquery datasource="#dsn_inspecao#" name="rsItemNCI">
-								Select Pos_NCISEI FROM ParecerUnidade
-								Where Pos_Inspecao = '#rsEmRevisaoFinalizadasSemNC.INP_NumInspecao#' and Rtrim(Ltrim(Pos_NCISEI)) !=''
-							</cfquery>
+						<cfset scor = 'white'>
+						<cfset avaliada = 0>
+						<cfoutput query="rsEmRevisaoFinalizadasSemNC">
+							<form action="" method="POST" >
+								<cfquery datasource="#dsn_inspecao#" name="rsItemNCI">
+									Select Pos_NCISEI FROM ParecerUnidade
+									Where Pos_Inspecao = '#rsEmRevisaoFinalizadasSemNC.INP_NumInspecao#' and Rtrim(Ltrim(Pos_NCISEI)) !=''
+								</cfquery>
 
-							<cfquery datasource="#dsn_inspecao#" name="rsEmReavaliacao" >
-								Select RIP_Resposta, RIP_Recomendacao FROM Resultado_Inspecao
-								Where RIP_NumInspecao = '#rsEmRevisaoFinalizadasSemNC.INP_NumInspecao#' and RIP_Recomendacao ='S'
-							</cfquery>
-							<cfquery datasource="#dsn_inspecao#" name="rsReavaliado" >
-								Select RIP_Resposta, RIP_Recomendacao FROM Resultado_Inspecao
-								Where RIP_NumInspecao = '#rsEmRevisaoFinalizadasSemNC.INP_NumInspecao#' and RIP_Recomendacao ='R'
-							</cfquery>
-							
-							<cfquery datasource="#dsn_inspecao#" name="rsInspetorTable2">
-								SELECT Fun_Matric, Fun_Nome, Dir_Sigla FROM Funcionarios 
-								INNER JOIN Diretoria ON  Dir_Codigo = Fun_DR 
-								WHERE Fun_Matric =#rsEmRevisaoFinalizadasSemNC.INP_Coordenador#
-							</cfquery>
-
-
-
-						<cfset fimaval = '#DateFormat(rsEmRevisaoFinalizadasSemNC.INP_DTConcluirAvaliacao,'dd/mm/yyyy')#' >
-						<cfset perInspec = '#DateFormat(rsEmRevisaoFinalizadasSemNC.INP_DtUltAtu,'dd/mm/yyyy')# #timeFormat(rsEmRevisaoFinalizadasSemNC.INP_DtUltAtu, "HH:MM")#'>
-
-						<cfset semNCvalidado = false>
-						<cfquery datasource="#dsn_inspecao#" name="rsSemValidacao" >
-							SELECT  Count(RIP_NumInspecao) as total
-									, Count(CASE WHEN RIP_Recomendacao='V' THEN 1 END) AS validado 
-							FROM Resultado_Inspecao
-							WHERE RIP_NumInspecao = '#INP_NumInspecao#' 
-						</cfquery>
-						<!---FIM - Verifica se é uma verifcação sem itens não conforme--->
-						<cfif "#rsSemValidacao.total#" eq "#rsSemValidacao.validado#"  and "#rsSemValidacao.total#" neq 0>
-							<cfset semNCvalidado = true>
-						</cfif>		    	
-					   
-							<tr id="#rsEmRevisaoFinalizadasSemNC.CurrentRow#" valign="middle" bgcolor="#scor#"  class="exibir" 
-								onMouseOver="mouseOver(this);" 
-                                onMouseOut="mouseOut(this);"
-                                onclick="gravaOrdLinha(this);"
-								style="cursor:pointer">
-											
-									<cfset temNCI = "">
-									<cfif '#rsItemNCI.RecordCount#' gt 0>
-									<cfset temNCI = "NCI:#rsItemNCI.RecordCount#">
-									</cfif>
-
-									<cfset emReavaliacao="">
-									<cfif '#rsEmReavaliacao.RecordCount#' gt 0>
-									<cfset emReavaliacao="EmRean:#rsEmReavaliacao.RecordCount#">
-									</cfif>
-									<cfset reanalisado="">
-									<cfif '#rsReavaliado.RecordCount#' gt 0>
-									<cfset reanalisado="Rean:#rsReavaliado.RecordCount#">
-									</cfif>
+								<cfquery datasource="#dsn_inspecao#" name="rsEmReavaliacao" >
+									Select RIP_Resposta, RIP_Recomendacao FROM Resultado_Inspecao
+									Where RIP_NumInspecao = '#rsEmRevisaoFinalizadasSemNC.INP_NumInspecao#' and RIP_Recomendacao ='S'
+								</cfquery>
+								<cfquery datasource="#dsn_inspecao#" name="rsReavaliado" >
+									Select RIP_Resposta, RIP_Recomendacao FROM Resultado_Inspecao
+									Where RIP_NumInspecao = '#rsEmRevisaoFinalizadasSemNC.INP_NumInspecao#' and RIP_Recomendacao ='R'
+								</cfquery>
+								
+								<cfquery datasource="#dsn_inspecao#" name="rsInspetorTable2">
+									SELECT Fun_Matric, Fun_Nome, Dir_Sigla FROM Funcionarios 
+									INNER JOIN Diretoria ON  Dir_Codigo = Fun_DR 
+									WHERE Fun_Matric =#rsEmRevisaoFinalizadasSemNC.INP_Coordenador#
+								</cfquery>
 
 
-									<td width="5%">
-										<div align="left" onClick="capturaPosicaoScroll();window.open('GeraRelatorio/gerador/dsp/papeltrabalho.cfm?pg=controle&Form.id=#INP_NumInspecao#','_blank');">
-											#rsEmRevisaoFinalizadasSemNC.INP_NumInspecao#
-										</div>
-									</td>
 
-									
-									<td width="25%" onClick="capturaPosicaoScroll();window.open('GeraRelatorio/gerador/dsp/papeltrabalho.cfm?pg=controle&Form.id=#INP_NumInspecao#','_blank');">
-										<div align="left" >#trim(Dir_Sigla)#-#trim(Und_Descricao)#								
-										</div>
-									</td>
-									
-									<td width="3%" onClick="capturaPosicaoScroll();window.open('GeraRelatorio/gerador/dsp/papeltrabalho.cfm?pg=controle&Form.id=#INP_NumInspecao#','_blank');">
-											<div align="center"><cfif #INP_Modalidade# eq 0>PRES.<CFELSE>A DIST.</CFIF></div>
-									</td>
-									
-									<td width="8%" onClick="capturaPosicaoScroll();window.open('GeraRelatorio/gerador/dsp/papeltrabalho.cfm?pg=controle&Form.id=#INP_NumInspecao#','_blank');">
-										<div align="center">#fimaval#</div>
-									</td>
-									<td width="8%" onClick="capturaPosicaoScroll();window.open('GeraRelatorio/gerador/dsp/papeltrabalho.cfm?pg=controle&Form.id=#INP_NumInspecao#','_blank');">
-										<div align="center">#perInspec#</div>
-									</td>
-									<td width="15%" onClick="capturaPosicaoScroll();window.open('GeraRelatorio/gerador/dsp/papeltrabalho.cfm?pg=controle&Form.id=#INP_NumInspecao#','_blank');">
-										<cfset temNCI="">
-										<cfset NCI="">
+								<cfset fimaval = '#DateFormat(rsEmRevisaoFinalizadasSemNC.INP_DTConcluirAvaliacao,'dd/mm/yyyy')#' >
+								<cfset perInspec = '#DateFormat(rsEmRevisaoFinalizadasSemNC.INP_DtUltAtu,'dd/mm/yyyy')# #timeFormat(rsEmRevisaoFinalizadasSemNC.INP_DtUltAtu, "HH:MM")#'>
+
+								<cfset semNCvalidado = false>
+								<cfquery datasource="#dsn_inspecao#" name="rsSemValidacao" >
+									SELECT  Count(RIP_NumInspecao) as total
+											, Count(CASE WHEN RIP_Recomendacao='V' THEN 1 END) AS validado 
+									FROM Resultado_Inspecao
+									WHERE RIP_NumInspecao = '#INP_NumInspecao#' 
+								</cfquery>
+								<!---FIM - Verifica se é uma verifcação sem itens não conforme--->
+								<cfif "#rsSemValidacao.total#" eq "#rsSemValidacao.validado#"  and "#rsSemValidacao.total#" neq 0>
+									<cfset semNCvalidado = true>
+								</cfif>		    	
+						
+								<tr id="#rsEmRevisaoFinalizadasSemNC.CurrentRow#" valign="middle" bgcolor="#scor#"  class="exibir" 
+									onMouseOver="mouseOver(this);" 
+									onMouseOut="mouseOut(this);"
+									onclick="gravaOrdLinha(this);"
+									style="cursor:pointer">
+												
+										<cfset temNCI = "">
 										<cfif '#rsItemNCI.RecordCount#' gt 0>
-											<cfif '#rsItemNCI.RecordCount#' eq 1>
-											<cfset temNCI="NCI: #rsItemNCI.RecordCount# item">
-											<cfelse>
-											<cfset temNCI="NCI: #rsItemNCI.RecordCount# itens">  
-											</cfif>
+										<cfset temNCI = "NCI:#rsItemNCI.RecordCount#">
 										</cfif>
-										<cfset emReanalise="">
+
+										<cfset emReavaliacao="">
 										<cfif '#rsEmReavaliacao.RecordCount#' gt 0>
-											<cfif '#rsEmReavaliacao.RecordCount#' eq 1>
-												<cfset emReanalise="Em Reanálise: #rsEmReavaliacao.RecordCount# item">
-											<cfelse>
-												<cfset emReanalise="Em Reanálise: #rsEmReavaliacao.RecordCount# itens">
-											</cfif>
+										<cfset emReavaliacao="EmRean:#rsEmReavaliacao.RecordCount#">
 										</cfif>
 										<cfset reanalisado="">
 										<cfif '#rsReavaliado.RecordCount#' gt 0>
-											<cfif '#rsReavaliado.RecordCount#' eq 1>
-											<cfset reanalisado="Reanalisado: #rsReavaliado.RecordCount# item">
-											<cfelse>
-											<cfset reanalisado="Reanalisado: #rsReavaliado.RecordCount# itens">
-											</cfif>
-										</cfif>
-										<cfset semNC="">
-										<cfif '#rsEmRevisaoFinalizadasSemNC.tipo#' eq 'semNC'>
-											<cfset semNC='Sem Itens "NÃO CONFORME"' >
+										<cfset reanalisado="Rean:#rsReavaliado.RecordCount#">
 										</cfif>
 
-										<div align="left" style="margin-left:10px">
-											<div style="color:red;">#temNCI#</div>
-											<div style="color:red;">#emReanalise#</div>
-											<div style="color:darkBlue;">#reanalisado#</div>
-											<div style="color:red;">#semNC#</div>    
-										</div>  						 
-																
-									</td>
-									<cfquery datasource="#dsn_inspecao#" name="rsInspCaInsp">
-										SELECT * from Inspecao INNER JOIN Usuarios ON INP_UserName = Usu_Login 
-										WHERE INP_NumInspecao = '#INP_NumInspecao#'
-									</cfquery>
-									<cfset revisor = 'SEM REVISOR(A)'>
-									<cfif trim(rsInspCaInsp.INP_RevisorLogin) gt 0>
-										<cfquery name="rsRevis" datasource="#dsn_inspecao#">
-											select Usu_Apelido 
-											from usuarios 
-											where Usu_login = (<cfqueryparam cfsqltype="cf_sql_varchar" value="#rsInspCaInsp.INP_RevisorLogin#">)
+
+										<td width="5%">
+											<div align="left" onClick="capturaPosicaoScroll();window.open('GeraRelatorio/gerador/dsp/papeltrabalho.cfm?pg=controle&Form.id=#INP_NumInspecao#','_blank');">
+												#rsEmRevisaoFinalizadasSemNC.INP_NumInspecao#
+											</div>
+										</td>
+
+										
+										<td width="25%" onClick="capturaPosicaoScroll();window.open('GeraRelatorio/gerador/dsp/papeltrabalho.cfm?pg=controle&Form.id=#INP_NumInspecao#','_blank');">
+											<div align="left" >#trim(Dir_Sigla)#-#trim(Und_Descricao)#								
+											</div>
+										</td>
+										
+										<td width="3%" onClick="capturaPosicaoScroll();window.open('GeraRelatorio/gerador/dsp/papeltrabalho.cfm?pg=controle&Form.id=#INP_NumInspecao#','_blank');">
+												<div align="center"><cfif #INP_Modalidade# eq 0>PRES.<CFELSE>A DIST.</CFIF></div>
+										</td>
+										
+										<td width="8%" onClick="capturaPosicaoScroll();window.open('GeraRelatorio/gerador/dsp/papeltrabalho.cfm?pg=controle&Form.id=#INP_NumInspecao#','_blank');">
+											<div align="center">#fimaval#</div>
+										</td>
+										<td width="8%" onClick="capturaPosicaoScroll();window.open('GeraRelatorio/gerador/dsp/papeltrabalho.cfm?pg=controle&Form.id=#INP_NumInspecao#','_blank');">
+											<div align="center">#perInspec#</div>
+										</td>
+										<td width="15%" onClick="capturaPosicaoScroll();window.open('GeraRelatorio/gerador/dsp/papeltrabalho.cfm?pg=controle&Form.id=#INP_NumInspecao#','_blank');">
+											<cfset temNCI="">
+											<cfset NCI="">
+											<cfif '#rsItemNCI.RecordCount#' gt 0>
+												<cfif '#rsItemNCI.RecordCount#' eq 1>
+												<cfset temNCI="NCI: #rsItemNCI.RecordCount# item">
+												<cfelse>
+												<cfset temNCI="NCI: #rsItemNCI.RecordCount# itens">  
+												</cfif>
+											</cfif>
+											<cfset emReanalise="">
+											<cfif '#rsEmReavaliacao.RecordCount#' gt 0>
+												<cfif '#rsEmReavaliacao.RecordCount#' eq 1>
+													<cfset emReanalise="Em Reanálise: #rsEmReavaliacao.RecordCount# item">
+												<cfelse>
+													<cfset emReanalise="Em Reanálise: #rsEmReavaliacao.RecordCount# itens">
+												</cfif>
+											</cfif>
+											<cfset reanalisado="">
+											<cfif '#rsReavaliado.RecordCount#' gt 0>
+												<cfif '#rsReavaliado.RecordCount#' eq 1>
+												<cfset reanalisado="Reanalisado: #rsReavaliado.RecordCount# item">
+												<cfelse>
+												<cfset reanalisado="Reanalisado: #rsReavaliado.RecordCount# itens">
+												</cfif>
+											</cfif>
+											<cfset semNC="">
+											<cfif '#rsEmRevisaoFinalizadasSemNC.tipo#' eq 'semNC'>
+												<cfset semNC='Sem Itens "NÃO CONFORME"' >
+											</cfif>
+
+											<div align="left" style="margin-left:10px">
+												<div style="color:red;">#temNCI#</div>
+												<div style="color:red;">#emReanalise#</div>
+												<div style="color:darkBlue;">#reanalisado#</div>
+												<div style="color:red;">#semNC#</div>    
+											</div>  						 
+																	
+										</td>
+										<cfquery datasource="#dsn_inspecao#" name="rsInspCaInsp">
+											SELECT * from Inspecao INNER JOIN Usuarios ON INP_UserName = Usu_Login 
+											WHERE INP_NumInspecao = '#INP_NumInspecao#'
 										</cfquery>
-										<cfset revisor = rsRevis.Usu_Apelido>
-									</cfif>
-								<!---									
-									<cfset UsuApelido = ''>
-									<cfif ucase(trim(rsInspCaInsp.Usu_GrupoAcesso)) eq 'GESTORES'> --->
-										<cfset UsuApelido = rsInspCaInsp.Usu_Apelido>
-								<!---								</cfif> --->
-									<td width="20%" onClick="capturaPosicaoScroll();window.open('GeraRelatorio/gerador/dsp/papeltrabalho.cfm?pg=controle&Form.id=#INP_NumInspecao#','_blank');">
-										<div align="left">#UsuApelido#</div>
-									</td>
+										<cfset revisor = 'SEM REVISOR(A)'>
+										<cfif trim(rsInspCaInsp.INP_RevisorLogin) gt 0>
+											<cfquery name="rsRevis" datasource="#dsn_inspecao#">
+												select Usu_Apelido 
+												from usuarios 
+												where Usu_login = (<cfqueryparam cfsqltype="cf_sql_varchar" value="#rsInspCaInsp.INP_RevisorLogin#">)
+											</cfquery>
+											<cfset revisor = rsRevis.Usu_Apelido>
+										</cfif>
+									<!---									
+										<cfset UsuApelido = ''>
+										<cfif ucase(trim(rsInspCaInsp.Usu_GrupoAcesso)) eq 'GESTORES'> --->
+											<cfset UsuApelido = rsInspCaInsp.Usu_Apelido>
+									<!---								</cfif> --->
+										<td width="20%" onClick="capturaPosicaoScroll();window.open('GeraRelatorio/gerador/dsp/papeltrabalho.cfm?pg=controle&Form.id=#INP_NumInspecao#','_blank');">
+											<div align="left">#UsuApelido#</div>
+										</td>
 
-									<td width="25%" onClick="capturaPosicaoScroll();if('#revisor#' != 'SEM REVISOR(A)'){window.open('GeraRelatorio/gerador/dsp/papeltrabalho.cfm?pg=controle&Form.id=#INP_NumInspecao#','_blank')} else {if (confirm ('                       Atenção! \n\nConfirma Assumir a Revisão?')) {window.open('cadastro_inspecao.cfm?numInspecao=#rsInspCaInsp.INP_NumInspecao#&Unid=#rsInspCaInsp.INP_Unidade#&acao=assumirevisao','_self')}}">
-										<div align="left">
-											<cfif revisor eq 'SEM REVISOR(A)'>
-												<button name="assumirrevisao" type="button" class="botao">Assumir Revisão?</button>
-												 <!--- <a href="##">Assumir Revisão?</a>	--->												
-											<cfelse>
-												<div align="left">#revisor#</div>
-											</cfif>
-										</div>	
-									</td>
-									<td width="5%" height="25px">
-										<!--- <div align="center"><a  onclick="abrirFormInspetores('#rsInspCaInsp.INP_NumInspecao#',#rsInspCaInsp.INP_Coordenador#)" href="##0"><img src="figuras/usuario.png" alt="Clique para visualizar os inspetores desta Avaliação" width="20" height="20" border="0" ></img></a></div> --->
-										<div align="center">
-											<a href="cadastro_inspecao_inspetores_alt.cfm?
-											numInspecao=#rsInspCaInsp.INP_NumInspecao#
-											&Unid=#rsInspCaInsp.INP_Unidade#
-											&coordenador=#rsInspCaInsp.INP_Coordenador#
-											&dtInicDeslocamento=#DateFormat(rsInspCaInsp.INP_DtInicDeslocamento,'dd/mm/yyyy')#
-											&dtFimDeslocamento=#DateFormat(rsInspCaInsp.INP_DtFimDeslocamento,'dd/mm/yyyy')#
-											&dtInicInspecao=#DateFormat(rsInspCaInsp.INP_DtInicInspecao,'dd/mm/yyyy')#
-											&dtFimInspecao=#DateFormat(rsInspCaInsp.INP_DtFimInspecao,'dd/mm/yyyy')#
-											&RIPMatricAvaliador=N
-											&telaretorno=cadastro_inspecao.cfm
-											##formCad"><img src="figuras/usuario.png" alt="Clique para cadastrar/visualizar inspetores" width="20" height="20" border="0" ></a>													
-										</div>										
-									</td>
-							</tr>
-						
-					</form>
+										<td width="25%" onClick="capturaPosicaoScroll();if('#revisor#' != 'SEM REVISOR(A)'){window.open('GeraRelatorio/gerador/dsp/papeltrabalho.cfm?pg=controle&Form.id=#INP_NumInspecao#','_blank')} else {if (confirm ('                       Atenção! \n\nConfirma Assumir a Revisão?')) {window.open('cadastro_inspecao.cfm?numInspecao=#rsInspCaInsp.INP_NumInspecao#&Unid=#rsInspCaInsp.INP_Unidade#&acao=assumirevisao','_self')}}">
+											<div align="left">
+												<cfif revisor eq 'SEM REVISOR(A)'>
+													<button name="assumirrevisao" type="button" class="botao">Assumir Revisão?</button>
+													<!--- <a href="##">Assumir Revisão?</a>	--->												
+												<cfelse>
+													<div align="left">#revisor#</div>
+												</cfif>
+											</div>	
+										</td>
+										<td width="5%" height="25px">
+											<!--- <div align="center"><a  onclick="abrirFormInspetores('#rsInspCaInsp.INP_NumInspecao#',#rsInspCaInsp.INP_Coordenador#)" href="##0"><img src="figuras/usuario.png" alt="Clique para visualizar os inspetores desta Avaliação" width="20" height="20" border="0" ></img></a></div> --->
+											<div align="center">
+												<a href="cadastro_inspecao_inspetores_alt.cfm?
+												numInspecao=#rsInspCaInsp.INP_NumInspecao#
+												&Unid=#rsInspCaInsp.INP_Unidade#
+												&coordenador=#rsInspCaInsp.INP_Coordenador#
+												&dtInicDeslocamento=#DateFormat(rsInspCaInsp.INP_DtInicDeslocamento,'dd/mm/yyyy')#
+												&dtFimDeslocamento=#DateFormat(rsInspCaInsp.INP_DtFimDeslocamento,'dd/mm/yyyy')#
+												&dtInicInspecao=#DateFormat(rsInspCaInsp.INP_DtInicInspecao,'dd/mm/yyyy')#
+												&dtFimInspecao=#DateFormat(rsInspCaInsp.INP_DtFimInspecao,'dd/mm/yyyy')#
+												&RIPMatricAvaliador=N
+												&telaretorno=cadastro_inspecao.cfm
+												##formCad"><img src="figuras/usuario.png" alt="Clique para cadastrar/visualizar inspetores" width="20" height="20" border="0" ></a>													
+											</div>										
+										</td>
+								</tr>
+							
+							</form>
 
-					<cfif scor eq 'white'>
-						<cfset scor = 'f7f7f7'>
-					<cfelse>
-						<cfset scor = 'white'>
-					</cfif>
-					</cfoutput>
-
-
+							<cfif scor eq 'white'>
+								<cfset scor = 'f7f7f7'>
+							<cfelse>
+								<cfset scor = 'white'>
+							</cfif>
+						</cfoutput>				
 					</table>
-					
-					</div>
-					<cfelse>
-					<label>NÃO EXISTEM AVALIAÇÕES FINALIZADAS (EM REVISÃO)</label>
-					</cfif>
-		</div>
-		<div id="VlrAloc" class="tabcontent" >
-				<!---INICIO TABELA DE valores alocados --->
-				<cfif rsvlralocado.recordCount neq 0>
-					
-					<div id="form_container" name="divEmVerificacao" style="width:1300px;height:expression(this.scrollHeight>299?'300px':'auto');overflow-y:auto;">
+				</div>
+			<cfelse>
+				<label>NÃO EXISTEM AVALIAÇÕES FINALIZADAS (EM REVISÃO)</label>
+			</cfif>
+	</div>
+	<div id="VlrAloc" class="tabcontent">
+			<!---INICIO TABELA DE valores alocados --->
+			<cfif rsvlralocado.recordCount gt 0>
+				<div id="form_container" name="divEmVerificacao" style="width:1300px;height:expression(this.scrollHeight>299?'300px':'auto');overflow-y:auto;">
 					<table border="0" align="center"  id="tabEmVerificacao" style="width:expression(this.scrollHeight>299?'690px':'700px');">
 						<tr>
 							<td colspan="9" align="center" class="titulos"><h1 style="font-size:14px;background:#6699CC">Fazer Registro dos Valores Alocados</h1></td>
@@ -1761,271 +1742,267 @@ tbody {
 							</td>							
 						</tr>
 
-					<cfset scor = 'white'>
-					<cfset avaliada = 0>
-					<cfoutput query="rsvlralocado">
-						<form action="" method="POST" >
-
-						<cfset fimaval = '#DateFormat(rsvlralocado.INP_DTConcluirAvaliacao,'dd/mm/yyyy')#' >  	
-					   
-							<tr id="#rsvlralocado.CurrentRow#" valign="middle" bgcolor="#scor#"  class="exibir" 
-								onMouseOver="mouseOver(this);" 
-                                onMouseOut="mouseOut(this);"
-                                onclick="gravaOrdLinha(this);"
-								style="cursor:pointer">							
-									<td width="5%">
-										<div align="left" onClick="capturaPosicaoScroll();window.open('cadastro_inspecao_despesas.cfm?numInspecao=#rsvlralocado.INP_NumInspecao#','_blank');">
-											#rsvlralocado.INP_NumInspecao#
-										</div>
-									</td>
-									<td width="25%" onClick="capturaPosicaoScroll();window.open('cadastro_inspecao_despesas.cfm?numInspecao=#rsvlralocado.INP_NumInspecao#','_blank');">
-										<div align="left" >#trim(Dir_Sigla)#-#rsvlralocado.Und_Descricao#								
-										</div>
-									</td>
-									
-									<td width="3%" onClick="capturaPosicaoScroll();window.open('cadastro_inspecao_despesas.cfm?numInspecao=#rsvlralocado.INP_NumInspecao#','_blank');">
-											<div align="center"><cfif #rsvlralocado.INP_Modalidade# eq 0>PRES.<CFELSE>A DIST.</CFIF></div>
-									</td>
-									
-									<td width="8%" onClick="capturaPosicaoScroll();window.open('cadastro_inspecao_despesas.cfm?numInspecao=#rsvlralocado.INP_NumInspecao#','_blank');">
-										<div align="center">#fimaval#</div>
-									</td>
-									<cfset revisor = 'SEM REVISOR(A)'>
-									<cfif trim(rsvlralocado.Usu_Apelido) neq ''>
-										<cfset revisor = trim(rsvlralocado.Usu_Apelido)>
-									</cfif>
-
-									<td width="25%" onClick="capturaPosicaoScroll();if('#revisor#' != 'SEM REVISOR(A)'){window.open('cadastro_inspecao_despesas.cfm?numInspecao=#INP_NumInspecao#','_blank')} else {if (confirm ('                       Atenção! \n\nConfirma Assumir a Revisão?')) {window.open('cadastro_inspecao.cfm?numInspecao=#rsInspCaInsp.INP_NumInspecao#&Unid=#rsInspCaInsp.INP_Unidade#&acao=assumirevisao','_self')}}">
-										<div align="left">
-												<div align="left">#revisor#</div>
-										</div>	
-									</td>
-							</tr>
-						
-					</form>
-
-					<cfif scor eq 'white'>
-						<cfset scor = 'f7f7f7'>
-					<cfelse>
 						<cfset scor = 'white'>
-					</cfif>
-					</cfoutput>
+						<cfset avaliada = 0>
+						<cfoutput query="rsvlralocado">
+							<form action="" method="POST" >
 
-
-					</table>
-					
-					</div>
-					<cfelse>
-					<label>NÃO EXISTEM AVALIAÇÕES FINALIZADAS (EM REVISÃO)</label>
-					</cfif>
-		</div>
-		<div id="SemNC" class="tabcontent" >
-			<!---INICIO TABELA DE AVALIAÇÕES SEM ITENS NC--->
-			<cfif rsFinalizadasSemNCencerrado.recordCount neq 0>
-				<div id="form_container" name="divSemNC" style="width:680px;height:expression(this.scrollHeight>299?'300px':'auto');overflow-y:auto;">
-					<table border="0" align="center" id="tabSemNC" style="width:expression(this.scrollHeight>299?'683px':'700px');">
-						<tr style="border:none;">
-							<td colspan="7" align="center">
-								<h1 style="font-size:14px;background:#6699CC;color:white;border:none">
-									AVALIAÇÕES FINALIZADAS SEM OPORTUNIDADES DE APRIMORAMENTO</h1>
-							</td>
-						</tr>
-
-						<tr bgcolor="#6699CC" class="exibir" align="center" style="color:white">
-							<td width="7%">
-								<div align="center">Número</div>
-							</td>
-							<td width="40%">
-								<div align="center">Unidade</div>
-							</td>
-							<td width="7%">
-								<div align="center"></div>Mod.
-
-							</td>
-							<td width="40%">
-								<div align="center">Coordenador</div>
-							</td>
-
-							<td width="5%">
-								<div align="center">Data Finalização</div>
-							</td>
-							
-							<td width="5%">
-								<div align="center">Inspetores</div>
-							</td>
-						</tr>
-
-								<cfset scor='white'>
-								<cfset avaliada=0>
-								<cfoutput query="rsFinalizadasSemNCencerrado">
-									<form action="" method="POST">
+							<cfset fimaval = '#DateFormat(rsvlralocado.INP_DTConcluirAvaliacao,'dd/mm/yyyy')#' >  	
+						
+								<tr id="#rsvlralocado.CurrentRow#" valign="middle" bgcolor="#scor#"  class="exibir" 
+									onMouseOver="mouseOver(this);" 
+									onMouseOut="mouseOut(this);"
+									onclick="gravaOrdLinha(this);"
+									style="cursor:pointer">							
+										<td width="5%">
+											<div align="left" onClick="capturaPosicaoScroll();window.open('cadastro_inspecao_despesas.cfm?numInspecao=#rsvlralocado.INP_NumInspecao#','_blank');">
+												#rsvlralocado.INP_NumInspecao#
+											</div>
+										</td>
+										<td width="25%" onClick="capturaPosicaoScroll();window.open('cadastro_inspecao_despesas.cfm?numInspecao=#rsvlralocado.INP_NumInspecao#','_blank');">
+											<div align="left" >#trim(Dir_Sigla)#-#rsvlralocado.Und_Descricao#								
+											</div>
+										</td>
 										
+										<td width="3%" onClick="capturaPosicaoScroll();window.open('cadastro_inspecao_despesas.cfm?numInspecao=#rsvlralocado.INP_NumInspecao#','_blank');">
+												<div align="center"><cfif #rsvlralocado.INP_Modalidade# eq 0>PRES.<CFELSE>A DIST.</CFIF></div>
+										</td>
 										
-										<cfquery datasource="#dsn_inspecao#" name="rsInspetorTable2">
-											SELECT Fun_Matric, Fun_Nome, Dir_Sigla FROM Funcionarios 
-										    INNER JOIN Diretoria ON  Dir_Codigo = Fun_DR 
-											WHERE Fun_Matric=#rsFinalizadasSemNCencerrado.INP_Coordenador#
-										</cfquery>
-										<cfset perInspec='#DateFormat(rsFinalizadasSemNCencerrado.INP_DtEncerramento,'dd/mm/yyyy')#'> 
+										<td width="8%" onClick="capturaPosicaoScroll();window.open('cadastro_inspecao_despesas.cfm?numInspecao=#rsvlralocado.INP_NumInspecao#','_blank');">
+											<div align="center">#fimaval#</div>
+										</td>
+										<cfset revisor = 'SEM REVISOR(A)'>
+										<cfif trim(rsvlralocado.Usu_Apelido) neq ''>
+											<cfset revisor = trim(rsvlralocado.Usu_Apelido)>
+										</cfif>
 
- 										
-
-										<tr	id="#rsFinalizadasSemNCencerrado.CurrentRow#" valign="middle" bgcolor="#scor#" class="exibir"
-											onMouseOver="mouseOver(this);" 
-                                    		onMouseOut="mouseOut(this);"
-                                    		onclick="gravaOrdLinha(this);"
-											style="cursor:pointer"
-											>
-											<td width="7%"
-											onclick="capturaPosicaoScroll();window.open('GeraRelatorio/gerador/dsp/papeltrabalho.cfm?pg=controle&Form.id=#INP_NumInspecao#','_blank')">
+										<td width="25%" onClick="capturaPosicaoScroll();if('#revisor#' != 'SEM REVISOR(A)'){window.open('cadastro_inspecao_despesas.cfm?numInspecao=#INP_NumInspecao#','_blank')} else {if (confirm ('                       Atenção! \n\nConfirma Assumir a Revisão?')) {window.open('cadastro_inspecao.cfm?numInspecao=#rsInspCaInsp.INP_NumInspecao#&Unid=#rsInspCaInsp.INP_Unidade#&acao=assumirevisao','_self')}}">
 											<div align="left">
-												#rsFinalizadasSemNCencerrado.INP_NumInspecao#
-												
-											</td>
+													<div align="left">#revisor#</div>
+											</div>	
+										</td>
+								</tr>
+							
+							</form>
 
+							<cfif scor eq 'white'>
+								<cfset scor = 'f7f7f7'>
+							<cfelse>
+								<cfset scor = 'white'>
+							</cfif>
+						</cfoutput>
+					</table>
+				</div>
+			<cfelse>
+				<label>NÃO EXISTEM AVALIAÇÕES FINALIZADAS (EM REVISÃO)</label>
+			</cfif>
+	</div>
+	<div id="SemNC" class="tabcontent">
+		<!---INICIO TABELA DE AVALIAÇÕES SEM ITENS NC--->
+		<cfif rsFinalizadasSemNCencerrado.recordCount gt 0>
+			<div id="form_container" name="divSemNC" style="width:680px;height:expression(this.scrollHeight>299?'300px':'auto');overflow-y:auto;">
+				<table border="0" align="center" id="tabSemNC" style="width:expression(this.scrollHeight>299?'683px':'700px');">
+					<tr style="border:none;">
+						<td colspan="7" align="center">
+							<h1 style="font-size:14px;background:#6699CC;color:white;border:none">
+								AVALIAÇÕES FINALIZADAS SEM OPORTUNIDADES DE APRIMORAMENTO</h1>
+						</td>
+					</tr>
 
-											<td width="40%"
-											onclick="capturaPosicaoScroll();window.open('GeraRelatorio/gerador/dsp/papeltrabalho.cfm?pg=controle&Form.id=#INP_NumInspecao#','_blank')">
-												<div align="left">#trim(Dir_Sigla)#-#trim(Und_Descricao)#
-													
-											</td>
+					<tr bgcolor="#6699CC" class="exibir" align="center" style="color:white">
+						<td width="7%">
+							<div align="center">Número</div>
+						</td>
+						<td width="40%">
+							<div align="center">Unidade</div>
+						</td>
+						<td width="7%">
+							<div align="center"></div>Mod.
 
-											<td width="7%"
-											onclick="capturaPosicaoScroll();window.open('GeraRelatorio/gerador/dsp/papeltrabalho.cfm?pg=controle&Form.id=#INP_NumInspecao#','_blank')">
-												<div align="center">
-													<cfif #INP_Modalidade# eq 0>PRES.<CFELSE>A DIST.</CFIF>
-												</div>
-											</td>
-											<td width="40%"
-											onclick="capturaPosicaoScroll();window.open('GeraRelatorio/gerador/dsp/papeltrabalho.cfm?pg=controle&Form.id=#INP_NumInspecao#','_blank')">
-												<div align="left">#trim(rsInspetorTable2.Fun_Nome)#
-													(#trim(rsInspetorTable2.Fun_Matric)#-#trim(rsInspetorTable2.Dir_Sigla)#)</div>
-											</td>
-											<td width="5%"
-											onclick="capturaPosicaoScroll();window.open('GeraRelatorio/gerador/dsp/papeltrabalho.cfm?pg=controle&Form.id=#INP_NumInspecao#','_blank')">
-												<div align="left">#perInspec#</div>
-											</td>
+						</td>
+						<td width="40%">
+							<div align="center">Coordenador</div>
+						</td>
 
+						<td width="5%">
+							<div align="center">Data Finalização</div>
+						</td>
+						
+						<td width="5%">
+							<div align="center">Inspetores</div>
+						</td>
+					</tr>
+
+							<cfset scor='white'>
+							<cfset avaliada=0>
+							<cfoutput query="rsFinalizadasSemNCencerrado">
+								<form action="" method="POST">
+									
+									
+									<cfquery datasource="#dsn_inspecao#" name="rsInspetorTable2">
+										SELECT Fun_Matric, Fun_Nome, Dir_Sigla FROM Funcionarios 
+										INNER JOIN Diretoria ON  Dir_Codigo = Fun_DR 
+										WHERE Fun_Matric=#rsFinalizadasSemNCencerrado.INP_Coordenador#
+									</cfquery>
+									<cfset perInspec='#DateFormat(rsFinalizadasSemNCencerrado.INP_DtEncerramento,'dd/mm/yyyy')#'> 
+
+									
+
+									<tr	id="#rsFinalizadasSemNCencerrado.CurrentRow#" valign="middle" bgcolor="#scor#" class="exibir"
+										onMouseOver="mouseOver(this);" 
+										onMouseOut="mouseOut(this);"
+										onclick="gravaOrdLinha(this);"
+										style="cursor:pointer"
+										>
+										<td width="7%"
+										onclick="capturaPosicaoScroll();window.open('GeraRelatorio/gerador/dsp/papeltrabalho.cfm?pg=controle&Form.id=#INP_NumInspecao#','_blank')">
+										<div align="left">
+											#rsFinalizadasSemNCencerrado.INP_NumInspecao#
 											
-											<cfquery datasource="#dsn_inspecao#" name="rsInspCaInsp">
-												SELECT * FROM Inspecao
-												WHERE INP_NumInspecao = '#INP_NumInspecao#'
+										</td>
 
-											</cfquery>
-											<td width="5%" height="25px" style="z-index:10000">
-												<div align="center" style="z-index:10000"><a
-														onclick="abrirFormInspetores('#rsInspCaInsp.INP_NumInspecao#',#rsInspCaInsp.INP_Coordenador#)"
-														href="##0"><img src="figuras/usuario.png"
-															alt="Clique para visualizar os inspetores desta Avaliação" width="20"
-															height="20" border="0" style="z-index:10000"></img></a></div>
-											</td>
+
+										<td width="40%"
+										onclick="capturaPosicaoScroll();window.open('GeraRelatorio/gerador/dsp/papeltrabalho.cfm?pg=controle&Form.id=#INP_NumInspecao#','_blank')">
+											<div align="left">#trim(Dir_Sigla)#-#trim(Und_Descricao)#
+												
+										</td>
+
+										<td width="7%"
+										onclick="capturaPosicaoScroll();window.open('GeraRelatorio/gerador/dsp/papeltrabalho.cfm?pg=controle&Form.id=#INP_NumInspecao#','_blank')">
+											<div align="center">
+												<cfif #INP_Modalidade# eq 0>PRES.<CFELSE>A DIST.</CFIF>
+											</div>
+										</td>
+										<td width="40%"
+										onclick="capturaPosicaoScroll();window.open('GeraRelatorio/gerador/dsp/papeltrabalho.cfm?pg=controle&Form.id=#INP_NumInspecao#','_blank')">
+											<div align="left">#trim(rsInspetorTable2.Fun_Nome)#
+												(#trim(rsInspetorTable2.Fun_Matric)#-#trim(rsInspetorTable2.Dir_Sigla)#)</div>
+										</td>
+										<td width="5%"
+										onclick="capturaPosicaoScroll();window.open('GeraRelatorio/gerador/dsp/papeltrabalho.cfm?pg=controle&Form.id=#INP_NumInspecao#','_blank')">
+											<div align="left">#perInspec#</div>
+										</td>
+
+										
+										<cfquery datasource="#dsn_inspecao#" name="rsInspCaInsp">
+											SELECT * FROM Inspecao
+											WHERE INP_NumInspecao = '#INP_NumInspecao#'
+
+										</cfquery>
+										<td width="5%" height="25px" style="z-index:10000">
+											<div align="center" style="z-index:10000"><a
+													onclick="abrirFormInspetores('#rsInspCaInsp.INP_NumInspecao#',#rsInspCaInsp.INP_Coordenador#)"
+													href="##0"><img src="figuras/usuario.png"
+														alt="Clique para visualizar os inspetores desta Avaliação" width="20"
+														height="20" border="0" style="z-index:10000"></img></a></div>
+										</td>
+									</tr>
+
+								</form>
+
+								<cfif scor eq 'white'>
+									<cfset scor='f7f7f7'>
+								<cfelse>
+									<cfset scor='white'>
+								</cfif>
+							</cfoutput>
+				</table>
+			</div>
+		<cfelse>
+		<label>NÃO EXISTEM AVALIAÇÕES SEM ITENS NÃO-CONFORMES</label>
+		</cfif>
+		<!---FIM TABELA DE AVALIAÇÕES SEM ITENS NC--->
+	</div>
+	<div id="Excluidas" class="tabcontent">
+		<!---INICIO TABELA DE AVALIAÇÕES EXCLUÍDAS--->
+		<cfif rsExcluidas.recordCount gt 0>
+			<div id="form_container" name="diExcluidas" style="width:680px;height:expression(this.scrollHeight>299?'300px':'auto');overflow-y:auto;">
+				<table border="0" align="center" id="tabExcluidas" style="width:expression(this.scrollHeight>299?'683px':'700px');">
+					<tr style="border:none;">
+						<td colspan="7" align="center">
+							<h1 style="font-size:14px;background:#6699CC;color:white;border:none">
+								AVALIAÇÕES EXCLUÍDAS</h1>
+						</td>
+					</tr>
+
+					<tr bgcolor="#6699CC" class="exibir" align="center" style="color:white">
+						<td width="7%">
+							<div align="center">Número</div>
+						</td>
+						<td width="40%">
+							<div align="center">Unidade</div>
+						</td>
+						<td width="5%">
+							<div align="center">Data Prevista</div>
+						</td>
+						<td width="35%">
+							<div align="center">Excluído por</div>
+						</td>
+						<td width="5%">
+							<div align="center">Data Exclusão</div>
+						</td>
+						
+					</tr>
+
+							<cfset scor='white'>
+							<cfset avaliada=0>
+							<cfoutput query="rsExcluidas">
+								<cfquery datasource="#dsn_inspecao#" name="rsEmpregExc">
+									SELECT Usu_Matricula, Usu_Apelido, Dir_Sigla FROM Usuarios 
+									INNER JOIN Diretoria ON  Dir_Codigo = Usu_DR 
+									WHERE Usu_Matricula =convert(varchar,#NIP_UserName#)
+								</cfquery>
+
+								<form action="" method="POST">
+									
+									<cfset perInspec='#DateFormat(rsExcluidas.NIP_DtIniPrev,'dd/mm/yyyy')#'> 
+									<cfset dtExc='#DateFormat(rsExcluidas.NIP_DtUltAtu,'dd/mm/yyyy')#'> 
+									<tr id="#rsExcluidas.CurrentRow#" valign="middle" bgcolor="#scor#" class="exibir"
+										onMouseOver="mouseOver(this);" 
+										onMouseOut="mouseOut(this);"
+										>
+										
+										<td width="7%">
+											<div align="left">#rsExcluidas.NIP_NumInspecao#</div>
+										</td>
+
+
+										<td width="40%">
+											<div align="left">#trim(Dir_Sigla)#-#trim(Und_Descricao)#
+												
+										</td>
+										
+										<td width="5%">
+											<div align="left">#perInspec#</div>
+										</td>
+
+										<td width="35%">
+											<div align="left">#trim(rsEmpregExc.Usu_Apelido)#
+												(#trim(rsEmpregExc.Usu_Matricula)#-#trim(rsEmpregExc.Dir_Sigla)#)</div>
+										</td>
+										<td width="5%">
+											<div align="center">#dtExc#</div>
+										</td>
+										
+										
 										</tr>
 
-									</form>
+								</form>
 
-									<cfif scor eq 'white'>
-										<cfset scor='f7f7f7'>
-									<cfelse>
-										<cfset scor='white'>
-									</cfif>
-								</cfoutput>
-					</table>
-				</div>
-			<cfelse>
-			<label>NÃO EXISTEM AVALIAÇÕES SEM ITENS NÃO-CONFORMES</label>
-			</cfif>
-			<!---FIM TABELA DE AVALIAÇÕES SEM ITENS NC--->
-		</div>
-
-		<div id="Excluidas" class="tabcontent" >
-			<!---INICIO TABELA DE AVALIAÇÕES EXCLUÍDAS--->
-			<cfif rsExcluidas.recordCount neq 0>
-				<div id="form_container" name="diExcluidas" style="width:680px;height:expression(this.scrollHeight>299?'300px':'auto');overflow-y:auto;">
-					<table border="0" align="center" id="tabExcluidas" style="width:expression(this.scrollHeight>299?'683px':'700px');">
-						<tr style="border:none;">
-							<td colspan="7" align="center">
-								<h1 style="font-size:14px;background:#6699CC;color:white;border:none">
-									AVALIAÇÕES EXCLUÍDAS</h1>
-							</td>
-						</tr>
-
-						<tr bgcolor="#6699CC" class="exibir" align="center" style="color:white">
-							<td width="7%">
-								<div align="center">Número</div>
-							</td>
-							<td width="40%">
-								<div align="center">Unidade</div>
-							</td>
-							<td width="5%">
-								<div align="center">Data Prevista</div>
-							</td>
-							<td width="35%">
-								<div align="center">Excluído por</div>
-							</td>
-							<td width="5%">
-								<div align="center">Data Exclusão</div>
-							</td>
-							
-						</tr>
-
-								<cfset scor='white'>
-								<cfset avaliada=0>
-								<cfoutput query="rsExcluidas">
-									<cfquery datasource="#dsn_inspecao#" name="rsEmpregExc">
-										SELECT Usu_Matricula, Usu_Apelido, Dir_Sigla FROM Usuarios 
-										INNER JOIN Diretoria ON  Dir_Codigo = Usu_DR 
-										WHERE Usu_Matricula =convert(varchar,#NIP_UserName#)
-									</cfquery>
-
-									<form action="" method="POST">
-										
-										<cfset perInspec='#DateFormat(rsExcluidas.NIP_DtIniPrev,'dd/mm/yyyy')#'> 
-										<cfset dtExc='#DateFormat(rsExcluidas.NIP_DtUltAtu,'dd/mm/yyyy')#'> 
-										<tr id="#rsExcluidas.CurrentRow#" valign="middle" bgcolor="#scor#" class="exibir"
-										    onMouseOver="mouseOver(this);" 
-                                    		onMouseOut="mouseOut(this);"
-                                    		>
-											
-											<td width="7%">
-												<div align="left">#rsExcluidas.NIP_NumInspecao#</div>
-											</td>
-
-
-											<td width="40%">
-												<div align="left">#trim(Dir_Sigla)#-#trim(Und_Descricao)#
-													
-											</td>
-											
-											<td width="5%">
-												<div align="left">#perInspec#</div>
-											</td>
-
-											<td width="35%">
-												<div align="left">#trim(rsEmpregExc.Usu_Apelido)#
-													(#trim(rsEmpregExc.Usu_Matricula)#-#trim(rsEmpregExc.Dir_Sigla)#)</div>
-											</td>
-											<td width="5%">
-												<div align="center">#dtExc#</div>
-											</td>
-											
-											
-											</tr>
-
-									</form>
-
-									<cfif scor eq 'white'>
-										<cfset scor='f7f7f7'>
-									<cfelse>
-										<cfset scor='white'>
-									</cfif>
-								</cfoutput>
-					</table>
-				</div>
-			<cfelse>
-			<label>NÃO EXISTEM AVALIAÇÕES EXCLUÝDAS</label>
-			</cfif>
-			<!---FIM TABELA DE AVALIAÇÕES EXCLUÝDAS--->
-		</div>
+								<cfif scor eq 'white'>
+									<cfset scor='f7f7f7'>
+								<cfelse>
+									<cfset scor='white'>
+								</cfif>
+							</cfoutput>
+				</table>
+			</div>
+		<cfelse>
+		<label>NÃO EXISTEM AVALIAÇÕES EXCLUÝDAS</label>
+		</cfif>
+		<!---FIM TABELA DE AVALIAÇÕES EXCLUÝDAS--->
+	</div>
 </div>
 
 
