@@ -47,7 +47,7 @@
     }
 </style>
 
-<body class="hold-transition layout-fixed layout-navbar-fixed layout-footer-fixed" data-panel-auto-height-mode="height" >
+<body class="hold-transition layout-fixed layout-navbar-fixed layout-footer-fixed" data-panel-auto-height-mode="height" style="padding-bottom: 5rem;">
 
 	<div class="wrapper">
       
@@ -55,7 +55,7 @@
         <cfinclude template="includes/aa_sidebar.cfm">
         <div class="content-wrapper">
             <section class="content">
-                <div class="container-fluid">
+                <div class="container-fluid" >
                     <div class="row">
                         <div class="col-12">
                             <h3 class="m-1" >Testes Aplicados
@@ -71,15 +71,15 @@
                     </div>
                 </div>
  
-                <div class="testes-aplicados-layout">
+                <div class="testes-aplicados-layout" >
                     <div class="testes-table-container">
                         <cfif structKeyExists(dadosTestes, "erro")>
                             <div class="alert alert-danger">
                                 <strong>Erro:</strong> <cfoutput>#dadosTestes.erro#</cfoutput>
                             </div>
                         </cfif>
-                        
-                        <table id="testesAplicadosTable" class="table table-striped table-bordered" style="width:100%">
+
+                        <table id="testesAplicadosTable" class="table table-striped table-bordered" style="width:100%;margin-bottom: 5rem;">
                             <thead>
                                 <tr>
                                     <th>N° do Teste</th>
@@ -133,9 +133,10 @@
                     searching: false
 
                 });
-           
+           $(".content-wrapper").css("height", "auto");
+
         });
-    </script>
+        
 </body>
 
 </html>
