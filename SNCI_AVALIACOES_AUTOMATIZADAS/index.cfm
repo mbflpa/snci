@@ -14,6 +14,63 @@
             font-weight: 300!important;
             line-height: 1.2!important;
         }
+
+        /* Iframe tab bar container */
+        .iframe-mode .nav.navbar {
+            padding-left: 0.5rem !important;
+            padding-right: 0.5rem !important;
+        }
+
+        /* Modern tab styles */
+        .iframe-mode .navbar-nav .nav-link {
+            border: 0;
+            padding: 0.75rem 1rem; /* Aumentar um pouco o padding para toque */
+            padding-top:0.3rem!important;
+            padding-bottom:0.3rem!important;
+            font-size: 0.9rem;
+            color: #6c757d;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s ease-in-out;
+            margin: 0 2px;
+            border-radius: 10px 10px 0 0;
+        }
+
+        .iframe-mode .navbar-nav .nav-link:hover {
+            color: #007bff;
+            background-color: #f8f9fa;
+            border-bottom-color: #dee2e6;
+        }
+
+        .iframe-mode .navbar-nav .nav-link.active {
+            font-weight: 600;
+            color:  var(--azul_correios)!important;
+            background-color: var(--amarelo_prisma_escuro_correios)!important;
+            border-bottom-color:  var(--azul_correios)!important;
+        }
+        
+        .iframe-mode .navbar-nav .nav-link.active::after {
+            content: none; /* remove the triangle */
+        }
+
+        /* Compact and modern control buttons */
+        .iframe-mode .navbar-light .nav-link[data-widget],
+        .iframe-mode .navbar-light .dropdown-toggle {
+            padding: 0.5rem 0.75rem;
+            font-size: 1rem;
+            color: #6c757d;
+            border-radius: 4px;
+        }
+
+        .iframe-mode .navbar-light .nav-link[data-widget]:hover,
+        .iframe-mode .navbar-light .dropdown-toggle:hover {
+            color: #007bff;
+            background-color: #e9ecef;
+        }
+
+        /* Dropdown icon for closing tabs */
+        .iframe-mode .dropdown-toggle i {
+            font-size: 1.1rem;
+        }
     </style>   
 </head>
 <body class="hold-transition layout-fixed layout-navbar-fixed layout-footer-fixed" data-panel-auto-height-mode="height">
