@@ -1299,39 +1299,42 @@ left JOIN TNC_Classificacao ON (RIP_NumInspecao = TNC_Avaliacao) AND (RIP_Unidad
 </cfquery>
 
 <cfquery name="qCausaProcesso" datasource="#dsn_inspecao#">
- SELECT Cpr_Codigo, Cpr_Descricao, PCP_Unidade, PCP_CodCausaProvavel  FROM ParecerCausaProvavel INNER JOIN CausaProvavel ON PCP_CodCausaProvavel =
- Cpr_Codigo WHERE PCP_Unidade='#URL.unid#' AND PCP_Inspecao='#URL.ninsp#' AND PCP_NumGrupo=#URL.ngrup# AND PCP_NumItem=#URL.nitem#
+	SELECT Cpr_Codigo, Cpr_Descricao, PCP_Unidade, PCP_CodCausaProvavel  FROM ParecerCausaProvavel INNER JOIN CausaProvavel ON PCP_CodCausaProvavel =
+	Cpr_Codigo WHERE PCP_Unidade='#URL.unid#' AND PCP_Inspecao='#URL.ninsp#' AND PCP_NumGrupo=#URL.ngrup# AND PCP_NumItem=#URL.nitem#
 </cfquery>
 <cfset PrzVencSN = 'no'>
 <cfif qResposta.Itn_TipoUnidade is 12 || qResposta.Itn_TipoUnidade is 16>
-	<cfset dtnovoprazo = createodbcdate(CreateDate(year(qResposta.INP_DTConcluirRevisao),month(qResposta.INP_DTConcluirRevisao),day(qResposta.INP_DTConcluirRevisao)))> 
-	<cfset dtnovoprazo = DateAdd( "d", 31, dtnovoprazo)>
-	<cfset nCont = 1>
-	<cfloop condition="nCont lte 1">
-		<!---  --->
-		<cfset vDiaSem = DayOfWeek(dtnovoprazo)>
-		<cfif vDiaSem neq 1 and vDiaSem neq 7>
-			<!--- verificar se Feriado Nacional --->
-			<cfquery name="rsFeriado" datasource="#dsn_inspecao#">
-				SELECT Fer_Data FROM FeriadoNacional where Fer_Data = #dtnovoprazo#
-			</cfquery>
-			<cfif rsFeriado.recordcount gt 0>
+	<cfset posdtprevsolucao = createodbcdate(CreateDate(year(qResposta.Pos_DtPrev_Solucao),month(qResposta.Pos_DtPrev_Solucao),day(qResposta.Pos_DtPrev_Solucao)))> 
+	<!---	
+		<cfset dtnovoprazo = createodbcdate(CreateDate(year(qResposta.INP_DTConcluirRevisao),month(qResposta.INP_DTConcluirRevisao),day(qResposta.INP_DTConcluirRevisao)))> 
+		<cfset dtnovoprazo = DateAdd( "d", 31, dtnovoprazo)>
+		<cfset nCont = 1>
+		<cfloop condition="nCont lte 1">
+			<!---  --->
+			<cfset vDiaSem = DayOfWeek(dtnovoprazo)>
+			<cfif vDiaSem neq 1 and vDiaSem neq 7>
+				<!--- verificar se Feriado Nacional --->
+				<cfquery name="rsFeriado" datasource="#dsn_inspecao#">
+					SELECT Fer_Data FROM FeriadoNacional where Fer_Data = #dtnovoprazo#
+				</cfquery>
+				<cfif rsFeriado.recordcount gt 0>
+					<cfset nCont = nCont - 1>
+					<cfset dtnovoprazo = DateAdd( "d", 1, dtnovoprazo)>
+				</cfif>
+			</cfif>
+			<!--- Verifica se final de semana  --->
+			<cfif vDiaSem eq 1 or vDiaSem eq 7>
 				<cfset nCont = nCont - 1>
 				<cfset dtnovoprazo = DateAdd( "d", 1, dtnovoprazo)>
-			</cfif>
-		</cfif>
-		<!--- Verifica se final de semana  --->
-		<cfif vDiaSem eq 1 or vDiaSem eq 7>
-			<cfset nCont = nCont - 1>
-			<cfset dtnovoprazo = DateAdd( "d", 1, dtnovoprazo)>
-		</cfif>	
-		<cfset nCont = nCont + 1>	
-	</cfloop> 	
-	<cfset dtposicfutagf = dtnovoprazo>
+			</cfif>	
+			<cfset nCont = nCont + 1>	
+		</cfloop> 	
+	--->	
+	<cfset dtposicfutagf = posdtprevsolucao>
 	<cfquery name="rsPonto" datasource="#dsn_inspecao#">
 		SELECT STO_Codigo, STO_Descricao FROM Situacao_Ponto 
 		WHERE STO_Status='A'                                                                                                   
-	<cfif dateformat(#dtnovoprazo#,"YYYYMMDD") lt dateformat(now(),"YYYYMMDD")>
+	<cfif dateformat(#posdtprevsolucao#,"YYYYMMDD") lt dateformat(now(),"YYYYMMDD")>
 		<cfif grpacesso eq 'GESTORMASTER' OR grpacesso eq 'GOVERNANCA'>
 			AND STO_Codigo in (9,12,13,21,25,26,30)
 		<cfelse>
