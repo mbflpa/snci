@@ -246,7 +246,13 @@
 <cfloop from="1" to="#arrayLen(assuntosZerados)#" index="i">
     <cfset arrayAppend(dadosOrdenados, assuntosZerados[i])>
 </cfloop>
-
+    
+      <!-- DataTables -->
+      <link rel="stylesheet" href="../SNCI_AVALIACOES_AUTOMATIZADAS/plugins/datatables/datatables.min.css">
+          
+      <!-- Theme style -->
+    <link rel="stylesheet" href="../SNCI_AVALIACOES_AUTOMATIZADAS/dist/css/adminlte.min.css">
+    <link rel="stylesheet" href="../SNCI_AVALIACOES_AUTOMATIZADAS/dist/css/stylesSNCI.css">
 <style>
     .card-header {
         border:none!important;
@@ -972,6 +978,10 @@
     </div>
 </div>
 
+<!-- Popper.js (se Bootstrap 4) -->
+<script src="../SNCI_AVALIACOES_AUTOMATIZADAS/plugins/popper/umd/popper.min.js"></script>
+
+<script  src="../SNCI_AVALIACOES_AUTOMATIZADAS/plugins/datatables/datatables.min.js"></script>
 <script>
     $(document).ready(function() {
         // Animar barras de progresso

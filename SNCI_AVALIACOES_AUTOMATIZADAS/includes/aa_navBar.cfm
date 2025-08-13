@@ -7,34 +7,9 @@
 	 <cfinclude template="aa_modal_overlay.cfm">
  <link rel="stylesheet" href="../SNCI_AVALIACOES_AUTOMATIZADAS/dist/css/animate.min.css">
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="../SNCI_AVALIACOES_AUTOMATIZADAS/plugins/fontawesome-free/css/all.min.css">
-    <link rel="stylesheet" href="../SNCI_AVALIACOES_AUTOMATIZADAS/plugins/fontawesome-free/css/fontawesome.min.css">
-    <!-- Tempusdominus Bootstrap 4 -->
-    <link rel="stylesheet" href="../SNCI_AVALIACOES_AUTOMATIZADAS/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css">
-    
-    
-    <!-- overlayScrollbars -->
-    <link rel="stylesheet" href="../SNCI_AVALIACOES_AUTOMATIZADAS/plugins/overlayScrollbars/css/OverlayScrollbars.min.css">
-    <!-- Daterange picker -->
-    <link rel="stylesheet" href="../SNCI_AVALIACOES_AUTOMATIZADAS/plugins/daterangepicker/daterangepicker.css">
+   
 
-    <!-- SweetAlert2 -->
-    <link rel="stylesheet" href="../SNCI_AVALIACOES_AUTOMATIZADAS/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.css">
-    <!-- Toastr -->
-    <link rel="stylesheet" href="../SNCI_AVALIACOES_AUTOMATIZADAS/plugins/toastr/toastr.css">
-    <!-- Bootstrap4 Duallistbox -->
-    <link rel="stylesheet" href="../SNCI_AVALIACOES_AUTOMATIZADAS/plugins/bootstrap4-duallistbox/bootstrap-duallistbox.css">
-    <!-- Select2 -->
-    <link rel="stylesheet" href="../SNCI_AVALIACOES_AUTOMATIZADAS/plugins/select2/css/select2.min.css">
-    <link rel="stylesheet" href="../SNCI_AVALIACOES_AUTOMATIZADAS/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css">
 
-    
-      <!-- DataTables -->
-      <link rel="stylesheet" href="../SNCI_AVALIACOES_AUTOMATIZADAS/plugins/datatables/datatables.min.css">
-          
-      <!-- Theme style -->
-    <link rel="stylesheet" href="../SNCI_AVALIACOES_AUTOMATIZADAS/dist/css/adminlte.min.css">
-    <link rel="stylesheet" href="../SNCI_AVALIACOES_AUTOMATIZADAS/dist/css/stylesSNCI.css">
 	 <style>
 		.tituloPagina{
             color: var(--azul_correios);
@@ -146,7 +121,7 @@
 		  
 	 </style>
 	<!-- Navbar -->
-		<link rel="stylesheet" href="../SNCI_AVALIACOES_AUTOMATIZADAS/dist/css/animate.min.css">
+
 		<nav class="main-header navbar navbar-expand navbar-light shadow-sm " style="height:56px;padding-right: 0;">
 			<ul class="navbar-nav w-100 d-flex justify-content-start align-items-center" style="width:100%;margin:0;padding:0;">
 				<li class="nav-item">
@@ -217,18 +192,7 @@
 				</li>
 			</ul>
 		</nav>
-		 <!-- jQuery -->
-<script src="../SNCI_AVALIACOES_AUTOMATIZADAS/plugins/jquery/jquery.min.js"></script>
-<!-- Popper.js (se Bootstrap 4) -->
-<script src="../SNCI_AVALIACOES_AUTOMATIZADAS/plugins/popper/umd/popper.min.js"></script>
-<!-- Bootstrap JS -->
-<script src="../SNCI_AVALIACOES_AUTOMATIZADAS/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
-<!-- jQuery UI -->
-<script src="../SNCI_AVALIACOES_AUTOMATIZADAS/plugins/jquery-ui/jquery-ui.min.js"></script>
-<!-- Select2 -->
-<script src="../SNCI_AVALIACOES_AUTOMATIZADAS/plugins/select2/js/select2.full.min.js"></script>
- <!-- DataTables  & Plugins -->
-<script  src="../SNCI_AVALIACOES_AUTOMATIZADAS/plugins/datatables/datatables.min.js"></script>
+
 <script language="JavaScript">
 	
 
