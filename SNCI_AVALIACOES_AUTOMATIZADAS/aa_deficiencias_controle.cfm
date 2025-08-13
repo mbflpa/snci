@@ -71,6 +71,100 @@
             }
         }
 
+        /* Modern and fluid Shepherd.js styles using Correios color palette */
+        .shepherd-element {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: #fff;
+            border-radius: 8px;
+            border: 1px solid var(--azul_correios, #00416B);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+            max-width: 380px;
+            opacity: 0;
+            transform: scale(0.95) translateY(10px);
+            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+        }
+
+        .shepherd-element.shepherd-enabled {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+        }
+
+        .shepherd-header {
+            background: linear-gradient(135deg, var(--azul_correios, #00416B), var(--azul_claro_correios, #0083CA));
+            color: #fff;
+            padding: 0.75rem 1rem;
+            border-top-left-radius: 7px;
+            border-top-right-radius: 7px;
+        }
+
+        .shepherd-title {
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .shepherd-text {
+            padding: 1rem;
+            color: #495057;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .shepherd-footer {
+            border-top: 1px solid #dee2e6;
+            padding: 0.75rem 1rem;
+        }
+
+        .shepherd-button {
+            background: var(--amarelo_prisma_escuro_correios, #FFC20E);
+            color: var(--azul_correios, #00416B);
+            border: none;
+            border-radius: 5px;
+            padding: 0.5rem 1rem;
+            font-weight: bold;
+            transform: translateY(0);
+            transition: all 0.2s ease;
+        }
+
+        .shepherd-button:hover {
+            background: var(--amarelo_correios, #FFD400);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .shepherd-button.shepherd-button-secondary {
+            background: #e9ecef;
+            color: #495057;
+        }
+
+        .shepherd-button.shepherd-button-secondary:hover {
+            background: #ced4da;
+        }
+
+        .shepherd-cancel-icon {
+            color: #fff;
+            opacity: 0.8;
+        }
+        .shepherd-cancel-icon:hover {
+            opacity: 1;
+        }
+
+        .shepherd-arrow::before {
+            background-color: var(--azul_correios, #00416B);
+        }
+
+        .shepherd-arrow::after {
+            content: '';
+            position: absolute;
+            top: 1px;
+            left: 1px;
+            width: 14px;
+            height: 14px;
+            background: #fff;
+            transform: rotate(45deg);
+            z-index: 1;
+            border-right: 1px solid var(--azul_correios, #00416B);
+            border-bottom: 1px solid var(--azul_correios, #00416B);
+        }
 
     </style>
 </head>
@@ -94,6 +188,9 @@
                                     data-html="true"
                                     data-content="Tratam-se de situações identificadas nas avaliações realizadas nas unidades operacionais, por meio da aplicação de testes de controle (Plano de Testes), que não condizem com o previsto em normas internas dos Correios, documentos de orientações vigentes (ofícios) e legislações.">
                                 </i>
+                                <button id="startTourBtn" class="btn btn-sm btn-outline-primary ml-3" style="font-size: 0.8rem; vertical-align: middle;">
+                                    <i class="fas fa-route"></i> Iniciar Tour
+                                </button>
                             </h3>
                         </div>
                     </div>
@@ -130,6 +227,186 @@
 					trigger: 'hover'
 				});
         });
+    </script>
+
+    <script>
+    $(window).on('load', function() {
+        const tour = new Shepherd.Tour({
+            useModalOverlay: true,
+            defaultStepOptions: {
+                classes: 'shadow-md bg-purple-dark',
+                scrollTo: { behavior: 'smooth', block: 'center' },
+                cancelIcon: {
+                    enabled: true
+                }
+            }
+        });
+
+        tour.addStep({
+            title: 'Bem-vindo ao Tour!',
+            text: 'Este tour irá guiá-lo pelas principais funcionalidades desta página. Vamos começar?',
+            buttons: [
+                {
+                    action() {
+                        return this.next();
+                    },
+                    text: 'Iniciar'
+                }
+            ]
+        });
+
+        tour.addStep({
+            title: 'Menu de Navegação',
+            text: 'Use este menu para navegar entre as diferentes seções das Avaliações Automatizadas.',
+            attachTo: {
+                element: '.main-sidebar',
+                on: 'right'
+            },
+            buttons: [
+                {
+                    action() { return this.back(); },
+                    classes: 'shepherd-button-secondary',
+                    text: 'Voltar'
+                },
+                {
+                    action() { return this.next(); },
+                    text: 'Avançar'
+                }
+            ]
+        });
+
+        tour.addStep({
+            title: 'Filtro de Mês',
+            text: 'Selecione um mês para visualizar os dados do período correspondente. A página será atualizada automaticamente.',
+            attachTo: {
+                element: '.meses-container',
+                on: 'bottom'
+            },
+            buttons: [
+                {
+                    action() { return this.back(); },
+                    classes: 'shepherd-button-secondary',
+                    text: 'Voltar'
+                },
+                {
+                    action() { return this.next(); },
+                    text: 'Avançar'
+                }
+            ]
+        });
+
+        tour.addStep({
+            title: 'Resumo Geral',
+            text: 'Este painel apresenta um resumo dos principais indicadores, como o número de testes aplicados, conformidades e deficiências encontradas.',
+            attachTo: {
+                element: '.snci-resumo-geral',
+                on: 'bottom'
+            },
+            buttons: [
+                {
+                    action() { return this.back(); },
+                    classes: 'shepherd-button-secondary',
+                    text: 'Voltar'
+                },
+                {
+                    action() { return this.next(); },
+                    text: 'Avançar'
+                }
+            ]
+        });
+
+        tour.addStep({
+            title: 'Detalhes do Indicador',
+            text: 'Cada cartão mostra um indicador específico. Passe o mouse sobre o ícone de informação para ver a definição detalhada.',
+            attachTo: {
+                element: '.kpi-card:first-child',
+                on: 'bottom'
+            },
+            buttons: [
+                {
+                    action() { return this.back(); },
+                    classes: 'shepherd-button-secondary',
+                    text: 'Voltar'
+                },
+                {
+                    action() { return this.next(); },
+                    text: 'Avançar'
+                }
+            ]
+        });
+
+        tour.addStep({
+            title: 'Desempenho por Assunto',
+            text: 'Este carrossel mostra o desempenho dos testes agrupados por assunto, comparando o mês atual com o anterior.',
+            attachTo: {
+                element: '.snci-desempenho-assunto',
+                on: 'top'
+            },
+            buttons: [
+                {
+                    action() { return this.back(); },
+                    classes: 'shepherd-button-secondary',
+                    text: 'Voltar'
+                },
+                {
+                    action() { return this.next(); },
+                    text: 'Avançar'
+                }
+            ]
+        });
+        
+        tour.addStep({
+            title: 'Navegação do Carrossel',
+            text: 'Use estas setas para navegar entre os diferentes assuntos.',
+            attachTo: {
+                element: '.carousel-controls',
+                on: 'top'
+            },
+            buttons: [
+                {
+                    action() { return this.back(); },
+                    classes: 'shepherd-button-secondary',
+                    text: 'Voltar'
+                },
+                {
+                    action() { return this.next(); },
+                    text: 'Avançar'
+                }
+            ]
+        });
+
+        tour.addStep({
+            title: 'Visualizar Evidências',
+            text: 'Clique no ícone de olho para ver as evidências detalhadas dos eventos encontrados. O ícone aparece no canto superior direito do cartão.',
+            attachTo: {
+                element: '.performance-card.evidencias-clickable',
+                on: 'top-end'
+            },
+            buttons: [
+                {
+                    action() { return this.back(); },
+                    classes: 'shepherd-button-secondary',
+                    text: 'Voltar'
+                },
+                {
+                    action() { return this.next(); },
+                    text: 'Finalizar'
+                }
+            ]
+        });
+
+        if (!localStorage.getItem('tourVisto')) {
+            tour.start();
+        }
+
+        const onEndTour = () => localStorage.setItem('tourVisto', 'true');
+        tour.on('complete', onEndTour);
+        tour.on('cancel', onEndTour);
+
+        $('#startTourBtn').on('click', function() {
+            tour.start();
+        });
+    });
     </script>
 </body>
 

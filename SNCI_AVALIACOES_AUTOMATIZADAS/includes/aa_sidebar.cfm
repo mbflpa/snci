@@ -45,6 +45,7 @@
       <!-- Theme style -->
     <link rel="stylesheet" href="../SNCI_AVALIACOES_AUTOMATIZADAS/dist/css/adminlte.min.css">
     <link rel="stylesheet" href="../SNCI_AVALIACOES_AUTOMATIZADAS/dist/css/stylesSNCI.css">
+    <link rel="stylesheet" href="../SNCI_AVALIACOES_AUTOMATIZADAS/plugins/shepherd/shepherd.css">
 
    <cfset links = [
         { href = "aa_mensagem_temporaria.cfm", icon = "fas fa-home", text = "Principal" },
@@ -378,6 +379,7 @@
     <script src="../SNCI_AVALIACOES_AUTOMATIZADAS/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
     <!-- AdminLTE App -->
     <script  src="../SNCI_AVALIACOES_AUTOMATIZADAS/dist/js/adminlte.min.js"></script>
+    <script src="../SNCI_AVALIACOES_AUTOMATIZADAS/plugins/shepherd/shepherd.min.js"></script>
 
 
    <script language="JavaScript">

@@ -923,7 +923,7 @@
                                          <cfif len(trim(tabelaEvidencia)) AND item.atual GT 0 AND NOT mesAtualEhMaiorDisponivel>
                                          title="Evidências disponíveis apenas para o período mais recente"
                                          </cfif>
-                                         </cfif>>
+                                         </cfif> ><span class="iconeEvidencias"></span>
                                         <div class="period-label"><cfoutput>#abreviarMes(nomeMesAtual)#</cfoutput></div>
                                         <div class="period-value">
                                             <cfoutput>#item.atual#</cfoutput>
@@ -1409,7 +1409,7 @@
 
         // Debug: verificar se existem cards clicáveis ao carregar a página
         setTimeout(function() {
-            const cardsClicaveis = $('.period-card.evidencias-clickable');
+            const cardsClicaveis = $('.f.evidencias-clickable');
             const cardsTotal = $('.period-card.current');
 
             // Mostrar informações de cada card
