@@ -52,25 +52,7 @@
             content: none; /* remove the triangle */
         }
 
-        /* Compact and modern control buttons */
-        .iframe-mode .navbar-light .nav-link[data-widget],
-        .iframe-mode .navbar-light .dropdown-toggle {
-            padding: 0.5rem 0.75rem;
-            font-size: 1rem;
-            color: #6c757d;
-            border-radius: 4px;
-        }
-
-        .iframe-mode .navbar-light .nav-link[data-widget]:hover,
-        .iframe-mode .navbar-light .dropdown-toggle:hover {
-            color: #007bff;
-            background-color: #e9ecef;
-        }
-
-        /* Dropdown icon for closing tabs */
-        .iframe-mode .dropdown-toggle i {
-            font-size: 1.1rem;
-        }
+       
     </style>   
 </head>
 <body class="hold-transition layout-fixed layout-navbar-fixed layout-footer-fixed" data-panel-auto-height-mode="height">
@@ -82,19 +64,17 @@
         <div class="content-wrapper iframe-mode" data-widget="iframe" >
             <div class="nav navbar navbar-expand navbar-white navbar-light border-bottom p-0">
                 <div class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
-                        <i class="fas fa-times"></i>
+                <a class="nav-link bg-danger dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Fechar</a>
+                <div class="dropdown-menu mt-0">
+                    <a class="dropdown-item" href="#" data-widget="iframe-close" data-type="all">
+                        <i class="fas fa-times-circle" ></i> Fechar todas as páginas
                     </a>
-                    <div class="dropdown-menu mt-0">
-                        <a class="dropdown-item" href="#" data-widget="iframe-close" data-type="all">
-                            <i class="fas fa-times-circle" ></i> Fechar todas as páginas
-                        </a>
-                        <a class="dropdown-item" href="#" data-widget="iframe-close" data-type="all-other">
-                            <i class="far fa-times-circle"></i> Fechar outras páginas
-                        </a>
+                    <a class="dropdown-item" href="#" data-widget="iframe-close" data-type="all-other">
+                        <i class="far fa-times-circle"></i> Fechar outras páginas
+                    </a>
                     
-                    </div>
                 </div>
+            </div>
                 <a class="nav-link" href="#" data-widget="iframe-scrollleft"><i class="fas fa-angle-double-left"></i></a>
                 <ul class="navbar-nav overflow-hidden" role="tablist"></ul>
                 <a class="nav-link" href="#" data-widget="iframe-scrollright"><i class="fas fa-angle-double-right"></i></a>
