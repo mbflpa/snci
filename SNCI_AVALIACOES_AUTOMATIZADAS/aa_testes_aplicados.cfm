@@ -40,10 +40,7 @@
     }
     
     .testes-table-container {
-        background: white;
-        border-radius: 8px;
-        padding: 20px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        background: transparent;
     }
 
     #testesAplicadosTable td,
@@ -127,7 +124,7 @@
                             </div>
                         </cfif>
                         
-                        <table id="testesAplicadosTable" class="table table-striped table-bordered" style="width:100%;margin-bottom: 5rem;">
+                        <table id="testesAplicadosTable" class="table table-striped table-bordered" style="width:100%;">
                             <thead>
                                 <tr>
                                     <th>N°  </th>
@@ -178,13 +175,16 @@
                     autoWidth: false,
                     paging:false,
                     order: [[ 0, "asc" ]],
-                    searching: false
-
-                });
-           $(".content-wrapper").css("height", "auto");
-
+                    searching: false,
+                    drawCallback: function(settings) {
+                        // Ajusta a altura para ocupar toda a página conforme a tabela
+                        var tableHeight = $('#testesAplicadosTable').outerHeight(true) + 100;
+                        $(".content-wrapper").css("min-height", tableHeight + "px");
+                    }
+           });
         });
-        
+      
+    </script>
 </body>
 
 </html>
