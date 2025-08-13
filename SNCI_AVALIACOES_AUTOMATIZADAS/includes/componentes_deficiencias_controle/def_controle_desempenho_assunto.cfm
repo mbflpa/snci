@@ -247,12 +247,15 @@
     <cfset arrayAppend(dadosOrdenados, assuntosZerados[i])>
 </cfloop>
     
-      <!-- DataTables -->
-      <link rel="stylesheet" href="../SNCI_AVALIACOES_AUTOMATIZADAS/plugins/datatables/datatables.min.css">
-          
-      <!-- Theme style -->
+    <!-- Theme style -->
     <link rel="stylesheet" href="../SNCI_AVALIACOES_AUTOMATIZADAS/dist/css/adminlte.min.css">
+    <!-- DataTables -->
+    <link rel="stylesheet" href="../SNCI_AVALIACOES_AUTOMATIZADAS/plugins/datatables/datatables.min.css">
     <link rel="stylesheet" href="../SNCI_AVALIACOES_AUTOMATIZADAS/dist/css/stylesSNCI.css">
+    <!-- Select2 -->
+    <link rel="stylesheet" href="../SNCI_AVALIACOES_AUTOMATIZADAS/plugins/select2/css/select2.min.css">
+    <link rel="stylesheet" href="../SNCI_AVALIACOES_AUTOMATIZADAS/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css">
+    
 <style>
     .card-header {
         border:none!important;
@@ -977,11 +980,17 @@
         </div>
     </div>
 </div>
-
+<!-- jQuery UI 1.11.4 -->
+    <script src="../SNCI_AVALIACOES_AUTOMATIZADAS/plugins/jquery-ui/jquery-ui.min.js"></script>
 <!-- Popper.js (se Bootstrap 4) -->
 <script src="../SNCI_AVALIACOES_AUTOMATIZADAS/plugins/popper/umd/popper.min.js"></script>
-
+<!--datatable-->
 <script  src="../SNCI_AVALIACOES_AUTOMATIZADAS/plugins/datatables/datatables.min.js"></script>
+<!-- Select2 -->
+    <script  src="../SNCI_AVALIACOES_AUTOMATIZADAS/plugins/select2/js/select2.full.min.js"></script>
+    <!-- AdminLTE App -->
+    <script  src="../SNCI_AVALIACOES_AUTOMATIZADAS/dist/js/adminlte.min.js"></script>
+
 <script>
     $(document).ready(function() {
         // Animar barras de progresso
