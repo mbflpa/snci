@@ -989,11 +989,13 @@ a:hover {
 .selecionar {
 	background-color:#8adbe748;
 }
+.tembordas {
+	border-radius: 8px;
+	border: 2px solid black;
+}
 table {
-
 	border-radius: 5px;
 	border: 1px solid black;
-
 }
 td, th, label {
 
@@ -1051,7 +1053,7 @@ label {
                 <cfset potencvlr = 'S'>
             </cfif>	 
 			<div class="box #RIP_Resposta#" align="center" title="Não Conforme" grp="#RIP_NumGrupo#" grpdesc="#Grp_Descricao#" itm="#RIP_NumItem#" itmdesc="#Itn_Descricao#" matrinsp="#RIP_MatricAvaliador#" nomeinsp="#funome#" pontuacao="#Itn_Pontuacao#" classificacao="#Itn_Classificacao#" resposta="#RIP_Resposta#" potencvlr="#potencvlr#" ripncisei = "#trim(RIP_NCISEI)#" riprecomendacao	= "#ucase(trim(RIP_Recomendacao))#" intimpactartipos="#ucase(trim(Itn_ImpactarTipos))#" Itnreincidentes="#ucase(trim(Itn_Reincidentes))#">
-				<h5>#RIP_NumGrupo#.#RIP_NumItem#<h5>#RIP_MatricAvaliador#</h5>
+				<h5>#RIP_NumGrupo#.#RIP_NumItem#</h5><h5>#RIP_MatricAvaliador#</h5>
 			</div>
 		</cfoutput>	
 		<cfif rsC.recordcount gt 0><div>&nbsp;</div><div><label>Conforme (<cfoutput>#rsC.recordcount#</cfoutput>)</label></div></cfif>
@@ -1061,7 +1063,7 @@ label {
                 <cfset potencvlr = 'S'>
             </cfif>	 
 			<div class="box #RIP_Resposta#" align="center" title="Conforme" grp="#RIP_NumGrupo#" grpdesc="#Grp_Descricao#" itm="#RIP_NumItem#" itmdesc="#Itn_Descricao#" matrinsp="#RIP_MatricAvaliador#" nomeinsp="#funome#" pontuacao="#Itn_Pontuacao#" classificacao="#Itn_Classificacao#" resposta="#RIP_Resposta#" potencvlr="#potencvlr#" ripncisei = "#trim(RIP_NCISEI)#" riprecomendacao	= "#ucase(trim(RIP_Recomendacao))#" intimpactartipos="#ucase(trim(Itn_ImpactarTipos))#" Itnreincidentes="#ucase(trim(Itn_Reincidentes))#">
-				<h5>#RIP_NumGrupo#.#RIP_NumItem#<h5>#RIP_MatricAvaliador#</h5>
+				<h5>#RIP_NumGrupo#.#RIP_NumItem#</h5><h5>#RIP_MatricAvaliador#</h5>
 			</div>
 		</cfoutput>
 		<cfif rsNV.recordcount gt 0><div>&nbsp;</div><div><label>Não Verificado (<cfoutput>#rsNV.recordcount#</cfoutput>)</label></div></cfif>
@@ -1071,13 +1073,13 @@ label {
                 <cfset potencvlr = 'S'>
             </cfif>				
 			<div class="box #RIP_Resposta#" align="center" title="Não Verificado" grp="#RIP_NumGrupo#" grpdesc="#Grp_Descricao#" itm="#RIP_NumItem#" itmdesc="#Itn_Descricao#" matrinsp="#RIP_MatricAvaliador#" nomeinsp="#funome#" pontuacao="#Itn_Pontuacao#" classificacao="#Itn_Classificacao#" resposta="#RIP_Resposta#" potencvlr="#potencvlr#" ripncisei = "#trim(RIP_NCISEI)#" riprecomendacao = "#ucase(trim(RIP_Recomendacao))#" intimpactartipos="#ucase(trim(Itn_ImpactarTipos))#" Itnreincidentes="#ucase(trim(Itn_Reincidentes))#">
-				<h5>#RIP_NumGrupo#.#RIP_NumItem#<h5>#RIP_MatricAvaliador#</h5>
+				<h5>#RIP_NumGrupo#.#RIP_NumItem#</h5><h5>#RIP_MatricAvaliador#</h5>
 			</div>
 		</cfoutput>
 		<cfif rsNE.recordcount gt 0><div>&nbsp;</div><div><label>Não Executa (<cfoutput>#rsNE.recordcount#</cfoutput>)</label></div></cfif>
 		<cfoutput query="rsNE">
 			<div class="box #RIP_Resposta#" align="center" title="Não Executa" grp="#RIP_NumGrupo#" grpdesc="#Grp_Descricao#" itm="#RIP_NumItem#" itmdesc="#Itn_Descricao#" matrinsp="#RIP_MatricAvaliador#" nomeinsp="#funome#" pontuacao="#Itn_Pontuacao#" classificacao="#Itn_Classificacao#" resposta="#RIP_Resposta#" potencvlr="#potencvlr#" ripncisei = "#trim(RIP_NCISEI)#" riprecomendacao = "#ucase(trim(RIP_Recomendacao))#" intimpactartipos="#ucase(trim(Itn_ImpactarTipos))#" Itnreincidentes="#ucase(trim(Itn_Reincidentes))#">
-				<h5>#RIP_NumGrupo#.#RIP_NumItem#<h5>#RIP_MatricAvaliador#</h5>
+				<h5>#RIP_NumGrupo#.#RIP_NumItem#</h5><h5>#RIP_MatricAvaliador#</h5>
 			</div>
 		</cfoutput>
 		<cfif rsNA.recordcount gt 0><div>&nbsp;</div><div><label>Não Avaliado (<cfoutput>#rsNA.recordcount#</cfoutput>)</label></div></cfif>
@@ -1087,313 +1089,308 @@ label {
                 <cfset potencvlr = 'S'>
             </cfif>				
 			<div class="box #RIP_Resposta#" align="center" title="Não Avaliado" grp="#RIP_NumGrupo#" grpdesc="#Grp_Descricao#" itm="#RIP_NumItem#" itmdesc="#Itn_Descricao#" matrinsp="" nomeinsp="" pontuacao="#Itn_Pontuacao#" classificacao="#Itn_Classificacao#" resposta="#RIP_Resposta#" potencvlr="#potencvlr#" ripncisei = "#trim(RIP_NCISEI)#" riprecomendacao	= "#ucase(trim(RIP_Recomendacao))#" intimpactartipos="#ucase(trim(Itn_ImpactarTipos))#" Itnreincidentes="#ucase(trim(Itn_Reincidentes))#">
-				<h5>#RIP_NumGrupo#.#RIP_NumItem#<h5>#RIP_MatricAvaliador#</h5>
+				<h5>#RIP_NumGrupo#.#RIP_NumItem#</h5><h5>#RIP_MatricAvaliador#</h5>
 			</div>
 		</cfoutput>
 	</nav>
 	<main class="main-page cf">
-	<section class="principal">
-		<form name="formx" id="formx" onSubmit="return validarform()" action="itens_inspetores_avaliacaov2.cfm" method="post" enctype="multipart/form-data">
-			<header>
-				<hgroup>  
-					<div align="center" class="card-title"><h2>AVALIAÇÃO DOS ITENS DE CONTROLE INTERNO</h2></div>	
-				</hgroup>    	
-			</header>
-			<div class="bloco selecionar" align="center">
-				<div align="left">
-					<label><h4>SELECIONAR AVALIAÇÃO:</h4></label> 
-					<select name="selInspecoes" id="selInspecoes" style="font-size:18px">
-						<option selected="selected" value="">---</option>
-						<cfoutput query="rsInspecoes">
-							<cfquery datasource="#dsn_inspecao#" name="rsInspecao">
-								SELECT * FROM Inspecao 
-								WHERE (INP_Situacao = 'NA' or INP_Situacao = 'ER')  and INP_NumInspecao='#rsInspecoes.INP_NumInspecao#'  
-							</cfquery>
-							<cfquery datasource="#dsn_inspecao#" name="rsCoordenador" >
-								select Usu_Matricula, Usu_Apelido from usuarios where Usu_Matricula = Convert(varchar,#rsInspecao.INP_Coordenador#)
-							</cfquery>
-							<cfquery datasource="#dsn_inspecao#" name="rsUnidades">
-								SELECT Und_Codigo, Und_Descricao, Und_NomeGerente FROM Unidades WHERE Und_Status='A' and Und_Codigo = '#rsInspecao.INP_Unidade#'
-							</cfquery>
-							<cfquery name="rsVerifComItemEmRevisao" datasource="#dsn_inspecao#">
-								SELECT RIP_Resposta FROM Resultado_Inspecao 
-								WHERE RIP_Recomendacao='S' AND RIP_NumInspecao='#rsInspecao.INP_NumInspecao#'
-							</cfquery>															
-							<!--- <cfparam name="coordenador" default="#rsCoordenador.Usu_Matricula#"> --->
-							<cfset coordenador = #rsCoordenador.Usu_Matricula#>
-							<cfset avalinicsn = 'Não'>
-							<cfif INP_AvaliacaoAtiva eq 'S'>
-								<cfset avalinicsn = 'Sim'>
-							</cfif>	
-						<!---	  <option value="itens_inspetores_avaliacaov2.cfm?numInspecao=#INP_NumInspecao#&Unid=#rsUnidades.Und_Codigo#" style="<cfif rsVerifComItemEmRevisao.recordcount neq 0 >color:red</cfif>">#rsInspecao.INP_NumInspecao# - #trim(rsUnidades.Und_Descricao)# (#rsUnidades.Und_Codigo#)-(Coordena:#coordenador#)-(Aval. Iniciada? #avalinicsn#)<cfif rsVerifComItemEmRevisao.recordcount neq 0 > - Reanálise: #rsVerifComItemEmRevisao.recordcount#<cfif #rsVerifComItemEmRevisao.recordcount# gt 1>itens<cfelse>item</cfif></cfif></option> --->
-						  <option value="itens_inspetores_avaliacaov2.cfm?numInspecao=#INP_NumInspecao#&Unid=#rsUnidades.Und_Codigo#" style="<cfif rsVerifComItemEmRevisao.recordcount neq 0 >color:red</cfif>" <cfif rsInspecao.INP_NumInspecao eq url.numInspecao>selected</cfif>>#rsInspecao.INP_NumInspecao# - #trim(rsUnidades.Und_Descricao)# (#rsUnidades.Und_Codigo#)-(Coordena:#coordenador#)-(Aval. Iniciada? #avalinicsn#)<cfif rsVerifComItemEmRevisao.recordcount neq 0 > - Reanálise: #rsVerifComItemEmRevisao.recordcount#<cfif #rsVerifComItemEmRevisao.recordcount# gt 1> itens<cfelse> item</cfif></cfif></option>
-						</cfoutput>		
-					</select>	
-				</div>	
-				<br>			
-			</div>
-			<div id='divconcluiraval' align="center">
-				<br>
-				<div><img  alt="Liberar" src="figuras/liberada.png" width="80" border="0"></div>
-				<div class="btnconcluiraval" align="center" title="concluir e liberar avaliação para revisão"><h5>Concluir e Liberar Avaliação para Revisão</h5></div>  
-			</div>	
-			<div id="reanalisegeral">
-				<div id="reanalise">
-					<div id="numavalreanalz"></div>
-					<div id="itemavalreanalz"></div>
-					<div id="statusavalreanalz"></div>
-					<div align="center"><label>Revisor(a) - Histórico das Recomendações</label></div>	
-					<div><textarea name="historirecominspetor" id="historirecominspetor" cols="172" rows="10" wrap="VIRTUAL" readonly style="background:transparent;font-size:12px"></textarea></div>	
-					<div align="center"><label>Inspetor(a) - Histórico das Respostas</label></div>		
-					<div><textarea name="historirespinspetor" id="historirespinspetor" cols="172" rows="10" wrap="VIRTUAL" readonly style="background:transparent;font-size:12px"></textarea></div>	
-					<div align="center"><label>Inspetor(a) - Responder para Revisor(a)</label></div>	
-					<div><textarea name="respondereanalise" id="respondereanalise" cols="172" rows="10" wrap="VIRTUAL" style="background:transparent;font-size:12px"></textarea></div>		
-					<div><hr></div>		
+		<section class="principal">
+			<form name="formx" id="formx" onSubmit="return validarform()" action="itens_inspetores_avaliacaov2.cfm" method="post" enctype="multipart/form-data">
+				<header>
+					<hgroup>  
+						<div align="center" class="card-title"><h2>AVALIAÇÃO DOS ITENS DE CONTROLE INTERNO</h2></div>	
+					</hgroup>    	
+				</header>
+				<div class="bloco selecionar" align="center" class="tembordas">
+					<div align="left">
+						<label><h4>SELECIONAR AVALIAÇÃO:</h4></label> 
+						<select name="selInspecoes" id="selInspecoes" style="font-size:18px">
+							<option selected="selected" value="">---</option>
+							<cfoutput query="rsInspecoes">
+								<cfquery datasource="#dsn_inspecao#" name="rsInspecao">
+									SELECT * FROM Inspecao 
+									WHERE (INP_Situacao = 'NA' or INP_Situacao = 'ER')  and INP_NumInspecao='#rsInspecoes.INP_NumInspecao#'  
+								</cfquery>
+								<cfquery datasource="#dsn_inspecao#" name="rsCoordenador" >
+									select Usu_Matricula, Usu_Apelido from usuarios where Usu_Matricula = Convert(varchar,#rsInspecao.INP_Coordenador#)
+								</cfquery>
+								<cfquery datasource="#dsn_inspecao#" name="rsUnidades">
+									SELECT Und_Codigo, Und_Descricao, Und_NomeGerente FROM Unidades WHERE Und_Status='A' and Und_Codigo = '#rsInspecao.INP_Unidade#'
+								</cfquery>
+								<cfquery name="rsVerifComItemEmRevisao" datasource="#dsn_inspecao#">
+									SELECT RIP_Resposta FROM Resultado_Inspecao 
+									WHERE RIP_Recomendacao='S' AND RIP_NumInspecao='#rsInspecao.INP_NumInspecao#'
+								</cfquery>															
+								<!--- <cfparam name="coordenador" default="#rsCoordenador.Usu_Matricula#"> --->
+								<cfset coordenador = #rsCoordenador.Usu_Matricula#>
+								<cfset avalinicsn = 'Não'>
+								<cfif INP_AvaliacaoAtiva eq 'S'>
+									<cfset avalinicsn = 'Sim'>
+								</cfif>	
+							<!---	  <option value="itens_inspetores_avaliacaov2.cfm?numInspecao=#INP_NumInspecao#&Unid=#rsUnidades.Und_Codigo#" style="<cfif rsVerifComItemEmRevisao.recordcount neq 0 >color:red</cfif>">#rsInspecao.INP_NumInspecao# - #trim(rsUnidades.Und_Descricao)# (#rsUnidades.Und_Codigo#)-(Coordena:#coordenador#)-(Aval. Iniciada? #avalinicsn#)<cfif rsVerifComItemEmRevisao.recordcount neq 0 > - Reanálise: #rsVerifComItemEmRevisao.recordcount#<cfif #rsVerifComItemEmRevisao.recordcount# gt 1>itens<cfelse>item</cfif></cfif></option> --->
+							<option value="itens_inspetores_avaliacaov2.cfm?numInspecao=#INP_NumInspecao#&Unid=#rsUnidades.Und_Codigo#" style="<cfif rsVerifComItemEmRevisao.recordcount neq 0 >color:red</cfif>" <cfif rsInspecao.INP_NumInspecao eq url.numInspecao>selected</cfif>>#rsInspecao.INP_NumInspecao# - #trim(rsUnidades.Und_Descricao)# (#rsUnidades.Und_Codigo#)-(Coordena:#coordenador#)-(Aval. Iniciada? #avalinicsn#)<cfif rsVerifComItemEmRevisao.recordcount neq 0 > - Reanálise: #rsVerifComItemEmRevisao.recordcount#<cfif #rsVerifComItemEmRevisao.recordcount# gt 1> itens<cfelse> item</cfif></cfif></option>
+							</cfoutput>		
+						</select>	
+					</div>	
+					<br>			
+				</div>
+				<div id='divconcluiraval' align="center">
 					<br>
+					<div><img  alt="Liberar" src="figuras/liberada.png" width="80" border="0"></div>
+					<div class="btnconcluiraval" align="center" title="concluir e liberar avaliação para revisão"><h5>Concluir e Liberar Avaliação para Revisão</h5></div>  
 				</div>	
-				<div align="center">
-					<div class="btnfecharreanalise" align="center">
-							<h5>Fechar</h5>
-					</div>
-					<div class="btnenviocomreanalise" align="center">
-							<h5>Enviar resposta para o Revisor(a) com Reanálise</h5>
-					</div>
-					<div class="btnenviosemreanalise" align="center">
-							<h5>Enviar resposta para o Revisor(a) sem Reanálise</h5>
-					</div>
-				</div>	
-			</div>				
-			<div id="reincidenciasgeral">
-				<div id="reincidencias01">
-					<div id="numavalreinc01"></div>
-					<div id="itemavalreinc01"></div>
-					<div id="statusavalreinc01"></div>
-					<div id="melhoriavalreinc01"><textarea name="melhoriareinc01" id="melhoriareinc01" cols="130" rows="15" wrap="VIRTUAL"></textarea></div>	
-					<div><hr></div>	
-					<div id="informe01reinc01" align="center"></div>	
-					<div id="informe02reinc01" align="center"></div>
+				<div id="reanalisegeral">
+					<div id="reanalise">
+						<div id="numavalreanalz"></div>
+						<div id="itemavalreanalz"></div>
+						<div id="statusavalreanalz"></div>
+						<div align="center"><label>Revisor(a) - Histórico das Recomendações</label></div>	
+						<div><textarea name="historirecominspetor" id="historirecominspetor" cols="172" rows="10" wrap="VIRTUAL" readonly style="background:transparent;font-size:12px"></textarea></div>	
+						<div align="center"><label>Inspetor(a) - Histórico das Respostas</label></div>		
+						<div><textarea name="historirespinspetor" id="historirespinspetor" cols="172" rows="10" wrap="VIRTUAL" readonly style="background:transparent;font-size:12px"></textarea></div>	
+						<div align="center"><label>Inspetor(a) - Responder para Revisor(a)</label></div>	
+						<div><textarea name="respondereanalise" id="respondereanalise" cols="172" rows="10" wrap="VIRTUAL" style="background:transparent;font-size:12px"></textarea></div>		
+						<div><hr></div>		
+						<br>
+					</div>	
+					<div align="center">
+						<div class="btnfecharreanalise" align="center">
+								<h5>Fechar</h5>
+						</div>
+						<div class="btnenviocomreanalise" align="center">
+								<h5>Enviar resposta para o Revisor(a) com Reanálise</h5>
+						</div>
+						<div class="btnenviosemreanalise" align="center">
+								<h5>Enviar resposta para o Revisor(a) sem Reanálise</h5>
+						</div>
+					</div>	
+				</div>				
+				<div id="reincidenciasgeral">
+					<div id="reincidencias01">
+						<div id="numavalreinc01"></div>
+						<div id="itemavalreinc01"></div>
+						<div id="statusavalreinc01"></div>
+						<div id="melhoriavalreinc01"><textarea name="melhoriareinc01" id="melhoriareinc01" cols="130" rows="15" wrap="VIRTUAL"></textarea></div>	
+						<div><hr></div>	
+						<div id="informe01reinc01" align="center"></div>	
+						<div id="informe02reinc01" align="center"></div>
+						<div><hr></div>	
+						<div align="center">
+							<div class="btnsim btnsn" align="center" id="sim01" selecaosn="N">
+									<h5>Sim</h5>
+							</div>
+							<div class="btnnao btnsn" align="center" id="nao01" selecaosn="N">
+									<h5>Não</h5>
+							</div>
+						</div>			
+						<div><hr></div>		
+						<br>
+					</div>	
+					<div id="reincidencias02">
+						<div id="numavalreinc02"></div>
+						<div id="itemavalreinc02"></div>
+						<div id="statusavalreinc02"></div>
+						<div id="melhoriavalreinc02"><textarea name="melhoriareinc02" id="melhoriareinc02" cols="130" rows="15" wrap="VIRTUAL"></textarea></div>	
+						<div><hr></div>	
+						<div id="informe01reinc02" align="center"></div>	
+						<div id="informe02reinc02" align="center"></div>
+						<div><hr></div>	
+						<div align="center">
+							<div class="btnsim btnsn" align="center" id="sim02" selecaosn="N">
+									<h5>Sim</h5>
+							</div>
+							<div class="btnnao btnsn" align="center" id="nao02" selecaosn="N">
+									<h5>Não</h5>
+							</div>
+						</div>
+					</div>	
 					<div><hr></div>	
 					<div align="center">
-						<div class="btnsim btnsn" align="center" id="sim01" selecaosn="N">
-								<h5>Sim</h5>
+						<div class="btnfechar" align="center">
+								<h5>Voltar</h5>
 						</div>
-						<div class="btnnao btnsn" align="center" id="nao01" selecaosn="N">
-								<h5>Não</h5>
+						<div class="btnsalvarreinc" align="center">
+								<h5>Confirmar (reincidência)</h5>
 						</div>
+					</div>	
+				</div>				
+				<div class="corpoavaliacao">
+					<div id="blocoreincidentes">
+						<div id="numinspreinc"></div>
+						<div id="gruporeinc"></div>
+						<div id="itemreinc"></div>
+						<div id="itemdescreinc"></div> 
+						<div id="ptoclassifreinc"></div>
+						<div id="statusreinc"></div>
+						<div id="pontuacaoreinc"></div>
+						<div id="statusparecer"></div>
+						<div id="nomeinspreinc"></div>
+						<div id="melhoriasreinc"><textarea name="ripmelhoriareinc" id="ripmelhoriareinc" cols="130" rows="10" wrap="VIRTUAL"></textarea></div>
+						<div id="recomendacoesreinc"><textarea name="riprecomendacaoreinc" id="riprecomendacaoreinc" cols="130" rows="10" wrap="VIRTUAL"></textarea></div>
+						<div><h5>Histórico das manifestações</h5></div>
+						<div id="parecereinc"><textarea name="posparecereinc" id="posparecereinc" cols="172" rows="25" wrap="VIRTUAL" style="background:transparent;font-size:12px"></textarea></div>
 					</div>			
-					<div><hr></div>		
-					<br>
-				</div>	
-				<div id="reincidencias02">
-					<div id="numavalreinc02"></div>
-					<div id="itemavalreinc02"></div>
-					<div id="statusavalreinc02"></div>
-					<div id="melhoriavalreinc02"><textarea name="melhoriareinc02" id="melhoriareinc02" cols="130" rows="15" wrap="VIRTUAL"></textarea></div>	
-					<div><hr></div>	
-					<div id="informe01reinc02" align="center"></div>	
-					<div id="informe02reinc02" align="center"></div>
-					<div><hr></div>	
-					<div align="center">
-						<div class="btnsim btnsn" align="center" id="sim02" selecaosn="N">
-								<h5>Sim</h5>
+					<div id="blocotmpantes">
+						<div id="numinsptmpantes"></div>
+						<div id="grupotmpantes"></div>
+						<div id="grupodesctmpantes"></div>
+						<div id="itemtmpantes"></div>
+						<div id="itemdesctmpantes"></div> 
+						<div id="ptoclassiftmpantes"></div>
+						<div id="statustmpantes"></div>
+						<div id="pontuacaotmpantes"></div>
+						<div id="nomeinsptmpantes"></div>
+						<div id="melhoriatmpantes"><textarea name="melhoriantes" id="melhoriantes" cols="130" rows="10" wrap="VIRTUAL"></textarea></div>
+						<div id="recomendacoestmpantes"><textarea name="recomendacoesantes" id="recomendacoesantes" cols="130" rows="10" wrap="VIRTUAL"></textarea></div>
+					</div>						
+					<div id="blocotmp">
+						<div id="grupotmp"></div>
+						<div id="grupodesctmp"></div>
+						<div id="itemtmp"></div>
+						<div id="itemdesctmp"></div> 
+						<div id="ptoclassiftmp"></div>
+						<div id="statustmp"></div>
+						<div id="pontuacaotmp"></div>
+						<div id="nomeinsptmp"></div>
+					</div>	
+					<div id="corpomanifestacao">
+						<div class="bloco row" >
+							<div class="col" align="left">
+								<label id="nomeavalitem">AVALIAR PARA:</label>
+								<select class="form-control-sm" name="avalitem" id="avalitem" style="font-size:18px"> 			
+								</select>	 
+							</div>
+							<div class="col" id="paratodos"><label>Aplicar à todos do Grupo(não avaliados)?:</label>
+								<select name="propagaval" id="propagaval" class="form-control-sm" style="font-size:18px">
+									<option value="N" selected>Não</option>
+									<option value="S">Sim</option>
+								</select>
+							</div>						
 						</div>
-						<div class="btnnao btnsn" align="center" id="nao02" selecaosn="N">
-								<h5>Não</h5>
+						<br>
+						<div id="mostrarmanchete">
+							<div align="left"><label class="cabecampo">Manchete</label></div>
+							<div align="left" class="tembordas"><textarea  name="manchete" id="manchete" cols="135" rows="2" wrap="VIRTUAL" style="color:#036;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:13px"><cfoutput>#form.manchete#</cfoutput></textarea></div>
 						</div>
-					</div>
-				</div>	
-				<div><hr></div>	
-				<div align="center">
-					<div class="btnfechar" align="center">
-							<h5>Voltar</h5>
-					</div>
-					<div class="btnsalvarreinc" align="center">
-							<h5>Confirmar (reincidência)</h5>
-					</div>
-				</div>	
-			</div>				
-			<div class="corpoavaliacao">
-				<div id="blocoreincidentes">
-					<div id="numinspreinc"></div>
-					<div id="gruporeinc"></div>
-					<div id="itemreinc"></div>
-					<div id="itemdescreinc"></div> 
-					<div id="ptoclassifreinc"></div>
-					<div id="statusreinc"></div>
-					<div id="pontuacaoreinc"></div>
-					<div id="statusparecer"></div>
-					<div id="nomeinspreinc"></div>
-					<div id="melhoriasreinc"><textarea name="ripmelhoriareinc" id="ripmelhoriareinc" cols="130" rows="10" wrap="VIRTUAL"></textarea></div>
-					<div id="recomendacoesreinc"><textarea name="riprecomendacaoreinc" id="riprecomendacaoreinc" cols="130" rows="10" wrap="VIRTUAL"></textarea></div>
-					<div><h5>Histórico das manifestações</h5></div>
-					<div id="parecereinc"><textarea name="posparecereinc" id="posparecereinc" cols="172" rows="25" wrap="VIRTUAL" style="background:transparent;font-size:12px"></textarea></div>
-				</div>			
-				<div id="blocotmpantes">
-					<div id="numinsptmpantes"></div>
-					<div id="grupotmpantes"></div>
-					<div id="grupodesctmpantes"></div>
-					<div id="itemtmpantes"></div>
-					<div id="itemdesctmpantes"></div> 
-					<div id="ptoclassiftmpantes"></div>
-					<div id="statustmpantes"></div>
-					<div id="pontuacaotmpantes"></div>
-					<div id="nomeinsptmpantes"></div>
-					<div id="melhoriatmpantes"><textarea name="melhoriantes" id="melhoriantes" cols="130" rows="10" wrap="VIRTUAL"></textarea></div>
-					<div id="recomendacoestmpantes"><textarea name="recomendacoesantes" id="recomendacoesantes" cols="130" rows="10" wrap="VIRTUAL"></textarea></div>
-				</div>						
-				<div id="blocotmp">
-					<div id="grupotmp"></div>
-					<div id="grupodesctmp"></div>
-					<div id="itemtmp"></div>
-					<div id="itemdesctmp"></div> 
-					<div id="ptoclassiftmp"></div>
-					<div id="statustmp"></div>
-					<div id="pontuacaotmp"></div>
-					<div id="nomeinsptmp"></div>
-				</div>	
-				<div id="corpomanifestacao">
-					<div class="bloco row">
-						<div class="col" align="left"><label id="nomeavalitem">AVALIAR PARA:</label>
-							<select class="form-control-sm" name="avalitem" id="avalitem" style="font-size:18px"> 			
-								<option value="A">---</option>				
-								<option value="C">CONFORME</option>
-								<option value="N">NÃO CONFORME</option>
-								<option value="V">NÃO VERIFICADO</option>
-								<option value="E">NÃO EXECUTA</option>
-							</select>	 
+						<div id="mostrartextarea">
+							<br>
+							<div align="left"><label class="cabecampo">Situação Encontrada</label></div>
+							<div align="left" class="tembordas"><textarea name="melhoria" id="melhoria" wrap="VIRTUAL"><cfoutput>#Form.melhoria#</cfoutput></textarea></div>
+							<br>
+							<div id="pontencialvalor">
+								<div align="left"><label class="cabecampo">Potencial Valor</label></div>
+								<div class="tembordas">
+									<table align="center" class="table table-bordered table-hover">
+										<tr>
+											<td><div><label>Estimado a Recuperar(R$)</label></div></td>
+											<td><div><label>Estimado Não Planejado/Extrapolado/Sobra(R$)</label></div></td>
+											<td><div><label>Estimado em Risco ou Envolvido(R$)</label></div></td>
+										</tr> 
+										<tr>
+											<td><div><input name="frmfalta" id="frmfalta" type="text" class="form-control-sm" value="" size="22" maxlength="18" onKeyPress="numericos()" onKeyUp="moedadig(this.name)"></div></td>
+											<td><div><input name="frmsobra" id="frmsobra" type="text" class="form-control-sm" value="" size="22" maxlength="18"  onKeyPress="numericos()" onKeyUp="moedadig(this.name)"></div></td>
+											<td><div><input name="frmemrisco" id="frmemrisco" type="text" class="form-control-sm" value="" size="22" maxlength="18" onKeyPress="numericos()" onKeyUp="moedadig(this.name)"></div></td>
+										</tr>  						
+									</table>
+								</div>
+							</div>
+							<br>
+							<div id="mostrarrecomendacoes">
+								<div align="left"><label class="cabecampo">Orientações</label></div>
+								<div align="left" class="tembordas"><textarea name="recomendacoes" id="recomendacoes"  wrap="VIRTUAL"><cfoutput>#Form.recomendacoes#</cfoutput></textarea></div>
+							</div>
 						</div>
-						<div class="col" id="paratodos"><label>Aplicar à todos do Grupo(não avaliados)?:</label>
-							<select name="propagaval" id="propagaval" class="form-control-sm" style="font-size:18px">
-								<option value="N" selected>Não</option>
-								<option value="S">Sim</option>
-							</select>
-						</div>						
-					</div>
-					<br>
-					<div id="mostrarmanchete">
-						<div align="left"><label class="cabecampo">Manchete</label></div>
-						<div align="left"><textarea  name="manchete" id="manchete" cols="135" rows="2" wrap="VIRTUAL" style="color:#036;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:13px"><cfoutput>#form.manchete#</cfoutput></textarea></div>
-					</div>
-					<div id="mostrartextarea">
-						<br>
-						<div align="left"><label class="cabecampo">Situação Encontrada</label></div>
-						<div align="left"><textarea name="melhoria" id="melhoria" wrap="VIRTUAL"><cfoutput>#Form.melhoria#</cfoutput></textarea></div>
-						<br>
-						<div id="mostrarrecomendacoes">
-							<div align="left"><label class="cabecampo">Orientações</label></div>
-							<div align="left"><textarea name="recomendacoes" id="recomendacoes"  wrap="VIRTUAL"><cfoutput>#Form.recomendacoes#</cfoutput></textarea></div>
+						<div id="reincidente">
+							<br>
+							<div align="left"><label class="cabecampo">Reincidência</label></div>
+								<div class="tembordas">
+									<table width="90%" align="center" class="table table-bordered table-hover">
+										<tr>
+											<td><label>Nº Avaliação</label>&nbsp;&nbsp;<input name="frmreincInsp" type="text" class="form-control-sm" id="frmreincInsp" size="10" maxlength="10" value="0" readonly=""></td>
+											<td><label>Nº Grupo</label>&nbsp;&nbsp;<input name="frmreincGrup" type="text" class="form-control-sm" id="frmreincGrup" size="5" maxlength="5" value="0"  readonly=""></td>
+											<td><label>Nº Item</label>&nbsp;&nbsp;<input name="frmreincItem" type="text" class="form-control-sm" id="frmreincItem" size="5" maxlength="5" value="0" readonly=""></td>
+										</tr> 	
+									</table>	
+								</div>				
+						</div>				
+						<div id="notacontrole">	
+							<br>
+							<div align="left"><label class="cabecampo">Nota de Controle?</label></div>
+								<div class="tembordas">		
+									<table align="center" class="table table-bordered table-hover">
+										<tr>
+											<td> 
+												<select name="nci" id="nci" class="form-select">
+													<option value="" selected>Não</option>
+													<option value="S">Sim</option>
+												</select>
+											</td>
+											<td align="center"><label>Nº SEI da NCI</label>&nbsp;&nbsp;<input class="form-control-sm" name="frmnumseinci" id="frmnumseinci" type="text" onKeyPress="numericos();" onKeyUp="Mascara_SEI(this.value);" size="27" maxlength="20" value="" readonly></td>								
+										</tr>	
+									</table>
+								</div>
 						</div>
-					</div>
-					<div id="reincidente">
-						<br>
-						<table width="90%" align="center" class="table table-bordered table-hover">
-							<tr>
-								<td align="left"><div id="impactofin"><label class="cabecampo">Reincidência</label></div></td>
-								<td><label>Nº Avaliação</label>&nbsp;&nbsp;<input name="frmreincInsp" type="text" class="form-control-sm" id="frmreincInsp" size="10" maxlength="10" value="0" readonly=""></td>
-								<td><label>Nº Grupo</label>&nbsp;&nbsp;<input name="frmreincGrup" type="text" class="form-control-sm" id="frmreincGrup" size="5" maxlength="5" value="0"  readonly=""></td>
-								<td><label>Nº Item</label>&nbsp;&nbsp;<input name="frmreincItem" type="text" class="form-control-sm" id="frmreincItem" size="5" maxlength="5" value="0" readonly=""></td>
-							</tr> 	
-						</table>					
-					</div>				
-					<div id="pontencialvalor">
-						<br>
-						<table align="center" class="table table-bordered table-hover">
-							<tr>
-								<td colspan="5" align="left"><div id="impactofin"><label class="cabecampo">Potencial Valor</label></div></td>
-							</tr>
-							<tr>
-								<td><div><label>Estimado a Recuperar(R$)</label></div></td>
-								<td><div><label>Estimado Não Planejado/Extrapolado/Sobra(R$)</label></div></td>
-								<td><div><label>Estimado em Risco ou Envolvido(R$)</label></div></td>
-							</tr> 
-							<tr>
-								<td><div><input name="frmfalta" id="frmfalta" type="text" class="form-control-sm" value="" size="22" maxlength="18" onKeyPress="numericos()" onKeyUp="moedadig(this.name)"></div></td>
-								<td><div><input name="frmsobra" id="frmsobra" type="text" class="form-control-sm" value="" size="22" maxlength="18"  onKeyPress="numericos()" onKeyUp="moedadig(this.name)"></div></td>
-								<td><div><input name="frmemrisco" id="frmemrisco" type="text" class="form-control-sm" value="" size="22" maxlength="18" onKeyPress="numericos()" onKeyUp="moedadig(this.name)"></div></td>
-							</tr>  						
-						</table>
-					</div>
-					<div id="notacontrole">	
-						<br>			
-						<table align="center" class="table table-bordered table-hover">
-							<tr>
-								<td align="left"><label class="cabecampo">Nota de Controle?</label></td>
-								<td> 
-									<select name="nci" id="nci" class="form-select">
-										<option value="" selected>Não</option>
-										<option value="S">Sim</option>
-									</select>
-								</td>
-								<td align="right"><br><label>Nº SEI da NCI</label></td>
-								<td align="Center"><input class="form-control" name="frmnumseinci" id="frmnumseinci" type="text" onKeyPress="numericos();" onKeyUp="Mascara_SEI(this.value);" size="27" maxlength="20" value="" readonly></td>								
-							</tr>	
-						</table>
-					</div>
-					<div id='mostraranexos'>
-						<br>
-						<table align="center" class="table table-bordered table-hover">
-							<tr>
-								<td colspan="2"><div align="left"><label class="cabecampo">Anexos</label></div></td>
-							</tr>
-								<tr>
-									<td colspan="1"><input type="file" id="arquivo" name="arquivo" class="form-control" size="50"></td>
-									<td colspan="1" align="center"><div id='anexar' class="form-control"><label class="lblbtn">Anexar</label></div>
-								</tr>
-							<tr>
-								<td colspan="4">
-									<div id='tableanexo'></div>							
-								</td>
-							</tr>					
-						</table>			
-					</div>
-					<input type="hidden" name="grpacesso" id="grpacesso" value="<cfoutput>#grpacesso#</cfoutput>">
-					<input type="hidden" name="numinspecao" id="numinspecao" value="<cfoutput>#url.numinspecao#</cfoutput>">
-					<input type="hidden" name="ano" id="ano" value="<cfoutput>#right(url.numinspecao,4)#</cfoutput>">
-					<input type="hidden" name="codunidade" id="codunidade" value="<cfoutput>#trim(rsResult.RIP_Unidade)#</cfoutput>">
-					<input type="hidden" name="unidade" id="unidade" value="<cfoutput>#trim(rsResult.Und_Descricao)#</cfoutput>">
-					<input type="hidden" name="inpresponsavel" id="inpresponsavel" value="<cfoutput>#trim(rsResult.INP_Responsavel)#</cfoutput>">
-					<input type="hidden" name="matrusuario" id="matrusuario" value="<cfoutput>#qAcesso.Usu_Matricula#</cfoutput>">
-					<input type="hidden" name="grpsel" id="grpsel" value="">
-					<input type="hidden" name="itmsel" id="itmsel" value="">
-					<input type="hidden" name="resp" id="resp" value="">
-					<input type="hidden" name="potencvlr" id="potencvlr" value="">
-					<input type="hidden" name="intimpactartipos" id="intimpactartipos" value="">
-					<input type="hidden" name="Itnreincidentes" id="Itnreincidentes" value="">
-					<input type="hidden" name="ripncisei" id="ripncisei" value="">
-					<input type="hidden" name="dbfrmfalta" id="dbfrmfalta" value="0,00">
-					<input type="hidden" name="dbfrmsobra" id="dbfrmsobra" value="0,00">
-					<input type="hidden" name="dbfrmemrisco" id="dbfrmemrisco" value="0,00">
-					<input type="hidden" name="qtdreincidente" id="qtdreincidente" value="0">
-					<input type="hidden" name="avalreincidente" id="avalreincidente" value="">
-					<input type="hidden" name="gruporeincidente" id="gruporeincidente" value="">
-					<input type="hidden" name="itemreincidente" id="itemreincidente" value="">
-					<input type="hidden" name="stodescreincidente" id="stodescreincidente" value="">
-					<input type="hidden" name="botaoanteriorsn" id="botaoanteriorsn" value="N">
-					<input type="hidden" name="botaoreincidesn" id="botaoreincidesn" value="N">
-					<input type="hidden" name="botaomostrareincidesn" id="botaomostrareincidesn" value="N">
-					<input type="hidden" name="riprecomendacaoInspetor" id="riprecomendacaoInspetor" value="<cfoutput>#len(trim(rsResult.RIP_Recomendacao_Inspetor))#</cfoutput>">
-					<input type="hidden" name="riprecomendacao" id="riprecomendacao" value="">
-					<input type="hidden" name="concluirevisaosn" id="concluirevisaosn" value="<cfoutput>#concluiravalasn#</cfoutput>">
-					<input type="hidden" name="impactarfalta" id="impactarfalta" value="N">
-					<input type="hidden" name="impactarsobra" id="impactarsobra" value="N">
-					<input type="hidden" name="impactarrisco" id="impactarrisco" value="N">
-					<input type="hidden" name="qtdlistainspsemaval" id="qtdlistainspsemaval" value="">
-					<input type="hidden" name="numanexoexcluir" id="numanexoexcluir" value="">
-					<input type="hidden" name="formgrp" id="formgrp" value="<cfoutput>#formgrp#</cfoutput>">
-					<input type="hidden" name="formitm" id="formitm" value="<cfoutput>#formitm#</cfoutput>">			
-					<input type="hidden" name="acao" id="acao" value="<cfoutput>#url.acao#</cfoutput>">
-			</form>					
-				<div id='divbtnsalvar'>
-					<table align="center" class="table table-hover">
-					<tr>
-						<td align="center">
-							<div class="btnsalvar" align="center" title="Salvar Avaliação do Grupo/Item"><h5>Salvar avaliação do item</h5></div>  
-						</td>   
-					</tr>
-					</table>
-				</div>			
-	</section> 
-
+						<div id='mostraranexos'>
+							<br>
+							<div align="left"><label class="cabecampo">Anexos</label></div>
+								<div class="tembordas">
+									<table align="center" class="table table-bordered table-hover">
+										<tr>
+											<label for="arquivo">Escolher Arquivo 'PDF' (clique aqui)</label>
+											<td colspan="1"><input type="file" id="arquivo" name="arquivo" class="form-control-sm" size="50" accept=".pdf"></td>
+											<td colspan="1" align="center"><div id='anexar' class="form-control"><label class="lblbtn">Anexar</label></div>
+										</tr>
+										<tr>
+											<td colspan="4">
+												<div id='tableanexo'></div>							
+											</td>
+										</tr>					
+									</table>	
+								</div>			
+						</div>
+						<input type="hidden" name="grpacesso" id="grpacesso" value="<cfoutput>#grpacesso#</cfoutput>">
+						<input type="hidden" name="numinspecao" id="numinspecao" value="<cfoutput>#url.numinspecao#</cfoutput>">
+						<input type="hidden" name="ano" id="ano" value="<cfoutput>#right(url.numinspecao,4)#</cfoutput>">
+						<input type="hidden" name="codunidade" id="codunidade" value="<cfoutput>#trim(rsResult.RIP_Unidade)#</cfoutput>">
+						<input type="hidden" name="unidade" id="unidade" value="<cfoutput>#trim(rsResult.Und_Descricao)#</cfoutput>">
+						<input type="hidden" name="inpresponsavel" id="inpresponsavel" value="<cfoutput>#trim(rsResult.INP_Responsavel)#</cfoutput>">
+						<input type="hidden" name="matrusuario" id="matrusuario" value="<cfoutput>#qAcesso.Usu_Matricula#</cfoutput>">
+						<input type="hidden" name="grpsel" id="grpsel" value="">
+						<input type="hidden" name="itmsel" id="itmsel" value="">
+						<input type="hidden" name="resp" id="resp" value="">
+						<input type="hidden" name="potencvlr" id="potencvlr" value="">
+						<input type="hidden" name="intimpactartipos" id="intimpactartipos" value="">
+						<input type="hidden" name="Itnreincidentes" id="Itnreincidentes" value="">
+						<input type="hidden" name="ripncisei" id="ripncisei" value="">
+						<input type="hidden" name="dbfrmfalta" id="dbfrmfalta" value="0,00">
+						<input type="hidden" name="dbfrmsobra" id="dbfrmsobra" value="0,00">
+						<input type="hidden" name="dbfrmemrisco" id="dbfrmemrisco" value="0,00">
+						<input type="hidden" name="qtdreincidente" id="qtdreincidente" value="0">
+						<input type="hidden" name="avalreincidente" id="avalreincidente" value="">
+						<input type="hidden" name="gruporeincidente" id="gruporeincidente" value="">
+						<input type="hidden" name="itemreincidente" id="itemreincidente" value="">
+						<input type="hidden" name="stodescreincidente" id="stodescreincidente" value="">
+						<input type="hidden" name="botaoanteriorsn" id="botaoanteriorsn" value="N">
+						<input type="hidden" name="botaoreincidesn" id="botaoreincidesn" value="N">
+						<input type="hidden" name="botaomostrareincidesn" id="botaomostrareincidesn" value="N">
+						<input type="hidden" name="riprecomendacaoInspetor" id="riprecomendacaoInspetor" value="<cfoutput>#len(trim(rsResult.RIP_Recomendacao_Inspetor))#</cfoutput>">
+						<input type="hidden" name="riprecomendacao" id="riprecomendacao" value="">
+						<input type="hidden" name="concluirevisaosn" id="concluirevisaosn" value="<cfoutput>#concluiravalasn#</cfoutput>">
+						<input type="hidden" name="impactarfalta" id="impactarfalta" value="N">
+						<input type="hidden" name="impactarsobra" id="impactarsobra" value="N">
+						<input type="hidden" name="impactarrisco" id="impactarrisco" value="N">
+						<input type="hidden" name="qtdlistainspsemaval" id="qtdlistainspsemaval" value="">
+						<input type="hidden" name="numanexoexcluir" id="numanexoexcluir" value="">
+						<input type="hidden" name="formgrp" id="formgrp" value="<cfoutput>#formgrp#</cfoutput>">
+						<input type="hidden" name="formitm" id="formitm" value="<cfoutput>#formitm#</cfoutput>">
+						<input type="hidden" name="tamanchete" id="tamanchete" value="0">			
+						<input type="hidden" name="acao" id="acao" value="<cfoutput>#url.acao#</cfoutput>">
+					</form>	
+					<br>				
+					<div id='divbtnsalvar' class="tembordas" align="center">
+						<div class="btnsalvar" align="center" title="Salvar Avaliação do Grupo/Item"><h5>Salvar avaliação do item</h5></div>  
+					</div>			
+		</section> 
 		<aside class="auxiliar">
 				<article id="buscas">
 					<header>
@@ -1406,14 +1403,16 @@ label {
 				<article>
 					<header>
 						<div id="grupo"></div>
-					</header>
 						<div id="grupodesc"></div>
+					</header>
+						
 				</article>
 				<article>
 					<header>
 						<div id="item"></div>
-					</header>
 						<div id="itemdesc"></div> 
+					</header>
+						
 				</article>
 				<article>
 					<header>
@@ -2102,6 +2101,7 @@ label {
 		let codunid = $("#codunidade").val()
 		let grp	= $("#grpsel").val()
 		let itm = $("#itmsel").val()
+		$(this).attr('class','form-control-sm '+respsel)
 		ajustarbotoes()
 		adaptartelas(respdb,respsel)
 		if(respsel != 'A'){
@@ -2336,9 +2336,10 @@ label {
 		$('.corpoavaliacao').show(500)	
 		if($('#sim01').attr('selecaosn') == 'S' || $('#sim02').attr('selecaosn') == 'S'){
 			//congelar opção para 'Conforme' e não mostrar reincidente
-			//alert('linha 1460 sim01: '+$('#sim01').attr('selecaosn'))
+			//alert('linha 2339 sim01: '+$('#sim01').attr('selecaosn'))
 			adaptartelas(respdb,'C')
-			let prots = '<option value="C">Conforme</option>'
+			$("#avalitem").attr('class','form-control-sm C')
+			let prots = '<option value="C" class="form-control-sm C">Conforme</option>'
 			$("#avalitem").html(prots) 
 			let posnuminsp  = $('#avalreincidente').val()
 			let stodesc = $('#stodescreincidente').val()
@@ -2355,7 +2356,8 @@ label {
 			$('.botaorevereinc').show(500)
 			$('.botaomostrareinc').show(500)
 			adaptartelas(respdb,'N')
-			let prots = '<option value="N">Não Conforme</option>'
+			$("#avalitem").attr('class','form-control-sm N')
+			let prots = '<option value="N" class="form-control-sm N">Não Conforme</option>'
  			$("#avalitem").html(prots)  
 			$("#frmreincInsp").val($('#avalreincidente').val())
 			$("#frmreincGrup").val($('#gruporeincidente').val())
@@ -2559,15 +2561,15 @@ label {
 		let codunid = $("#codunidade").val()
 		let prots = ''
 		if(resp == "A"){selecionar = 'selected'}else{selecionar = ''}
-		prots = '<option value="A"'+selecionar+'>---</option>'
+		prots = '<option value="A" classe="form-control-sm A"'+selecionar+'>---</option>'
 		if(resp == "C"){selecionar = 'selected'}else{selecionar = ''}
-		prots += '<option value="C"'+selecionar+'>CONFORME</option>'
+		prots += '<option value="C" classe="form-control-sm C"'+selecionar+'>CONFORME</option>'
 		if(resp == "N"){selecionar = 'selected'}else{selecionar = ''}
-		prots += '<option value="N"'+selecionar+'>NÃO CONFORME</option>'
+		prots += '<option value="N" classe="form-control-sm N"'+selecionar+'>NÃO CONFORME</option>'
 		if(resp == "V"){selecionar = 'selected'}else{selecionar = ''}
-		prots += '<option value="V"'+selecionar+'>NÃO VERIFICADO</option>'
+		prots += '<option value="V" classe="form-control-sm V"'+selecionar+'>NÃO VERIFICADO</option>'
 		if(resp == "E"){selecionar = 'selected'}else{selecionar = ''}
-		prots += '<option value="E"'+selecionar+'>NÃO EXECUTA</option>'
+		prots += '<option value="E" classe="form-control-sm E"'+selecionar+'>NÃO EXECUTA</option>'
  		$("#avalitem").html(prots) 
 		adaptartelas(resp,resp)
 		dbresultadoinspecao(numinspecao,grp,itm,resp,codunid)
@@ -2647,7 +2649,7 @@ label {
 			let avaliador2 = '       Atenção!\n\nEste Item já foi avaliado por:\n\n'+nomeinsp+' ('+matrinsp+')'
 			alert(avaliador2)
 		}
-		
+		$("#tamanchete").val(0)
 		let codunid = $("#codunidade").val()
 		let nomeunidade = $("#unidade").val()
 		let inpresponsavel= $("#inpresponsavel").val()
@@ -2660,22 +2662,23 @@ label {
 		$('#nomeinsp').html('<h5>Avaliado por : </h5><small>'+nomeinsp+'</small>')
 		$('#unid').html('<h5>Unidade: </h5><small>'+codunid+' - '+nomeunidade+'</small>'+'<br><small>'+inpresponsavel+'</small>')
         $(this).css('box-shadow', '8px 8px 5px #888')
-		$('#grupodesc').html('<small>'+grpdesc+'</small>')
-		$('#itemdesc').html('<small>'+itmdesc+'</small>')
+		$('#grupodesc').html('<h5>'+grpdesc+'</h5>')
+		$('#itemdesc').html('<h5>'+itmdesc+'</h5>')
 		$('#nomeavalitem').html('Avaliar Grupo_Item (<strong>'+grp+'_'+itm +'</strong>) para:')
 		adaptartelas(resp,resp)
 		let selecionar = ''
 		if(resp == "A"){selecionar = 'selected'}else{selecionar = ''}
-		prots = '<option value="A"'+selecionar+'>---</option>'
+		prots = '<option value="A" class="form-control-sm A"'+selecionar+'>---</option>'
 		if(resp == "C"){selecionar = 'selected'}else{selecionar = ''}
-		prots += '<option value="C"'+selecionar+'>CONFORME</option>'
+		prots += '<option value="C" class="form-control-sm C"'+selecionar+'>CONFORME</option>'
 		if(resp == "N"){selecionar = 'selected'}else{selecionar = ''}
-		prots += '<option value="N"'+selecionar+'>NÃO CONFORME</option>'
+		prots += '<option value="N" class="form-control-sm N"'+selecionar+'>NÃO CONFORME</option>'
 		if(resp == "V"){selecionar = 'selected'}else{selecionar = ''}
-		prots += '<option value="V"'+selecionar+'>NÃO VERIFICADO</option>'
+		prots += '<option value="V" class="form-control-sm V"'+selecionar+'>NÃO VERIFICADO</option>'
 		if(resp == "E"){selecionar = 'selected'}else{selecionar = ''}
-		prots += '<option value="E"'+selecionar+'>NÃO EXECUTA</option>'
+		prots += '<option value="E" class="form-control-sm E"'+selecionar+'>NÃO EXECUTA</option>'
  		$("#avalitem").html(prots)   
+		$("#avalitem").attr('class',resp)
 		let numinspecao = $('#numinspecao').val()
 		//alert('resp: '+resp)
 		if(resp != 'A'){
@@ -2853,6 +2856,7 @@ label {
 					$("#recomendacoes").val(ret[4])
 					CKEDITOR.instances['recomendacoes'].setData(recomendacoes)
 					$("#manchete").val(ret[5])
+					$("#tamanchete").val(ret[5].length)
 					CKEDITOR.instances['manchete'].setData(manchete)
 					ret[6] = ret[6].replace("          ","")
 					//alert('tamanho: '+ret[6].length)
@@ -2906,7 +2910,7 @@ label {
 					//alert('prerelato: '+ret[3])
 					$("#melhoria").val(ret[3])
 					$("#recomendacoes").val(ret[4])
-					$("#manchete").val(ret[5])			
+					$("#manchete").val(ret[5])		
 					//alert('tamanho: '+ret[6].length)
 					$("#frmreincInsp").val(ret[6])
 					$("#frmreincGrup").val(ret[7])
@@ -3093,7 +3097,12 @@ label {
 					$('#manchete').focus()
 					return false
 				}
-
+				let frmmanchete = $('#manchete').val()
+				frmmanchete = frmmanchete.length
+				let tamanchete = $('#tamanchete').val()	
+				if(tamanchete != 0 && frmmanchete == tamanchete){
+					if(confirm('Inspetor(a), \n\nA manchete deve retratar a não conformidade registrada. \n\nProsseguir sem o ajuste da manchete?')){}else{return false}
+				}			
 				if (melhoria.length < 100 || recomedar.length < 100)
 				{
 					alert('Inspetor(a), para avaliação "NÃO CONFORME", o campo "Situação Encontrada e/ou Orientações" deve conter, no mínimo, 100 caracteres')
