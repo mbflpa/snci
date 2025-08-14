@@ -940,7 +940,7 @@
                                             </cfif>
                                         </div>
                                         <cfif item.valorEnvolvido GT 0>
-                                            <div class="valor-envolvido">Valor Envolvido:<br>R$ <span class="valor-formatada" data-valor="<cfoutput>#item.valorEnvolvido#</cfoutput>">0,00</span></div>
+                                            <div class="valor-envolvido">Total Envolvido:<br>R$ <span class="valor-formatada" data-valor="<cfoutput>#item.valorEnvolvido#</cfoutput>">0,00</span></div>
                                         </cfif>
                                     </div>
                                     <div class="period-card previous">
@@ -957,7 +957,7 @@
                                             <div class="eventos-container">eventos <cfif item.anterior GT 0>(<cfoutput>#item.percentualAnterior#%</cfoutput>)</cfif></div>
                                         </cfif>
                                         <cfif NOT isJaneiro AND structKeyExists(item, "valorEnvolvidoAnterior") AND item.valorEnvolvidoAnterior GT 0>
-                                            <div class="valor-envolvido">Valor Envolvido:<br>R$ <span class="valor-formatada" data-valor="<cfoutput>#item.valorEnvolvidoAnterior#</cfoutput>">0,00</span></div>
+                                            <div class="valor-envolvido">Total Envolvido:<br>R$ <span class="valor-formatada" data-valor="<cfoutput>#item.valorEnvolvidoAnterior#</cfoutput>">0,00</span></div>
                                         </cfif>
                                     </div>
                                 </div>
