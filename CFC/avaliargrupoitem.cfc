@@ -18,7 +18,7 @@
             </cfcatch>
         </cftry>
         <cfreturn rsqtd>
-    </cffunction>	
+    </cffunction>
     <cffunction name="grupoitemreanalise" access="remote" returntype="any">
 		<cfargument name="grpacesso" required="true">
         <cfargument name="numinspecao" required="true">
@@ -42,7 +42,7 @@
 		
 			<!--- Update na tabela Resultado_Inspecao--->
 			<cfquery name="rsreanalise" datasource="DBSNCI">
-				select RIP_Recomendacao_Inspetor, RIP_Critica_Inspetor
+				select RIP_Critica_Inspetor
 				from Resultado_Inspecao 
 				where RIP_NumInspecao = '#numinspecao#' and RIP_NumGrupo = #grp# and RIP_NumItem = #itm#
 			</cfquery>
