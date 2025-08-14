@@ -521,7 +521,7 @@
             });
 
             tour.addStep({
-                title: 'Bem-vindo ao Tour!',
+                title: 'Bem-vindo!',
                 text: 'Este tour irá guiá-lo pelas principais funcionalidades desta página. Vamos começar?',
                 attachTo: {
                     element: '#startTourBtn',
