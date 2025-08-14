@@ -261,7 +261,8 @@
         border:none!important;
         padding-left: 0!important;
         padding-right: 0!important;
-        min-height: 63px;
+        min-height: 63px!important;
+        background-color: transparent!important;
     }
     .snci-desempenho-assunto {
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -923,7 +924,7 @@
                                          <cfif len(trim(tabelaEvidencia)) AND item.atual GT 0 AND NOT mesAtualEhMaiorDisponivel>
                                          title="Evidências disponíveis apenas para o período mais recente"
                                          </cfif>
-                                         </cfif>>
+                                         </cfif> ><span class="iconeEvidencias"></span>
                                         <div class="period-label"><cfoutput>#abreviarMes(nomeMesAtual)#</cfoutput></div>
                                         <div class="period-value">
                                             <cfoutput>#item.atual#</cfoutput>
@@ -974,7 +975,7 @@
             <i class="fas fa-info-circle mr-2" style="color: #457b9d;"></i>
             <strong class="highlight">Evidências:</strong> Os meses que exibem o ícone 
             <span><i class="fas fa-eye" style="color: #457b9d;"></i></span> 
-            possuem uma tabela de evidências disponível para consulta detalhada. Clique no card com a quantidade de eventos para consultar.
+            possuem uma tabela de evidências disponível para consulta detalhada. Clique no quadro com a quantidade de eventos para consultar.
             <br>
             <small><strong>Observação:</strong> Atualmente, as evidências estão disponíveis apenas para o último mês.</small>
         </div>
@@ -1409,7 +1410,7 @@
 
         // Debug: verificar se existem cards clicáveis ao carregar a página
         setTimeout(function() {
-            const cardsClicaveis = $('.period-card.evidencias-clickable');
+            const cardsClicaveis = $('.f.evidencias-clickable');
             const cardsTotal = $('.period-card.current');
 
             // Mostrar informações de cada card
