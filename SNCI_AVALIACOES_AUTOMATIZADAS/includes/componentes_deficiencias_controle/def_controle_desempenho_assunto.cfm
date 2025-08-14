@@ -261,7 +261,8 @@
         border:none!important;
         padding-left: 0!important;
         padding-right: 0!important;
-        min-height: 63px;
+        min-height: 63px!important;
+        background-color: transparent!important;
     }
     .snci-desempenho-assunto {
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -974,7 +975,7 @@
             <i class="fas fa-info-circle mr-2" style="color: #457b9d;"></i>
             <strong class="highlight">Evidências:</strong> Os meses que exibem o ícone 
             <span><i class="fas fa-eye" style="color: #457b9d;"></i></span> 
-            possuem uma tabela de evidências disponível para consulta detalhada. Clique no card com a quantidade de eventos para consultar.
+            possuem uma tabela de evidências disponível para consulta detalhada. Clique no quadro com a quantidade de eventos para consultar.
             <br>
             <small><strong>Observação:</strong> Atualmente, as evidências estão disponíveis apenas para o último mês.</small>
         </div>
