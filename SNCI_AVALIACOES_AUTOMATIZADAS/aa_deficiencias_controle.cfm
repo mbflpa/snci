@@ -71,100 +71,89 @@
             }
         }
 
+
+        /*TOUR*/  
         /* Modern and fluid Shepherd.js styles using Correios color palette */
         .shepherd-element {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            background: #fff;
-            border-radius: 8px;
-            border: 1px solid var(--azul_correios, #00416B);
-            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
-            max-width: 380px;
-            opacity: 0;
-            transform: scale(0.95) translateY(10px);
-            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif!important;
+            background: #fff!important;
+            border-radius: 8px!important;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15)!important;
+            max-width: 380px!important;
+            opacity: 0!important;
+            transform: scale(0.95) translateY(10px)!important;
+            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out!important
         }
 
         .shepherd-element.shepherd-enabled {
-            opacity: 1;
-            transform: scale(1) translateY(0);
+            opacity: 1!important;
+            transform: scale(1) translateY(0)!important;
         }
 
         .shepherd-header {
-            background: linear-gradient(135deg, var(--azul_correios, #00416B), var(--azul_claro_correios, #0083CA));
-            color: #fff;
-            padding: 0.75rem 1rem;
-            border-top-left-radius: 7px;
-            border-top-right-radius: 7px;
+            background: linear-gradient(135deg, var(--azul_correios, #00416B), var(--azul_claro_correios, #0083CA))!important;
+            color: #fff!important;
+            padding: 0.75rem 1rem!important;
+            border-top-left-radius: 7px!important;
+            border-top-right-radius: 7px!important;
         }
+     
 
         .shepherd-title {
-            font-weight: 600;
-            font-size: 1rem;
+            font-weight: 600!important;
+            font-size: 1rem!important;
+            color: #fff!important;
+           
         }
 
         .shepherd-text {
-            padding: 1rem;
-            color: #495057;
-            font-size: 0.9rem;
-            line-height: 1.6;
+            padding: 1rem!important;
+            color: #495057!important;
+            font-size: 0.9rem!important;
+            line-height: 1.6!important;
+            text-align: justify!important;
         }
 
         .shepherd-footer {
-            border-top: 1px solid #dee2e6;
-            padding: 0.75rem 1rem;
-        }
+            border-top: 1px solid #dee2e6!important;
+            padding: 0.75rem 1rem!important;
+            justify-content: space-between!important;
 
         .shepherd-button {
-            background: var(--amarelo_prisma_escuro_correios, #FFC20E);
-            color: var(--azul_correios, #00416B);
-            border: none;
-            border-radius: 5px;
-            padding: 0.5rem 1rem;
-            font-weight: bold;
-            transform: translateY(0);
-            transition: all 0.2s ease;
+            background: var(--amarelo_prisma_escuro_correios, #FFC20E)!important;
+            color: var(--azul_correios, #00416B)!important;
+            border: none!important;
+            border-radius: 5px!important;
+            padding: 0.5rem 1rem!important;
+            font-weight: bold!important;
+            transform: translateY(0)!important;
+            transition: all 0.2s ease!important;
         }
 
         .shepherd-button:hover {
-            background: var(--amarelo_correios, #FFD400);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            background: var(--amarelo_correios, #FFD400)!important;
+            transform: translateY(-2px)!important;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1)!important;
         }
 
         .shepherd-button.shepherd-button-secondary {
-            background: #e9ecef;
-            color: #495057;
+            background: #e9ecef!important;
+            color: #495057!important;
         }
 
         .shepherd-button.shepherd-button-secondary:hover {
-            background: #ced4da;
+            background: #ced4da!important;
         }
 
         .shepherd-cancel-icon {
-            color: #fff;
-            opacity: 0.8;
+            color: #fff!important;
+            opacity: 0.8!important;
         }
         .shepherd-cancel-icon:hover {
-            opacity: 1;
+            opacity: 1!important;
         }
 
-        .shepherd-arrow::before {
-            background-color: var(--azul_correios, #00416B);
-        }
-
-        .shepherd-arrow::after {
-            content: '';
-            position: absolute;
-            top: 1px;
-            left: 1px;
-            width: 14px;
-            height: 14px;
-            background: #fff;
-            transform: rotate(45deg);
-            z-index: 1;
-            border-right: 1px solid var(--azul_correios, #00416B);
-            border-bottom: 1px solid var(--azul_correios, #00416B);
-        }
+      
 
     </style>
 </head>
@@ -180,8 +169,8 @@
                 <div class="container-fluid">
                     <div class="row">
                         <div class="col-12">
-                            <h3 class="m-3" style="padding-bottom: 0!important;margin-bottom: 0!important;">Avaliação Geral - Deficiência do Controle
-                                <i class="fas fa-info-circle info-icon-automatizadas" style="position: relative;right: 3px;bottom: 13px;font-size: 1rem;" 
+                            <h3 class="tituloPagina m-3 " style="padding-bottom: 0!important;margin-bottom: 0!important;">Avaliação Geral - Deficiência do Controle
+                                <i class="fa-regular fa-circle-question info-icon-automatizadas" style="position: relative;right: 3px;bottom: 13px;font-size: 1rem;" 
                                     data-toggle="popover" 
                                     data-trigger="hover" 
                                     data-placement="right"
@@ -245,6 +234,10 @@
         tour.addStep({
             title: 'Bem-vindo ao Tour!',
             text: 'Este tour irá guiá-lo pelas principais funcionalidades desta página. Vamos começar?',
+            attachTo: {
+                element: '#startTourBtn',
+                on: 'bottom'
+            },
             buttons: [
                 {
                     action() { return this.cancel(); },
@@ -302,7 +295,7 @@
 
         tour.addStep({
             title: 'Resumo Geral',
-            text: 'Este painel apresenta um resumo dos principais indicadores, como o número de testes aplicados, conformidades e deficiências encontradas.',
+            text: 'Este painel apresenta diferentes métricas, acumuladas de jan do ano atual até o mês selecionado no filtro.',
             attachTo: {
                 element: '.snci-resumo-geral',
                 on: 'bottom'
@@ -326,8 +319,8 @@
         });
 
         tour.addStep({
-            title: 'Detalhes do Indicador',
-            text: 'Cada cartão mostra um indicador específico. Passe o mouse sobre o ícone de informação para ver a definição detalhada.',
+            title: 'Cartão da Métrica',
+            text: 'Cada cartão mostra uma métrica específica. Passe o mouse sobre o ícone  <strong><i class="fa-regular fa-circle-question"></i></strong> para ver a definição detalhada.<br> Obs.: Em qualquer elemento desta página, sempre que este ícone for exibido, você pode obter mais informações sobre métricas, definições, explicações, dados extras, etc.',
             attachTo: {
                 element: '.kpi-card:first-child',
                 on: 'bottom'
@@ -377,7 +370,7 @@
         
         tour.addStep({
             title: 'Navegação do Carrossel',
-            text: 'Use estas setas para navegar entre os diferentes assuntos.',
+            text: 'Use estas setas para navegar entre os diferentes assuntos ou use a barra de rolagem.',
             attachTo: {
                 element: '.carousel-controls',
                 on: 'top'
@@ -402,9 +395,9 @@
 
         tour.addStep({
             title: 'Visualizar Evidências',
-            text: 'Clique no ícone de olho para ver as evidências detalhadas dos eventos encontrados. O ícone aparece no canto superior direito do cartão.',
+            text: 'Quando o ícone <i class="fa-solid fa-eye"></i> estiver visível, clique no cartão para ver as evidências detalhadas dos respectivos eventos. O ícone aparece no canto superior direito do cartão.',
             attachTo: {
-                element: '.performance-card.evidencias-clickable',
+                element: '.current',
                 on: 'top-end'
             },
             buttons: [
@@ -420,10 +413,107 @@
                 },
                 {
                     action() { return this.next(); },
+                    text: 'Avançar'
+                }
+            ]
+        });
+
+        tour.addStep({
+            title: 'Assunto reincidente',
+            text: 'Assuntos reincidentes são aqueles com, pelo menos, um evento aparecendo no mês atual e também no mês anterior.',
+            attachTo: {
+                element: '.badge-reincidente',
+                on: 'right'
+            },
+            buttons: [
+                {
+                    action() { return this.cancel(); },
+                    classes: 'shepherd-button-secondary',
+                    text: 'Fechar'
+                },
+                {
+                    action() { return this.back(); },
+                    classes: 'shepherd-button-secondary',
+                    text: 'Voltar'
+                },
+                {
+                    action() { return this.next(); },
+                    text: 'Avançar'
+                }
+            ]
+        });
+
+        tour.addStep({
+            title: 'Valor Envolvido',
+            text: 'Sempre que eventos do assunto apresentarem valores envolvidos, o total do mês será exibido no cartão correspondente.',
+            attachTo: {
+                element: '.valor-envolvido',
+                on: 'right'
+            },
+            buttons: [
+                {
+                    action() { return this.cancel(); },
+                    classes: 'shepherd-button-secondary',
+                    text: 'Fechar'
+                },
+                {
+                    action() { return this.back(); },
+                    classes: 'shepherd-button-secondary',
+                    text: 'Voltar'
+                },
+                {
+                    action() { return this.next(); },
+                    text: 'Avançar'
+                }
+            ]
+        });
+
+        tour.addStep({
+            title: 'Informações sobre o Assunto',
+            text: 'Dê especial atenção às informações apresentadas neste ícone <strong><i class="fa-regular fa-circle-question"></i></strong>. Ele mostra detalhes importantes sobre o assunto.',
+            attachTo: {
+                element: '.card-title',
+                on: 'top-end'
+            },
+            buttons: [
+                {
+                    action() { return this.cancel(); },
+                    classes: 'shepherd-button-secondary',
+                    text: 'Fechar'
+                },
+                {
+                    action() { return this.back(); },
+                    classes: 'shepherd-button-secondary',
+                    text: 'Voltar'
+                },
+                {
+                    action() { return this.next(); },
+                    text: 'Avançar'
+                }
+            ]
+        });
+
+        tour.addStep({
+            title: 'Fim do tour',
+            text: 'Chegamos ao final desse tour. Sempre que desejar, você pode reiniciá-lo clicando neste botão.',
+            attachTo: {
+                element: '#startTourBtn',
+                on: 'top-end'
+            },
+            buttons: [
+                
+                {
+                    action() { return this.back(); },
+                    classes: 'shepherd-button-secondary',
+                    text: 'Voltar'
+                },
+                {
+                    action() { return this.next(); },
                     text: 'Finalizar'
                 }
             ]
         });
+
 
         if (!localStorage.getItem('tourVisto')) {
             tour.start();
