@@ -258,95 +258,84 @@
     
 <style>
     .card-header {
-        border:none!important;
-        padding-left: 0!important;
-        padding-right: 0!important;
-        min-height: 63px!important;
-        background-color: transparent!important;
+        border: none !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        min-height: 3.9375rem;
     }
     .snci-desempenho-assunto {
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         width: 100%;
         margin: 0;
         padding: 0;
-        margin-bottom: 30px;
+        margin-bottom: 1.875rem;
     }
-
     .snci-desempenho-assunto .desempenho-container {
         background: #fff;
-        padding: 24px;
+        padding: 1.5rem;
         width: 100%;
         box-sizing: border-box;
     }
-
     .snci-desempenho-assunto .container-header {
-        border-radius: 8px 8px 0 0;
-        padding-top: 20px;
+        border-radius: 0.5rem 0.5rem 0 0;
+        padding-top: 1.25rem;
         padding-left: 0;
         padding-right: 0;
     }
-
     .snci-desempenho-assunto .container-header h2 {
         font-size: 1.25rem;
         font-weight: 600;
-        margin-bottom: 16px;
+        margin-bottom: 1rem;
         color: #1e293b;
-        padding-bottom: 6px;
+        padding-bottom: 0.375rem;
         position: relative;
         text-align: left;
     }
-
     .snci-desempenho-assunto .container-header h2::after {
         content: '';
         position: absolute;
         bottom: 0;
         left: 0;
         width: 100%;
-        height: 2px;
+        height: 0.125rem;
         background: linear-gradient(90deg, #457b9d, #a8dadc);
-        border-radius: 1px;
+        border-radius: 0.0625rem;
     }
-
     .snci-desempenho-assunto .subtitle {
         font-size: 0.9rem;
         color: #64748b;
-        margin: 8px 0 0 0;
+        margin: 0.5rem 0 0 0;
         font-weight: 500;
         text-align: left;
     }
-
-    /* Carrossel */
     .snci-desempenho-assunto .carousel-container {
         position: relative;
-        overflow-x: auto; /* Permite barra de rolagem horizontal */
+        overflow-x: auto;
         overflow-y: visible;
-        padding: 0 60px;
+        padding: 0 3.75rem;
         width: 100%;
-        padding-top: 10px;
+        padding-top: 0.625rem;
         scrollbar-width: thin;
         scrollbar-color: #457b9d #e2e8f0;
-        
     }
     .snci-desempenho-assunto .carousel-track {
         display: flex;
-        gap: 24px;
-        width: max-content; /* Garante largura para scroll */
+        gap: 1.5rem;
+        width: max-content;
         min-width: 100%;
         transition: transform 0.5s ease-in-out;
-        /* Remover cursor: grab */
         user-select: none;
         -webkit-user-select: none;
         -moz-user-select: none;
         -ms-user-select: none;
     }
-    /* Barra de rolagem customizada para navegadores Webkit */
     .snci-desempenho-assunto .carousel-container::-webkit-scrollbar {
-        height: 12px;
+        height: 0.75rem;
         cursor: pointer;
     }
     .snci-desempenho-assunto .carousel-container::-webkit-scrollbar-thumb {
         background: #457b9d;
-        border-radius: 6px;
+        border-radius: 0.375rem;
         cursor: pointer;
     }
     .snci-desempenho-assunto .carousel-container::-webkit-scrollbar-thumb:hover {
@@ -355,93 +344,81 @@
     }
     .snci-desempenho-assunto .carousel-container::-webkit-scrollbar-track {
         background: #e2e8f0;
-        border-radius: 6px;
+        border-radius: 0.375rem;
         cursor: pointer;
     }
-    
     .snci-desempenho-assunto .carousel-controls {
         position: absolute;
         top: 50%;
         transform: translateY(-50%);
         background: #fff;
-        border: 2px solid #e2e8f0;
+        border: 0.125rem solid #e2e8f0;
         border-radius: 50%;
-        width: 45px;
-        height: 45px;
+        width: 2.8125rem;
+        height: 2.8125rem;
         display: flex;
         align-items: center;
         justify-content: center;
         cursor: pointer;
         z-index: 10;
         transition: all 0.3s ease;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.15);
     }
-
     .snci-desempenho-assunto .carousel-controls:hover {
         background: #f8fafc;
         border-color: #457b9d;
         transform: translateY(-50%) scale(1.1);
-        box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+        box-shadow: 0 0.375rem 1.25rem rgba(0, 0, 0, 0.2);
     }
-
     .snci-desempenho-assunto .carousel-controls.disabled {
         opacity: 0.3;
         cursor: not-allowed;
         pointer-events: none;
     }
-
     .snci-desempenho-assunto .carousel-prev {
-        left: 10px;
+        left: 0.625rem;
     }
-
     .snci-desempenho-assunto .carousel-next {
-        right: 70px;
+        right: 4.375rem;
     }
-
     .snci-desempenho-assunto .carousel-controls i {
         color: #457b9d;
-        font-size: 18px;
+        font-size: 1.125rem;
     }
-
-    /* Cards */
     .snci-desempenho-assunto .performance-card {
-        flex: 0 0 250px;
+        flex: 0 0 15.625rem;
         background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
-        border-radius: 16px;
-        padding: 10px;
-        border: 1px solid #e2e8f0;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        border-radius: 1rem;
+        padding: 0.625rem;
+        border: 0.0625rem solid #e2e8f0;
+        box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.08);
         transition: all 0.3s ease;
         position: relative;
         overflow: hidden;
-        min-height: 200px;
-        margin-bottom: 10px;
+        min-height: 12.5rem;
+        margin-bottom: 0.625rem;
     }
-
     .snci-desempenho-assunto .performance-card::before {
         content: '';
         position: absolute;
         top: 0;
         left: 0;
         right: 0;
-        height: 4px;
+        height: 0.25rem;
         background: linear-gradient(90deg, #457b9d, #a8dadc);
     }
-
     .snci-desempenho-assunto .performance-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        transform: translateY(-0.25rem);
+        box-shadow: 0 0.5rem 1.5625rem rgba(0, 0, 0, 0.15);
         border-color: #cbd5e1;
     }
-
-
     .snci-desempenho-assunto .card-title {
         font-size: 0.6rem;
         font-weight: 700;
         color: #1e293b;
         line-height: 1.2;
         text-transform: uppercase;
-        letter-spacing: 0.5px;
+        letter-spacing: 0.0313rem;
         text-align: center;
         display: block;
         width: 100%;
@@ -449,10 +426,8 @@
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
-        text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        text-shadow: 0 0.0625rem 0.125rem rgba(0, 0, 0, 0.1);
     }
-    
-
     .snci-desempenho-assunto .card-subtitle {
         font-size: 0.7rem;
         color: #64748b;
@@ -462,98 +437,81 @@
         display: block;
         width: 100%;
     }
-
     .snci-desempenho-assunto .card-metrics {
-        margin-bottom: 20px;
+        margin-bottom: 1.25rem;
     }
-
     .snci-desempenho-assunto .metric-row {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 12px;
-        padding: 8px 12px;
-        background: rgba(255,255,255,0.6);
-        border-radius: 8px;
+        margin-bottom: 0.75rem;
+        padding: 0.5rem 0.75rem;
+        background: rgba(255, 255, 255, 0.6);
+        border-radius: 0.5rem;
     }
-
     .snci-desempenho-assunto .metric-row:last-child {
         margin-bottom: 0;
     }
-
     .snci-desempenho-assunto .metric-label {
         font-size: 0.85rem;
         color: #475569;
         font-weight: 500;
     }
-
     .snci-desempenho-assunto .metric-value {
         font-size: 1.1rem;
         font-weight: 600;
         color: #1e293b;
     }
-
-    /* Barras de progresso */
     .snci-desempenho-assunto .progress-section {
-        margin-bottom: 0px;
+        margin-bottom: 0;
     }
-
-    /* Nova seção de comparação moderna */
     .snci-desempenho-assunto .comparison-section {
         background: transparent;
     }
-
     .snci-desempenho-assunto .comparison-grid {
         display: grid;
         grid-template-columns: 1fr 1fr;
-        gap: 12px;
-        margin-bottom: 16px;
+        gap: 0.75rem;
+        margin-bottom: 1rem;
     }
-
     .snci-desempenho-assunto .period-card {
         background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
-        border-radius: 10px;
-        padding: 12px;
+        border-radius: 0.625rem;
+        padding: 0.75rem;
         text-align: center;
-        border: 2px solid transparent;
+        border: 0.125rem solid transparent;
         transition: all 0.3s ease;
         position: relative;
         overflow: hidden;
     }
-
     .snci-desempenho-assunto .period-card::before {
         content: '';
         position: absolute;
         top: 0;
         left: 0;
         right: 0;
-        height: 3px;
+        height: 0.1875rem;
         transition: all 0.3s ease;
     }
-
     .snci-desempenho-assunto .period-card.current::before {
         background: linear-gradient(90deg, #457b9d, #1e3d59);
     }
-
     .snci-desempenho-assunto .period-card.previous::before {
         background: linear-gradient(90deg, #a8dadc, #7fb3d3);
     }
-
     .snci-desempenho-assunto .period-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(69, 123, 157, 0.15);
+        transform: translateY(-0.125rem);
+        box-shadow: 0 0.25rem 0.75rem rgba(69, 123, 157, 0.15);
         border-color: rgba(69, 123, 157, 0.2);
     }
-
     .snci-desempenho-assunto .period-label {
         font-size: 0.7rem;
         font-weight: 600;
         color: #64748b;
-        margin-bottom: 4px;
+        margin-bottom: 0.25rem;
         text-transform: uppercase;
-        letter-spacing: 0.5px;
+        letter-spacing: 0.0313rem;
     }
-
     .snci-desempenho-assunto .period-value {
         font-size: 1.8rem;
         font-weight: 700;
@@ -562,168 +520,128 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        gap: 6px;
+        gap: 0.375rem;
     }
-
     .snci-desempenho-assunto .period-card.current .period-value {
         color: #457b9d;
     }
-
     .snci-desempenho-assunto .period-card.previous .period-value {
         color: #7fb3d3;
     }
-
     .snci-desempenho-assunto .value-icon {
         font-size: 1.2rem;
         opacity: 0.7;
     }
-
-    /* Indicador de tendência aprimorado */
     .snci-desempenho-assunto .trend-indicator {
         display: flex;
         align-items: center;
         justify-content: center;
-        border-radius: 10px;
+        border-radius: 0.625rem;
         font-size: 0.8rem;
         font-weight: 600;
-        background: rgba(255,255,255,0.6);
-        border: 2px solid transparent;
+        background: rgba(255, 255, 255, 0.6);
+        border: 0.125rem solid transparent;
         transition: all 0.3s ease;
     }
-
     .snci-desempenho-assunto .trend-indicator:hover {
         transform: scale(1.02);
     }
-
     .snci-desempenho-assunto .trend-icon {
         font-size: 1.1rem;
         display: flex;
         align-items: center;
         justify-content: center;
-        width: 24px;
-        height: 24px;
+        width: 1.5rem;
+        height: 1.5rem;
         border-radius: 50%;
-        background: rgba(255,255,255,0.8);
+        background: rgba(255, 255, 255, 0.8);
     }
-
-    /* Vermelho adobe para aumento */
     .snci-desempenho-assunto .trend-indicator.increase {
         color: #e63946;
         border-color: rgba(230, 57, 70, 0.2);
         background: rgba(254, 226, 226, 0.4);
     }
-
-    /* Verde para redução */
     .snci-desempenho-assunto .trend-indicator.decrease {
         color: #059669;
         border-color: rgba(5, 150, 105, 0.2);
         background: rgba(209, 250, 229, 0.4);
     }
-
     .snci-desempenho-assunto .trend-indicator.stable {
         color: #6b7280;
         border-color: rgba(107, 114, 128, 0.2);
         background: rgba(243, 244, 246, 0.4);
     }
-
     .snci-desempenho-assunto .trend-text {
         display: flex;
         align-items: center;
-        gap: 4px;
+        gap: 0.25rem;
     }
-
     .snci-desempenho-assunto .trend-percentage {
         font-size: 0.9rem;
         font-weight: 700;
     }
-
     .snci-desempenho-assunto .trend-label {
         font-size: 0.7rem;
         opacity: 0.8;
         text-transform: lowercase;
     }
-
     .performance-card.empty-card::before {
         display: none !important;
         content: none !important;
     }
-
-    /* Background vermelho discreto para cards com valor atual > 0 */
     .snci-desempenho-assunto .performance-card.has-current-value {
         background: linear-gradient(135deg, rgba(220, 38, 38, 0.15) 0%, rgba(248, 113, 113, 0.08) 100%);
         border-color: rgba(220, 38, 38, 0.25);
     }
-
     .snci-desempenho-assunto .performance-card.has-current-value:hover {
         background: linear-gradient(135deg, rgba(220, 38, 38, 0.2) 0%, rgba(248, 113, 113, 0.12) 100%);
         border-color: rgba(220, 38, 38, 0.35);
     }
-
-    /* Ajustar borda superior dos cards com valor atual */
     .snci-desempenho-assunto .performance-card.has-current-value::before {
         background: linear-gradient(90deg, #dc2626, #ef4444);
     }
-
-    /* Ajustar cores dos period-cards internos para melhor contraste */
     .snci-desempenho-assunto .performance-card.has-current-value .period-card {
         background: rgba(255, 255, 255, 0.85);
-        border: 1px solid rgba(220, 38, 38, 0.1);
+        border: 0.0625rem solid rgba(220, 38, 38, 0.1);
     }
-
     .snci-desempenho-assunto .performance-card.has-current-value .period-card:hover {
         background: rgba(255, 255, 255, 0.95);
         border-color: rgba(220, 38, 38, 0.2);
     }
-
-    /* Ajustar indicador de tendência para melhor contraste */
     .snci-desempenho-assunto .performance-card.has-current-value .trend-indicator {
         background: rgba(255, 255, 255, 0.8);
         border-color: rgba(220, 38, 38, 0.15);
     }
-
-    /* Background verde para cards com redução (decrease) */
     .snci-desempenho-assunto .performance-card.has-reduction {
         background: linear-gradient(135deg, rgba(5, 150, 105, 0.15) 0%, rgba(34, 197, 94, 0.08) 100%);
         border-color: rgba(5, 150, 105, 0.25);
     }
-
     .snci-desempenho-assunto .performance-card.has-reduction:hover {
         background: linear-gradient(135deg, rgba(5, 150, 105, 0.2) 0%, rgba(34, 197, 94, 0.12) 100%);
         border-color: rgba(5, 150, 105, 0.35);
     }
-
-    /* Ajustar borda superior dos cards com redução */
     .snci-desempenho-assunto .performance-card.has-reduction::before {
         background: linear-gradient(90deg, #059669, #22c55e);
     }
-
-    /* Ajustar cores dos period-cards internos para melhor contraste */
     .snci-desempenho-assunto .performance-card.has-reduction .period-card {
         background: rgba(255, 255, 255, 0.85);
-        border: 1px solid rgba(5, 150, 105, 0.1);
+        border: 0.0625rem solid rgba(5, 150, 105, 0.1);
     }
-
     .snci-desempenho-assunto .performance-card.has-reduction .period-card:hover {
         background: rgba(255, 255, 255, 0.95);
         border-color: rgba(5, 150, 105, 0.2);
     }
-
-    /* Ajustar indicador de tendência para cards com redução */
     .snci-desempenho-assunto .performance-card.has-reduction .trend-indicator {
         background: rgba(255, 255, 255, 0.8);
         border-color: rgba(5, 150, 105, 0.15);
     }
-
-    /* Estilo para o container dos eventos com posicionamento relativo */
     .snci-desempenho-assunto .eventos-container {
         position: relative;
-        font-size: 0.7rem; 
-        color: #64748b; 
+        font-size: 0.7rem;
+        color: #64748b;
         text-align: center;
-        margin-top: -4px; /* Move a div "eventos" um pouco mais para cima */
+        margin-top: -0.25rem;
     }
-
-    /* Estilo para centralizar o badge reincidente */
     .snci-desempenho-assunto .badge-reincidente {
         position: relative;
         font-size: 0.65rem;
@@ -732,8 +650,6 @@
         z-index: 5;
         white-space: nowrap;
     }
-
-    /* Estilo para o valor envolvido */
     .valor-envolvido {
         display: block;
         font-size: 0.6rem;
@@ -741,73 +657,79 @@
         font-weight: 600;
         text-align: center;
         background: rgba(255, 255, 255, 0.95);
-        border-radius: 4px;
-        border: 1px solid #e5e7eb;
-        box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        border-radius: 0.25rem;
+        border: 0.0625rem solid #e5e7eb;
+        box-shadow: 0 0.0625rem 0.125rem rgba(0, 0, 0, 0.1);
     }
-
-    /* Estilo para cards clicáveis com evidências */
     .snci-desempenho-assunto .period-card.evidencias-clickable {
         cursor: pointer;
-     
         position: relative;
     }
-
-    
-
     .snci-desempenho-assunto .period-card.evidencias-clickable::after {
-        content: "\f06e";               /* Unicode do fa-eye */
+        content: "\f06e";
         font-family: "Font Awesome 6 Free";
         font-weight: 900;
         color: #457b9d;
         position: absolute;
-        top: 5px;
-        right: 5px;
+        top: 0.3125rem;
+        right: 0.3125rem;
         font-size: 0.8rem;
         transition: opacity 0.3s ease;
     }
-
     .snci-desempenho-assunto .period-card.evidencias-clickable:hover::after {
         opacity: 1;
     }
-
-    /* Estilo para o rodapé informativo */
     .snci-desempenho-assunto .info-footer {
-        margin-top: 5px;
-        padding: 5px;
+        margin-top: 0.3125rem;
+        padding: 0.3125rem;
         background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
-        border: 1px solid #e2e8f0;
-        border-radius: 12px;
+        border: 0.0625rem solid #e2e8f0;
+        border-radius: 0.75rem;
         font-size: 0.85rem;
         color: #64748b;
         text-align: center;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.06);
     }
-
     .snci-desempenho-assunto .info-footer .icon-demo {
         display: inline-block;
-        margin: 0 4px;
-        padding: 2px 6px;
+        margin: 0 0.25rem;
+        padding: 0.125rem 0.375rem;
         background: rgba(69, 123, 157, 0.1);
-        border-radius: 4px;
+        border-radius: 0.25rem;
         font-family: 'Font Awesome 5 Free';
         font-weight: 900;
         color: #457b9d;
     }
-
     .snci-desempenho-assunto .info-footer .highlight {
         font-weight: 600;
         color: #457b9d;
     }
-
-        /* Aumentar largura dos popovers Bootstrap */
     .popover {
-        max-width: 420px !important;
-        width: 420px !important;
+        max-width: 26.25rem !important;
+        width: 26.25rem !important;
     }
-
-
-
+    @media (max-width: 768px) {
+        .snci-desempenho-assunto .carousel-track {
+            gap: 1rem;
+        }
+        .snci-desempenho-assunto .performance-card {
+            flex: 0 0 14.375rem;
+        }
+    }
+    @media (max-width: 480px) {
+        .snci-desempenho-assunto .desempenho-container {
+            padding: 1rem;
+        }
+        .snci-desempenho-assunto .carousel-container {
+            padding: 0 0.625rem;
+        }
+        .snci-desempenho-assunto .carousel-controls {
+            display: none;
+        }
+        .snci-desempenho-assunto .performance-card {
+            flex: 0 0 12.5rem;
+        }
+    }
 </style>
 
 <div class="snci-desempenho-assunto">
@@ -940,7 +862,7 @@
                                             </cfif>
                                         </div>
                                         <cfif item.valorEnvolvido GT 0>
-                                            <div class="valor-envolvido">Total Envolvido:<br>R$ <span class="valor-formatada" data-valor="<cfoutput>#item.valorEnvolvido#</cfoutput>">0,00</span></div>
+                                            <div class="valor-envolvido">Valor Envolvido:<br>R$ <span class="valor-formatada" data-valor="<cfoutput>#item.valorEnvolvido#</cfoutput>">0,00</span></div>
                                         </cfif>
                                     </div>
                                     <div class="period-card previous">
@@ -957,7 +879,7 @@
                                             <div class="eventos-container">eventos <cfif item.anterior GT 0>(<cfoutput>#item.percentualAnterior#%</cfoutput>)</cfif></div>
                                         </cfif>
                                         <cfif NOT isJaneiro AND structKeyExists(item, "valorEnvolvidoAnterior") AND item.valorEnvolvidoAnterior GT 0>
-                                            <div class="valor-envolvido">Total Envolvido:<br>R$ <span class="valor-formatada" data-valor="<cfoutput>#item.valorEnvolvidoAnterior#</cfoutput>">0,00</span></div>
+                                            <div class="valor-envolvido">Valor Envolvido:<br>R$ <span class="valor-formatada" data-valor="<cfoutput>#item.valorEnvolvidoAnterior#</cfoutput>">0,00</span></div>
                                         </cfif>
                                     </div>
                                 </div>
@@ -975,7 +897,7 @@
             <i class="fas fa-info-circle mr-2" style="color: #457b9d;"></i>
             <strong class="highlight">Evidências:</strong> Os meses que exibem o ícone 
             <span><i class="fas fa-eye" style="color: #457b9d;"></i></span> 
-            possuem uma tabela de evidências disponível para consulta detalhada. Clique no quadro com a quantidade de eventos para consultar.
+            possuem uma tabela de evidências disponível para consulta detalhada. Clique no card com a quantidade de eventos para consultar.
             <br>
             <small><strong>Observação:</strong> Atualmente, as evidências estão disponíveis apenas para o último mês.</small>
         </div>

@@ -105,30 +105,27 @@
 </cfif>
 
 <style>
-    /* Container principal harmonizado com desempenho_assunto */
     .snci-resumo-geral {
-        margin-bottom: 20px;
+        margin-bottom: 1.25rem;
     }
     .snci-resumo-geral .desempenho-container {
         display: flex;
         flex-direction: column;
-        gap: 12px;
+        gap: 0.75rem;
     }
-
     .snci-resumo-geral .comparison-container {
         background: #fff;
-        padding: 12px 16px;
-        border-radius: 12px;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.05);
-        border: 1px solid #e2e8f0;
+        padding: 0.75rem 1rem;
+        border-radius: 0.75rem;
+        box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.05);
+        border: 0.0625rem solid #e2e8f0;
     }
-
     .snci-resumo-geral .comparison-container h2 {
         font-size: 1.25rem;
         font-weight: 600;
-        margin-bottom: 16px;
+        margin-bottom: 1rem;
         color: #1e293b;
-        padding-bottom: 6px;
+        padding-bottom: 0.375rem;
         position: relative;
         text-align: left;
     }
@@ -138,49 +135,44 @@
         bottom: 0;
         left: 0;
         width: 100%;
-        height: 2px;
+        height: 0.125rem;
         background: linear-gradient(90deg, #457b9d, #a8dadc);
-        border-radius: 1px;
+        border-radius: 0.0625rem;
     }
-
-    /* Cards alinhados horizontalmente */
     .snci-resumo-geral .kpi-row {
         display: flex;
         flex-direction: row;
-        gap: 5px;
+        gap: 0.3125rem;
         justify-content: center;
         align-items: stretch;
         flex-wrap: wrap;
     }
-
     .snci-resumo-geral .kpi-card {
         background: #fff;
-        padding: 10px 10px;
-        border-radius: 12px;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+        padding: 0.625rem;
+        border-radius: 0.75rem;
+        box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.05);
         display: flex;
         align-items: center;
-        gap: 10px;
+        gap: 0.625rem;
         text-align: left;
         transition: all 0.3s ease;
-        border: 1px solid #e2e8f0;
-        min-width: 180px;
-        flex: 1 1 180px;
-        max-width: 250px;
+        border: 0.0625rem solid #e2e8f0;
+        min-width: 11.25rem;
+        flex: 1 1 11.25rem;
+        max-width: 15.625rem;
     }
-
     .snci-resumo-geral .kpi-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 16px rgba(0,0,0,0.08);
+        transform: translateY(-0.125rem);
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.08);
     }
-
     .snci-resumo-geral .kpi-card .icon {
         font-size: 1.5rem;
         color: var(--primary-color, #003366);
         background-color: rgba(0, 51, 102, 0.08);
-        height: 44px;
-        width: 44px;
-        border-radius: 10px;
+        height: 2.75rem;
+        width: 2.75rem;
+        border-radius: 0.625rem;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -194,85 +186,67 @@
         color: #2a9d8f;
         background-color: rgba(42, 157, 143, 0.08);
     }
-
     .snci-resumo-geral .kpi-card .text {
         flex: 1;
         min-width: 0;
     }
-    
-    /* Título com ícone de informação */
     .snci-resumo-geral .kpi-card .text .title {
         font-size: 0.85rem;
         color: #64748b;
-        margin-bottom: 4px;
+        margin-bottom: 0.25rem;
         line-height: 1.2;
         font-weight: 500;
         display: flex;
         align-items: center;
-        gap: 6px;
+        gap: 0.375rem;
     }
-    
-    
-    
     .snci-resumo-geral .kpi-card .text .value {
         font-size: 1.2rem;
         font-weight: 600;
         color: #1e293b;
         line-height: 1.2;
     }
-    /* Remover animações */
-    .snci-resumo-geral .fade-in-up {
-        /* removido */
-    }
-    .snci-resumo-geral .fade-in-up.animate {
-        /* removido */
-    }
+    .snci-resumo-geral .fade-in-up,
+    .snci-resumo-geral .fade-in-up.animate,
     .snci-resumo-geral .kpi-card .text .value.loading {
         /* removido */
     }
-
-    /* Responsividade */
     @media (max-width: 1100px) {
         .snci-resumo-geral .kpi-row {
-            flex-wrap: wrap;
-            gap: 12px;
+            gap: 0.75rem;
         }
         .snci-resumo-geral .kpi-card {
-            min-width: 160px;
+            min-width: 10rem;
             max-width: 100%;
         }
-        
         .metric-tooltip {
-            max-width: 250px;
+            max-width: 15.625rem;
         }
     }
     @media (max-width: 768px) {
         .snci-resumo-geral .kpi-row {
             flex-direction: column;
-            gap: 10px;
+            gap: 0.625rem;
         }
         .snci-resumo-geral .kpi-card {
             min-width: 0;
             width: 100%;
-            padding: 12px;
+            padding: 0.75rem;
         }
         .snci-resumo-geral .comparison-container h2 {
             font-size: 1.1rem;
         }
-        
         .metric-tooltip {
-            max-width: 200px;
+            max-width: 12.5rem;
             font-size: 0.75rem;
-            padding: 10px 12px;
+            padding: 0.625rem 0.75rem;
         }
     }
-    
     @media (max-width: 480px) {
         .metric-tooltip {
             max-width: 90vw;
         }
     }
-
     .popover .popover-body {
         text-align: justify !important;
     }
