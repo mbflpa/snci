@@ -439,21 +439,34 @@
       }
 
       // Função para atualizar links do sidebar com filtro de mês
-      function atualizarLinksComFiltroMes() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const mesFiltro = urlParams.get('mesFiltro');
-        
+      function atualizarLinksComFiltroMes(mesFiltro) {
+        // Se mesFiltro não for fornecido, tenta obter da URL
+        if (typeof mesFiltro === 'undefined' || mesFiltro === null || mesFiltro === '') {
+            const urlParams = new URLSearchParams(window.location.search);
+            mesFiltro = urlParams.get('mesFiltro');
+        }
+
         if (mesFiltro) {
-          const navLinks = document.querySelectorAll('.modern-nav-link');
-          
-          navLinks.forEach(link => {
-            const url = new URL(link.href);
-            // Apenas adicionar o filtro se não existir
-            if (!url.searchParams.has('mesFiltro')) {
-              url.searchParams.set('mesFiltro', mesFiltro);
-              link.href = url.toString();
-            }
-          });
+            const navLinks = document.querySelectorAll('.modern-nav-link');
+            
+            navLinks.forEach(link => {
+                try {
+                    const originalHref = link.getAttribute('href');
+                    // Ignorar links que não devem ter o filtro (vazios, âncoras, ou página principal)
+                    if (!originalHref || originalHref.startsWith('#') || originalHref.includes('aa_mensagem_temporaria.cfm')) {
+                        return;
+                    }
+
+                    // Manipula a string do href para manter o caminho relativo
+                    const [path, queryString] = originalHref.split('?');
+                    const params = new URLSearchParams(queryString || '');
+                    params.set('mesFiltro', mesFiltro);
+                    link.setAttribute('href', path + '?' + params.toString());
+
+                } catch (e) {
+                    console.error("Erro ao atualizar o link: ", link.getAttribute('href'), e);
+                }
+            });
         }
       }
 
@@ -471,7 +484,8 @@
         // Aguardar um pouco antes de definir link ativo para dar tempo dos filtros carregarem
         setTimeout(function() {
           setActiveLink();
-          atualizarLinksComFiltroMes();
+          // A função agora é chamada a partir da navbar, mas mantemos aqui como fallback
+          atualizarLinksComFiltroMes(); 
         }, 500);
       });
 

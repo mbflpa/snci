@@ -261,15 +261,21 @@
 			success: function(response) {
 				if (response.success && response.data.length > 0) {
 					renderizarBotoesMeses(response.data);
-					// Após renderizar os botões, verificar URL e atualizar sidebar
+					
+					// Define o mês ativo (do URL ou o padrão)
+					var urlParams = new URLSearchParams(window.location.search);
+					var mesFiltroAtivo = urlParams.get('mesFiltro') || (response.data.length > 0 ? response.data[0].id : null);
+
+					// Atualiza os links da sidebar imediatamente com o mês ativo
+					if (mesFiltroAtivo && typeof atualizarLinksComFiltroMes === 'function') {
+						atualizarLinksComFiltroMes(mesFiltroAtivo);
+					}
+
+					// Funções de UI que podem rodar um pouco depois
 					setTimeout(function() {
 						verificarMesSelecionadoURL();
 						if (typeof setActiveLink === 'function') {
 							setActiveLink();
-						}
-						// Atualizar links do sidebar com filtro de mês
-						if (typeof atualizarLinksComFiltroMes === 'function') {
-							atualizarLinksComFiltroMes();
 						}
 					}, 100);
 				} else {
@@ -323,10 +329,12 @@
 	}
 	
 	// Função para selecionar um mês
-		// ...existing code...
-		// ...existing code...
 	function selecionarMes(mesId, btnElement) {
-		console.log('selecionarMes chamado com mesId:', mesId);
+		// Atualiza os links da sidebar com o novo mês ANTES de recarregar a página
+		if (typeof atualizarLinksComFiltroMes === 'function') {
+			atualizarLinksComFiltroMes(mesId);
+		}
+
 		$('.btn-mes').removeClass('active');
 		btnElement.addClass('active');
 	
@@ -343,47 +351,35 @@
 			var $iframe = $(this).find('iframe');
 			if ($iframe.length) {
 				var iframeSrc = $iframe.attr('src') || '';
-				console.log('Aba', index, 'iframe src original:', iframeSrc);
 	
 				// Verifica se o src contém alguma das páginas ignoradas
 				if (paginasIgnoradas.some(function(pagina) { return iframeSrc.includes(pagina); })) {
-					console.log('Aba', index, 'pulada (página ignorada).');
 					iframesIgnorados++;
 					return;
 				}
 	
-				// ...restante do código...
 				if (iframeSrc.charAt(0) === '/') {
 					iframeSrc = iframeSrc.substring(1);
-					console.log('Aba', index, 'src sem barra inicial:', iframeSrc);
 				}
 				if (!iframeSrc.toLowerCase().startsWith('snci/snci_avaliacoes_automatizadas/')) {
 					iframeSrc = 'snci/SNCI_AVALIACOES_AUTOMATIZADAS/' + iframeSrc;
-					console.log('Aba', index, 'src com prefixo:', iframeSrc);
 				}
 	
 				var urlObj = new URL(iframeSrc, window.location.origin);
-				console.log('Aba', index, 'URL antes do filtro:', urlObj.pathname + urlObj.search);
-	
 				urlObj.searchParams.set('mesFiltro', mesId);
-				console.log('Aba', index, 'URL final:', urlObj.pathname + urlObj.search);
 	
 				$iframe.attr('src', urlObj.pathname + urlObj.search);
 				recarregouAlguma = true;
-			} else {
-				console.log('Aba', index, 'não possui iframe');
 			}
 		});
 	
+		// Se a página atual não usa iframes (como aa_deficiencias_controle), recarrega a página inteira.
 		if (!recarregouAlguma && iframesIgnorados === 0) {
-			console.log('Nenhuma aba com iframe encontrada para recarregar, recarregando página principal');
 			var urlAtual = new URL(window.location);
 			urlAtual.searchParams.set('mesFiltro', mesId);
-			console.log('URL principal:', urlAtual.toString());
 			window.location.href = urlAtual.toString();
 		}
 	}
-	// ...existing code...
 
 
 </script>

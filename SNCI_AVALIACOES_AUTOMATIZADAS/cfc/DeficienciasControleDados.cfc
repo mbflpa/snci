@@ -195,29 +195,20 @@
         <cfset var dadosBrutos = buscarDadosCompletos(arguments.sk_mcu, arguments.mesAnoFiltro)>
         <cfset var resultado = structNew()>
         
-        <!--- Para resumo geral com filtro, usar dados históricos acumulados --->
-        <cfif len(trim(arguments.mesAnoFiltro)) AND structKeyExists(dadosBrutos, "dadosHistoricosAcumulados")>
-            <cfset resultado.dadosHistoricos = {
-                testesEnvolvidos = dadosBrutos.dadosHistoricosAcumulados.testesEnvolvidos,
-                totalEventos = dadosBrutos.dadosHistoricosAcumulados.totalEventos,
-                testesAplicados = dadosBrutos.dadosHistoricosAcumulados.testesAplicados,
-                conformes = dadosBrutos.dadosHistoricosAcumulados.conformes,
-                deficienciasControle = dadosBrutos.dadosHistoricosAcumulados.deficienciasControle,
-                valorEnvolvido = dadosBrutos.dadosHistoricosAcumulados.valorEnvolvido,
-                reincidencia = dadosBrutos.dadosHistoricosAcumulados.reincidencia
-            }>
-        <cfelse>
-            <!--- Para casos sem filtro, usar dados históricos normais --->
-            <cfset resultado.dadosHistoricos = {
-                testesEnvolvidos = dadosBrutos.dadosHistoricos.testesEnvolvidos,
-                totalEventos = dadosBrutos.dadosHistoricos.totalEventos,
-                testesAplicados = dadosBrutos.dadosHistoricos.testesAplicados,
-                conformes = dadosBrutos.dadosHistoricos.conformes,
-                deficienciasControle = dadosBrutos.dadosHistoricos.deficienciasControle,
-                valorEnvolvido = dadosBrutos.dadosHistoricos.valorEnvolvido,
-                reincidencia = dadosBrutos.dadosHistoricos.reincidencia
-            }>
-        </cfif>
+        <!--- 
+            A query 'rsDadosHistoricos' dentro de 'buscarDadosCompletos' já aplica o filtro de mês.
+            Portanto, podemos usar diretamente 'dadosBrutos.dadosHistoricos' em todos os casos.
+            A lógica anterior usava incorretamente 'dadosHistoricosAcumulados' quando um filtro era aplicado.
+        --->
+        <cfset resultado.dadosHistoricos = {
+            testesEnvolvidos = dadosBrutos.dadosHistoricos.testesEnvolvidos,
+            totalEventos = dadosBrutos.dadosHistoricos.totalEventos,
+            testesAplicados = dadosBrutos.dadosHistoricos.testesAplicados,
+            conformes = dadosBrutos.dadosHistoricos.conformes,
+            deficienciasControle = dadosBrutos.dadosHistoricos.deficienciasControle,
+            valorEnvolvido = dadosBrutos.dadosHistoricos.valorEnvolvido,
+            reincidencia = dadosBrutos.dadosHistoricos.reincidencia
+        }>
 
         <cfreturn resultado>
     </cffunction>
