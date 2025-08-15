@@ -708,6 +708,8 @@
                 ]
             });
 
+
+                      
             tour.addStep({
                 title: 'Assunto reincidente',
                 text: 'Assuntos reincidentes são aqueles com, pelo menos, um evento aparecendo no mês atual e também no mês anterior.',
@@ -715,30 +717,26 @@
                     element: '.badge-reincidente',
                     on: 'right'
                 },
-                buttons: [
-                    {
-                        action() { return this.cancel(); },
-                        classes: 'shepherd-button-secondary',
-                        text: 'Fechar'
-                    },
-                    {
-                        action() { return this.back(); },
-                        classes: 'shepherd-button-secondary',
-                        text: 'Voltar'
-                    },
-                    {
-                        action() { return this.next(); },
-                        text: 'Avançar'
+                beforeShowPromise: function() {
+                    return new Promise(function(resolve) {
+                        // Se não existe nenhum .badge-reincidente, insere temporariamente
+                        if ($('.badge-reincidente').length === 0) {
+                            var $card = $('.period-card.current').first();
+                            if ($card.length) {
+                                var $eventos = $card.find('.eventos-container');
+                                if ($eventos.length) {
+                                    $eventos.append('<span class="badge-reincidente tour-temp">Reincidente</span>');
+                                }
+                            }
+                        }
+                        resolve();
+                    });
+                },
+                when: {
+                    hide: function() {
+                        // Remove o badge temporário após o passo do tour
+                        $('.badge-reincidente.tour-temp').remove();
                     }
-                ]
-            });
-
-            tour.addStep({
-                title: 'Valor Envolvido',
-                text: 'Sempre que eventos apresentarem valores envolvidos, o total do mês será exibido no cartão correspondente.',
-                attachTo: {
-                    element: '.valor-envolvido',
-                    on: 'right'
                 },
                 buttons: [
                     {
@@ -757,6 +755,54 @@
                     }
                 ]
             });
+            
+                        // ...existing code...
+            tour.addStep({
+                title: 'Valor Envolvido',
+                text: 'Sempre que eventos apresentarem valores envolvidos, o total do mês será exibido no cartão correspondente.',
+                attachTo: {
+                    element: '.valor-envolvido',
+                    on: 'right'
+                },
+                beforeShowPromise: function() {
+                    return new Promise(function(resolve) {
+                        // Se não existe nenhum .valor-envolvido, insere temporariamente
+                        if ($('.valor-envolvido').length === 0) {
+                            var $card = $('.period-card.current').first();
+                            if ($card.length) {
+                                var $eventos = $card.find('.eventos-container');
+                                if ($eventos.length) {
+                                    $eventos.append('<span class="valor-envolvido tour-temp">R$0,00</span>');
+                                }
+                            }
+                        }
+                        resolve();
+                    });
+                },
+                when: {
+                    hide: function() {
+                        // Remove o valor temporário após o passo do tour
+                        $('.valor-envolvido.tour-temp').remove();
+                    }
+                },
+                buttons: [
+                    {
+                        action() { return this.cancel(); },
+                        classes: 'shepherd-button-secondary',
+                        text: 'Fechar'
+                    },
+                    {
+                        action() { return this.back(); },
+                        classes: 'shepherd-button-secondary',
+                        text: 'Voltar'
+                    },
+                    {
+                        action() { return this.next(); },
+                        text: 'Avançar'
+                    }
+                ]
+            });
+            // ...existing code...
 
             tour.addStep({
                 title: 'Informações sobre o Assunto',
