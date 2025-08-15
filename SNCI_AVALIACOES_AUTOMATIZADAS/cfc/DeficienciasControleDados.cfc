@@ -195,20 +195,29 @@
         <cfset var dadosBrutos = buscarDadosCompletos(arguments.sk_mcu, arguments.mesAnoFiltro)>
         <cfset var resultado = structNew()>
         
-        <!--- 
-            A query 'rsDadosHistoricos' dentro de 'buscarDadosCompletos' já aplica o filtro de mês.
-            Portanto, podemos usar diretamente 'dadosBrutos.dadosHistoricos' em todos os casos.
-            A lógica anterior usava incorretamente 'dadosHistoricosAcumulados' quando um filtro era aplicado.
-        --->
-        <cfset resultado.dadosHistoricos = {
-            testesEnvolvidos = dadosBrutos.dadosHistoricos.testesEnvolvidos,
-            totalEventos = dadosBrutos.dadosHistoricos.totalEventos,
-            testesAplicados = dadosBrutos.dadosHistoricos.testesAplicados,
-            conformes = dadosBrutos.dadosHistoricos.conformes,
-            deficienciasControle = dadosBrutos.dadosHistoricos.deficienciasControle,
-            valorEnvolvido = dadosBrutos.dadosHistoricos.valorEnvolvido,
-            reincidencia = dadosBrutos.dadosHistoricos.reincidencia
-        }>
+        <!--- Para resumo geral com filtro, usar dados históricos acumulados --->
+        <cfif len(trim(arguments.mesAnoFiltro)) AND structKeyExists(dadosBrutos, "dadosHistoricosAcumulados")>
+            <cfset resultado.dadosHistoricos = {
+                testesEnvolvidos = dadosBrutos.dadosHistoricosAcumulados.testesEnvolvidos,
+                totalEventos = dadosBrutos.dadosHistoricosAcumulados.totalEventos,
+                testesAplicados = dadosBrutos.dadosHistoricosAcumulados.testesAplicados,
+                conformes = dadosBrutos.dadosHistoricosAcumulados.conformes,
+                deficienciasControle = dadosBrutos.dadosHistoricosAcumulados.deficienciasControle,
+                valorEnvolvido = dadosBrutos.dadosHistoricosAcumulados.valorEnvolvido,
+                reincidencia = dadosBrutos.dadosHistoricosAcumulados.reincidencia
+            }>
+        <cfelse>
+            <!--- Para casos sem filtro, usar dados históricos normais --->
+            <cfset resultado.dadosHistoricos = {
+                testesEnvolvidos = dadosBrutos.dadosHistoricos.testesEnvolvidos,
+                totalEventos = dadosBrutos.dadosHistoricos.totalEventos,
+                testesAplicados = dadosBrutos.dadosHistoricos.testesAplicados,
+                conformes = dadosBrutos.dadosHistoricos.conformes,
+                deficienciasControle = dadosBrutos.dadosHistoricos.deficienciasControle,
+                valorEnvolvido = dadosBrutos.dadosHistoricos.valorEnvolvido,
+                reincidencia = dadosBrutos.dadosHistoricos.reincidencia
+            }>
+        </cfif>
 
         <cfreturn resultado>
     </cffunction>
@@ -471,25 +480,21 @@
                         WHERE Und_Codigo = <cfqueryparam value="#lotacaoAtualUsuario#" cfsqltype="cf_sql_varchar">
                     </cfquery>
                     
-                    <!--- Se a lotação atual não existe, usar UPDATE mais permissivo --->
+                    <!--- Fazer UPDATE --->
+                    <cfquery name="updateLotacao" datasource="#application.dsn_avaliacoes_automatizadas#" result="updateResult">
+                        UPDATE Usuarios 
+                        SET Usu_Lotacao = <cfqueryparam value="#arguments.codigoUnidade#" cfsqltype="cf_sql_varchar">,
+                            Usu_LotacaoNome = <cfqueryparam value="#verificaUnidadeDestino.Und_Descricao#" cfsqltype="cf_sql_varchar">
+                        WHERE Usu_Login = 
+                            <cfif (FindNoCase("localhost", application.auxsite))>
+                                'CORREIOSNET\80859992'
+                            <cfelse>     
+                                <cfqueryparam value="#application.loginCGI#" cfsqltype="cf_sql_varchar">
+                            </cfif>
+                    </cfquery>
+
+                    <!--- Se a lotação atual não existe, customizar a mensagem --->
                     <cfif verificaLotacaoAtual.total EQ 0>
-                        <!--- Temporariamente, definir lotação como NULL ou usar MERGE --->
-                        <cfquery name="updateLotacaoComProblema" datasource="#application.dsn_avaliacoes_automatizadas#" result="updateResult">
-                            UPDATE Usuarios 
-                            SET Usu_Lotacao = <cfqueryparam value="#arguments.codigoUnidade#" cfsqltype="cf_sql_varchar">,
-                                Usu_LotacaoNome = <cfqueryparam value="#verificaUnidadeDestino.Und_Descricao#" cfsqltype="cf_sql_varchar">
-                           WHERE Usu_Login = 
-                                <cfif (FindNoCase("localhost", application.auxsite))>
-                                    'CORREIOSNET\80859992'
-                                <cfelse>     
-                                    <cfqueryparam value="#application.loginCGI#" cfsqltype="cf_sql_varchar">
-                                </cfif>
-                            AND NOT EXISTS (
-                                SELECT 1 FROM Unidades u 
-                                WHERE u.Und_Codigo = Usuarios.Usu_Lotacao
-                            )
-                        </cfquery>
-                        
                         <cfset result = {
                             "success": true,
                             "message": "Lotação atualizada (corrigida lotação inválida anterior: '#lotacaoAtualUsuario#')",
@@ -498,19 +503,6 @@
                             "observacao": "Usuário tinha lotação inexistente"
                         }>
                     <cfelse>
-                        <!--- Fazer UPDATE normal --->
-                        <cfquery name="updateLotacao" datasource="#application.dsn_avaliacoes_automatizadas#" result="updateResult">
-                            UPDATE Usuarios 
-                            SET Usu_Lotacao = <cfqueryparam value="#arguments.codigoUnidade#" cfsqltype="cf_sql_varchar">,
-                                Usu_LotacaoNome = <cfqueryparam value="#verificaUnidadeDestino.Und_Descricao#" cfsqltype="cf_sql_varchar">
-                            WHERE Usu_Login = 
-                                <cfif (FindNoCase("localhost", application.auxsite))>
-                                    'CORREIOSNET\80859992'
-                                <cfelse>     
-                                    <cfqueryparam value="#application.loginCGI#" cfsqltype="cf_sql_varchar">
-                                </cfif>
-                        </cfquery>
-                        
                         <cfset result = {
                             "success": true,
                             "message": "Lotação atualizada com sucesso",
