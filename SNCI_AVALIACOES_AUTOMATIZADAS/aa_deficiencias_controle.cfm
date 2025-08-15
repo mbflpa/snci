@@ -659,7 +659,7 @@
             
             tour.addStep({
                 title: 'Navegação dos Assuntos',
-                text: 'Use estas setas para navegar entre os diferentes assuntos ou use a barra de rolagem na parte inferior desta seção.',
+                text: 'Use as setas para navegar entre os diferentes assuntos ou use a barra de rolagem na parte inferior desta seção.',
                 attachTo: {
                     element: '.carousel-controls',
                     on: 'top'
@@ -685,7 +685,7 @@
 
             tour.addStep({
                 title: 'Visualizar Evidências',
-                text: 'Este ícone <i class="fa-solid fa-eye"></i> aparece no canto superior do cartão do último mês avaliado. Com um clique sobre a quantidade de eventos, é possível visualizar as evidências de forma detalhada. <br><span style="color: red;">Obs.: As evidências só estarão disponíveis para o último mês avaliado.</span>',
+                text: 'Este ícone <i class="fa-solid fa-eye"></i> aparecerá no canto superior direito do cartão do último mês avaliado, sempre que as evidências estiverem disponíveis. Com um clique sobre a quantidade de eventos, é possível visualizar as evidências de forma detalhada. <br><span style="color: red;">Obs.: As evidências só estarão disponíveis para o último mês avaliado.</span>',
                 attachTo: {
                     element: '.current',
                     on: 'top-end'
@@ -712,7 +712,7 @@
                       
             tour.addStep({
                 title: 'Assunto reincidente',
-                text: 'Assuntos reincidentes são aqueles com, pelo menos, um evento aparecendo no mês atual e também no mês anterior.',
+                text: 'Quando o Assunto for reincidente, a indicação aparecerá no cartão correspondente. Assuntos reincidentes são aqueles com, pelo menos, um evento aparecendo no mês atual e também no mês anterior.',
                 attachTo: {
                     element: '.badge-reincidente',
                     on: 'right'
